@@ -1,0 +1,4 @@
+.main-image-container {
+    height: 30vh;
+    object-fit: cover;
+}
