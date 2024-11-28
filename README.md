@@ -1,6 +1,9 @@
 # SpringWebProject
 
-## 폴더 구조
+### Spring 프로젝트명 : home
+### React 프로젝트명 : react-home
+
+## Spring 프로젝트 폴더 구조
 
 ```
 /프로젝트명
