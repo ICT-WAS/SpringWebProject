@@ -39,6 +39,16 @@ p {
     font-size: 12px;
 }
 
+.filter-category {
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  .filter-values {
+    font-weight: 400;
+    font-size: 16px;
+  }
+
 * {
     font-family: "Inter", sans-serif;
     font-optical-sizing: auto;
