@@ -1,4 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 .main-image-container {
+    width: 100%; /* Container의 가로에 맞추기 */
+    overflow: hidden; /* 넘치는 부분을 잘라냄 */
     height: 30vh;
-    object-fit: cover;
+}
+
+.main-image {
+    object-fit: cover; /* 가로에 맞추고 세로는 비율에 맞게 크롭 */
+  width: 100%;
+  height: 100%;
+}
+
+p {
+    flex-grow: 0;
+  flex-shrink: 0;
+  font-size: 24px;
+  text-align: left;
+  color: #000;
+}
+
+.nav-bar-links {
+  font-size: 16px;
+  color: #1e1e1e;
+}
+
+.heading-text {
+    font-weight: 600;
+}
+
+.card-header-text {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.card-body-text {
+    color: #B3B3B3;
+    font-size: 12px;
+}
+
+* {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
 }
