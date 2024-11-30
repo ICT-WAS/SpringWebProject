@@ -6,7 +6,6 @@ import com.ict.home.user.dto.PostUserReq;
 import com.ict.home.user.dto.PostUserRes;
 import com.ict.home.util.AES128;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +24,7 @@ public class UserService {
      * 회원가입
      */
     @Transactional
-    public PostUserRes createUser(PostUserReq postUserReq) throws BaseException{
+    public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
         //이메일 중복 검증
         if (userRepository.findByEmailCount(postUserReq.getEmail()) >= 1) {
             throw new BaseException(POST_USERS_EXISTS_EMAIL);

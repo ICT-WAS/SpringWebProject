@@ -31,4 +31,5 @@ public class UserController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
 }

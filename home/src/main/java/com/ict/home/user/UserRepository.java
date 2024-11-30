@@ -13,4 +13,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Integer findByEmailCount(@Param("email") String email);
 
     Optional<User> findByEmail(String email);  //JPA
+
 }

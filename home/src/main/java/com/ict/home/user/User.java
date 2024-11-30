@@ -3,7 +3,6 @@ package com.ict.home.user;
 import com.ict.home.util.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Entity
