@@ -4,6 +4,7 @@ import com.ict.home.exception.BaseException;
 import com.ict.home.exception.BaseResponse;
 import com.ict.home.user.dto.PostLoginReq;
 import com.ict.home.user.dto.PostLoginRes;
+
 import com.ict.home.user.dto.PostUserReq;
 import com.ict.home.user.dto.PostUserRes;
 import jakarta.validation.Valid;
@@ -45,5 +46,4 @@ public class UserController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
-
 }

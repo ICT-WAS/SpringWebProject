@@ -8,6 +8,7 @@ import com.ict.home.login.jwt.Token;
 import com.ict.home.login.jwt.TokenRepository;
 import com.ict.home.user.dto.PostLoginReq;
 import com.ict.home.user.dto.PostLoginRes;
+
 import com.ict.home.user.dto.PostUserReq;
 import com.ict.home.user.dto.PostUserRes;
 import com.ict.home.util.AES128;
@@ -15,8 +16,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
-
 import static com.ict.home.exception.BaseResponseStatus.*;
+
+import static com.ict.home.exception.BaseResponseStatus.PASSWORD_ENCRYPTION_ERROR;
+import static com.ict.home.exception.BaseResponseStatus.POST_USERS_EXISTS_EMAIL;
+
 
 @EnableTransactionManagement
 @Service

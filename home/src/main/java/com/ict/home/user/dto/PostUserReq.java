@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostUserReq {
+
     @NotNull(message = "사용자 이름은 필수 항목입니다.")
     private String username;  //사용자가 입력한 아이디, 닉네임
 
