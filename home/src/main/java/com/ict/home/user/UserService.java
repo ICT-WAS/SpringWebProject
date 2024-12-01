@@ -112,5 +112,4 @@ public class UserService {
     public boolean checkUsernameExists(String username) {
         return userRepository.existsByUsername(username);
     }
-
 }

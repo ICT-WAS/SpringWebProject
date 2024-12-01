@@ -64,6 +64,4 @@ public class UserController {
     public boolean checkUsername(@RequestParam("username") String username) {
         return userService.checkUsernameExists(username);
     }
-
-
 }
