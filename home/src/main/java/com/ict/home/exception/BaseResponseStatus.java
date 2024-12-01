@@ -26,12 +26,13 @@ public enum BaseResponseStatus {
     /**
      * 3000: Response 오류
      */
-
+    FAILED_TO_LOGIN(false,3001,"이메일과 비밀번호를 다시 확인해주세요."),
 
     /**
      * 4000: Database, Server 오류
      */
-    PASSWORD_ENCRYPTION_ERROR(false, 4011, "비밀번호 암호화에 실패하였습니다.");
+    PASSWORD_ENCRYPTION_ERROR(false, 4001, "비밀번호 암호화에 실패하였습니다."),
+    PASSWORD_DECRYPTION_ERROR(false, 4002, "비밀번호 복호화에 실패하였습니다.");
 
     private final boolean isSuccess;
     private final int code;
