@@ -38,7 +38,7 @@ public class UserService {
     @Transactional
     public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
         //이메일 중복 검증
-        if (userRepository.findByEmailCount(postUserReq.getEmail()) >= 1) {
+        if (userRepository.existsByEmail(postUserReq.getEmail())) {
             throw new BaseException(POST_USERS_EXISTS_EMAIL);
         }
 
@@ -97,4 +97,20 @@ public class UserService {
             throw new BaseException(FAILED_TO_LOGIN);
         }
     }
+
+    /**
+     * 비동기 처리를 위한 email 중복 체크
+     */
+    public boolean checkEmailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public boolean checkPhoneNumberExists(String phoneNumber) {
+        return userRepository.existsByPhoneNumber(phoneNumber);
+    }
+
+    public boolean checkUsernameExists(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
 }

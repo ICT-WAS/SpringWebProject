@@ -46,4 +46,24 @@ public class UserController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 비동기 처리를 위한 email & phoneNumber 중복 체크
+     */
+    @GetMapping("/check-email")
+    public boolean checkEmail(@RequestParam("email") String email) {
+        return userService.checkEmailExists(email);
+    }
+
+    @GetMapping("/check-phone")
+    public boolean checkPhoneNumber(@RequestParam("phone") String phone) {
+        return userService.checkPhoneNumberExists(phone);
+    }
+
+    @GetMapping("/check-username")
+    public boolean checkUsername(@RequestParam("username") String username) {
+        return userService.checkUsernameExists(username);
+    }
+
+
 }
