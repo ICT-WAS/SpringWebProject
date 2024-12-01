@@ -9,9 +9,10 @@
   padding: 24px;
   gap: 24px;
 
-  width: 600px;
+  width: 100%;
   min-width: 320px;
-  height: 622px;
+  max-width: 622px;
+  min-height: 622px;
 
   background: #ffffff;
   border: 1px solid #d9d9d9;
@@ -23,10 +24,19 @@
   flex-grow: 0;
 }
 
-.form-group {
+.form-container-signin {
+  /* Add styling specific to the sign-in section */
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: flex-start;
+  width: 100%;
+  gap: 16px; /* Adjust gap between form groups */
+}
+
+.form-group {
+  /* Example styling for form group, adjust as needed */
+  display: flex;
+  flex-direction: column;
   width: 100%;
 }
 
@@ -39,6 +49,8 @@
   padding: 8px;
   border: 1px solid #d9d9d9;
   border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .submit-button {
@@ -53,3 +65,12 @@
 .submit-button:hover {
   background-color: #45a049;
 }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+/* 휴대전화 */

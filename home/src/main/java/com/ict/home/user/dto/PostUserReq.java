@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 public class PostUserReq {
 
     @NotNull(message = "사용자 이름은 필수 항목입니다.")
+    @Size(min = 2, max = 12, message = "사용자 이름은 2자 이상 12자 이하로 입력해주세요.")
     private String username;  //사용자가 입력한 아이디, 닉네임
 
     @NotNull(message = "이메일은 필수 항목입니다.")
