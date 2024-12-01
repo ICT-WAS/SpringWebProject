@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 
-//@Entity
+@Entity
 @Builder
 @Getter
 @AllArgsConstructor
