@@ -2,12 +2,19 @@ import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import { Container, Row, Col, Button, Card, CardBody } from "react-bootstrap";
 import LoginStateButton from "../components/login/LoginStateButton";
+import { useNavigate } from "react-router-dom";
 
 function Logo() {
+  const navigate = useNavigate();
+
+  function handleLogoClick() {
+    navigate("/");
+  }
+
   return (
     <>
-      <a
-        href="#"
+      <Button variant="link"
+        onClick={handleLogoClick}
         className="link-body-emphasis link-underline link-underline-opacity-0"
       >
         <Container>
@@ -22,7 +29,7 @@ function Logo() {
             </Col>
           </Row>
         </Container>
-      </a>
+      </Button>
     </>
   );
 }
@@ -41,19 +48,24 @@ function SearchField() {
 }
 
 function NavBar() {
+  const navigate = useNavigate();
+
+  function handleListClick() {
+    navigate("/list");
+  }
+                
   return (
     <>
       <Container>
         <Row className="align-items-center">
           <Col md="auto">
-            <p className="nav-bar-links">
-              <a
-                href="#"
+              <Button variant="link" onClick={handleListClick}
                 className="link-body-emphasis link-underline link-underline-opacity-0"
               >
+                <p className="nav-bar-links">
                 청약 공고
-              </a>
-            </p>
+                </p>
+              </Button>
           </Col>
 
           <Col md="auto">
