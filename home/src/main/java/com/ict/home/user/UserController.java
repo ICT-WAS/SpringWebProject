@@ -7,8 +7,11 @@ import com.ict.home.user.dto.PostLoginRes;
 
 import com.ict.home.user.dto.PostUserReq;
 import com.ict.home.user.dto.PostUserRes;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -39,10 +42,22 @@ public class UserController {
      * 로그인
      */
     @PostMapping("/login")
-    public BaseResponse<PostLoginRes> loginUser(@RequestBody @Valid PostLoginReq postLoginReq) {
+    public BaseResponse<PostLoginRes> login(@RequestBody @Valid PostLoginReq postLoginReq, HttpServletResponse response) {
         try{
-            return new BaseResponse<>(userService.localLogin(postLoginReq));
+            return new BaseResponse<>(userService.localLogin(postLoginReq, response));
         } catch(BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 로그아웃
+     */
+    @PostMapping("/logout")
+    public BaseResponse<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        try{
+            return new BaseResponse<>(userService.logout(request, response));
+        } catch (BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
     }

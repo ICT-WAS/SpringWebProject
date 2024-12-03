@@ -57,11 +57,11 @@ const Email = ({ email, setEmail }) => {
 
   return (
     <div className="form-group">
-      <label htmlFor="email">Email</label>
+      <label htmlFor="signup-email">Email</label>
       <input
         type="email"
-        id="email"
-        name="email"
+        id="signup-email"
+        name="signup-email"
         value={email}
         onBlur={check}
         onChange={handleChange}

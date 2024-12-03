@@ -56,7 +56,7 @@ const Phone = ({ phoneNumber, setPhoneNumber }) => {
     }
   };
 
-  //형식 맞추기
+  //휴대폰 번호(000-0000-0000) 형식 맞추기
   const formatPhoneNumber = (phoneNumber) => {
     //숫자만 추출
     const onlyNumber = phoneNumber.replace(/[^0-9]/g, "");
@@ -74,21 +74,27 @@ const Phone = ({ phoneNumber, setPhoneNumber }) => {
   };
 
   return (
-    <div className="form-group">
+    <div className="form-group-phone">
       <label htmlFor="phoneNumber">휴대폰 번호</label>
-      <input
-        type="phoneNumber"
-        id="phoneNumber"
-        name="phoneNumber"
-        value={phoneNumber}
-        onBlur={check}
-        onChange={handleChange}
-        placeholder="휴대폰 번호를 입력해주세요."
-      />
-      {error && <span style={{ color: "red" }}>{error}</span>}
-      <button type="submit" className="phone-auth-button">
-        인증하기
-      </button>
+      <div className="input-group">
+        <input
+          type="phoneNumber"
+          id="phoneNumber"
+          name="phoneNumber"
+          value={phoneNumber}
+          onBlur={check}
+          onChange={handleChange}
+          placeholder="휴대폰 번호를 입력해주세요."
+        />
+        <button type="submit" className="phone-auth-button">
+          인증하기
+        </button>
+      </div>
+      {error && (
+        <span className="error-message" style={{ color: "red" }}>
+          {error}
+        </span>
+      )}
     </div>
   );
 };

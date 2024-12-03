@@ -2,6 +2,7 @@ package com.ict.home.user.dto;
 
 import com.ict.home.login.dto.JwtResponseDto;
 import com.ict.home.user.User;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,11 +18,9 @@ import lombok.Setter;
 public class PostLoginRes {
     private Long UserId;
     private String accessToken;
-    private String refreshToken;
 
-    public PostLoginRes(User user, JwtResponseDto jwtResponseDto) {
+    public PostLoginRes(User user, String accessToken) {
         this.UserId = user.getId();
-        this.accessToken = jwtResponseDto.getAccessToken();
-        this.refreshToken = jwtResponseDto.getRefreshToken();
+        this.accessToken = accessToken;
     }
 }
