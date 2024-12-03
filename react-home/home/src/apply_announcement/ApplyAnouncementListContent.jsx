@@ -1,4 +1,4 @@
-import { Button, Card, Stack, Table } from 'react-bootstrap';
+import { Button, Card, Dropdown, Stack, Table } from 'react-bootstrap';
 import { Container, Row, Col } from 'react-bootstrap';
 import FilteredTag from './FilteredTag';
 import Nav from 'react-bootstrap/Nav';
@@ -38,6 +38,7 @@ function NewSubscriptionCard({ subscription }) {
   );
 }
 
+/* 모집공고 */
 function NewSubscriptionCards() {
   /* 임시 데이터 */
   const subscriptions = [
@@ -54,9 +55,21 @@ function NewSubscriptionCards() {
   return (
     <>
       <p className='heading-text'>
-        모집공고
-      </p>
+          모집공고
+        </p>
+        <p className='card-body-text mb-0'>0,000 건</p>
+
       <Stack direction='vertical' gap={3}>
+      <Dropdown className="ms-auto px-3">
+          <Dropdown.Toggle variant="warning" className='dropdown-transparent' >
+            최신순
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item href="#/action-1">오래된순</Dropdown.Item>
+            <Dropdown.Item href="#/action-2">어쩌고</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+
         {newSubscriptionList}
       </Stack>
     </>
@@ -66,30 +79,68 @@ function NewSubscriptionCards() {
 function Filters() {
   return (
     <>
+      <Stack direction='horizontal' gap={2} style={{ alignItems: 'flex-end' }}>
 
-      <Container>
-        <Row>
-          <Col>
-            <p className='filter-category'>
-              희망지역
-            </p>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Stack direction="horizontal" gap={2}>
-              <FilteredTag filterName={'서울 전체'} />
-              <FilteredTag filterName={'경기도 광명시'} />
-              <FilteredTag filterName={'경기도 성남시'} />
-            </Stack>
-          </Col>
-        </Row>
-      </Container>
-      <div>
-        <p className='filter-values'>
 
-        </p>
-      </div>
+        <Container>
+          <Row>
+            <Col>
+              <p className='filter-category mb-2'>
+                희망지역
+              </p>
+            </Col>
+          </Row>
+          <Row className='mb-3'>
+            <Col>
+              <Stack direction="horizontal" gap={2}>
+                <FilteredTag filterName={'서울 전체'} />
+                <FilteredTag filterName={'경기도 광명시'} />
+                <FilteredTag filterName={'경기도 성남시'} />
+              </Stack>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col>
+              <p className='filter-category mb-2'>
+                주택정보
+              </p>
+            </Col>
+          </Row>
+          <Row className='mb-3'>
+            <Col>
+              <Stack direction="horizontal" gap={2}>
+                <FilteredTag filterName={'국민주택'} />
+                <FilteredTag filterName={'85m² 미만'} />
+                <FilteredTag filterName={'3억 이상 4억 미만'} />
+                <FilteredTag filterName={'생애최초'} />
+              </Stack>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col>
+              <p className='filter-category mb-2'>
+                모집기간
+              </p>
+            </Col>
+          </Row>
+          <Row className='mb-3'>
+            <Col>
+              <Stack direction="horizontal" gap={2}>
+                <FilteredTag filterName={'접수중'} />
+                <FilteredTag filterName={'일반공급접수기간:'} />
+              </Stack>
+            </Col>
+          </Row>
+
+        </Container>
+
+
+        <Button variant='dark' style={{ whiteSpace: 'nowrap' }}>
+          0,000 건의 공고 보기
+        </Button>
+      </Stack>
     </>
   );
 }
@@ -359,11 +410,11 @@ function ApplicationPeriod() {
             <Table hover borderless>
               <tbody>
                 <tr>
-                  <td>국민주택</td></tr>
+                  <td>접수전</td></tr>
                 <tr>
-                  <td>민영주택</td></tr>
+                  <td>접수중</td></tr>
                 <tr>
-                  <td>무순위</td></tr>
+                  <td>계약중</td></tr>
               </tbody>
 
             </Table>
@@ -379,11 +430,50 @@ function ApplicationPeriod() {
             <Table hover borderless>
               <tbody>
                 <tr>
-                  <td>국민주택</td></tr>
+                  <td>
+                    <Dropdown>
+                      <Dropdown.Toggle variant="warning" className='dropdown-transparent' >
+                        공급접수시작일
+                      </Dropdown.Toggle>
+
+                      <Dropdown.Menu>
+                        <Dropdown.Item href="#/action-1">일반공급접수시작일</Dropdown.Item>
+                        <Dropdown.Item href="#/action-2">특별공급접수시작일</Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </td>
+                  <td>
+                    2024-01-01
+                  </td>
+                  <td>
+                    <Button className='btn-transparent'>
+                      <i className='bi bi-calendar' />
+                    </Button>
+                  </td>
+                </tr>
                 <tr>
-                  <td>민영주택</td></tr>
-                <tr>
-                  <td>무순위</td></tr>
+                  <td>
+                    <Dropdown>
+                      <Dropdown.Toggle variant="warning" className='dropdown-transparent' >
+                        공급접수종료일
+                      </Dropdown.Toggle>
+
+                      <Dropdown.Menu>
+                        <Dropdown.Item href="#/action-1">일반공급접수종료일</Dropdown.Item>
+                        <Dropdown.Item href="#/action-2">특별공급접수종료일</Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </td>
+                  <td>
+                    2024-01-01
+                  </td>
+                  <td>
+                    <Button className='btn-transparent'>
+                      <i className='bi bi-calendar' />
+                    </Button>
+                  </td>
+                </tr>
+
               </tbody>
 
             </Table>
