@@ -1,8 +1,10 @@
-import { Card, Image, Stack } from 'react-bootstrap';
+import { Button, Card, Stack, Table } from 'react-bootstrap';
 import { Container, Row, Col } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
-import CommunityCard from '../community/CommunityCard';
+import FilteredTag from './FilteredTag';
+import Nav from 'react-bootstrap/Nav';
+import React, { useState } from 'react';
 
 function NotificationButton() {
   return (
@@ -22,7 +24,7 @@ function NotificationButton() {
   );
 }
 
-function NewSubscriptionCard({subscription}) {
+function NewSubscriptionCard({ subscription }) {
   return (
     <>
       <Container>
@@ -32,9 +34,9 @@ function NewSubscriptionCard({subscription}) {
               <Container>
                 <Row>
                   <Col><p className='card-header-text'>
-          <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
-                  {subscription.title}
-                  </a>
+                    <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
+                      {subscription.title}
+                    </a>
                   </p>
                   </Col>
                 </Row>
@@ -58,26 +60,24 @@ function NewSubscriptionCard({subscription}) {
 function NewSubscriptionCards() {
   /* 임시 데이터 */
   const subscriptions = [
-    {title:'화성 비봉지구 B1블록 금성백조 예미지2차', type:'민영', region:'경기도 > 화성시', date:'2024-05-02'},
-    {title:'화성 비봉지구 B1블록 금성백조 예미지2차', type:'민영', region:'경기도 > 화성시', date:'2024-05-02'},
-    {title:'화성 비봉지구 B1블록 금성백조 예미지2차', type:'민영', region:'경기도 > 화성시', date:'2024-05-02'},
-    {title:'화성 비봉지구 B1블록 금성백조 예미지2차', type:'민영', region:'경기도 > 화성시', date:'2024-05-02'}
+    { title: '화성 비봉지구 B1블록 금성백조 예미지2차', type: '민영', region: '경기도 > 화성시', date: '2024-05-02' },
+    { title: '화성 비봉지구 B1블록 금성백조 예미지2차', type: '민영', region: '경기도 > 화성시', date: '2024-05-02' },
+    { title: '화성 비봉지구 B1블록 금성백조 예미지2차', type: '민영', region: '경기도 > 화성시', date: '2024-05-02' },
+    { title: '화성 비봉지구 B1블록 금성백조 예미지2차', type: '민영', region: '경기도 > 화성시', date: '2024-05-02' }
   ];
 
   const newSubscriptionList = subscriptions.map(subscription =>
-    NewSubscriptionCard({subscription})
+    NewSubscriptionCard({ subscription })
   );
 
   return (
     <>
-    <p className='heading-text'>
-        <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
-          새로 올라온 공고 &gt;
-        </a>
+      <p className='heading-text'>
+        모집공고
       </p>
       <Stack direction='vertical' gap={3}>
         {newSubscriptionList}
-        </Stack>
+      </Stack>
     </>
   );
 }
@@ -85,34 +85,332 @@ function NewSubscriptionCards() {
 function Filters() {
   return (
     <>
-      
+
       <Container>
         <Row>
           <Col>
-          <p className='filter-category'>
-        희망지역
-      </p>
-      </Col>
+            <p className='filter-category'>
+              희망지역
+            </p>
+          </Col>
         </Row>
         <Row>
           <Col>
-          
+            <Stack direction="horizontal" gap={2}>
+              <FilteredTag filterName={'서울 전체'} />
+              <FilteredTag filterName={'경기도 광명시'} />
+              <FilteredTag filterName={'경기도 성남시'} />
+            </Stack>
           </Col>
         </Row>
       </Container>
       <div>
-      <p className='filter-values'>
+        <p className='filter-values'>
 
-      </p>
+        </p>
       </div>
     </>
   );
 }
 
 function Conditions() {
+
+  const conditionCards = {
+    WishRegion: WishRegion,
+    HomeInfo: HomeInfo,
+    ApplicationPeriod: ApplicationPeriod
+  };
+  const [selectedCondition, setSelectedCondition] = useState(conditionCards['WishRegion']());
+
+  const handleSelect = (eventKey) => {
+    if (conditionCards[eventKey]) {
+      const result = conditionCards[eventKey]();
+      setSelectedCondition(result);
+    }
+
+  };
+
   return (
     <>
+      <p className='heading-text'>
+        조건검색
+      </p>
 
+      <Nav justify variant="tabs" defaultActiveKey="WishRegion" onSelect={handleSelect} style={{ paddingRight: 0 }}>
+        <Nav.Item>
+          <Nav.Link eventKey="WishRegion">희망지역</Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey="HomeInfo">주택정보</Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey="ApplicationPeriod">모집기간</Nav.Link>
+        </Nav.Item>
+      </Nav>
+      {selectedCondition}
+    </>
+  );
+}
+
+function WishRegion() {
+  return (
+    <>
+      <Stack direction='horizontal' style={{ width: '100%', padding: '0' }} gap={1}>
+        <div className='border-div'>
+          <p className='filter-category'>
+            시/도
+          </p>
+          <hr className='p-text' />
+          <div className="scrollable-table">
+            <Table hover borderless>
+              <tbody>
+                <tr>
+                  <td>서울특별시</td></tr>
+                <tr>
+                  <td>부산광역시</td></tr>
+                <tr>
+                  <td>대구광역시</td></tr>
+                <tr>
+                  <td>인천광역시</td></tr>
+                <tr>
+                  <td>광주광역시</td></tr>
+                <tr>
+                  <td>대전광역시</td></tr>
+                <tr>
+                  <td>울산광역시</td></tr>
+                <tr>
+                  <td>세종특별자치시</td></tr>
+                <tr>
+                  <td>경기도</td></tr>
+                <tr>
+                  <td>충청북도</td></tr>
+                <tr>
+                  <td>충청남도</td></tr>
+                <tr>
+                  <td>전라남도</td></tr>
+                <tr>
+                  <td>경상북도</td></tr>
+                <tr>
+                  <td>경상남도</td></tr>
+                <tr>
+                  <td>강원특별자치도</td></tr>
+                <tr>
+                  <td>전북특별자치도</td></tr>
+                <tr>
+                  <td>제주특별자치도</td></tr>
+              </tbody>
+
+            </Table>
+          </div>
+        </div>
+
+        <div className='border-div'>
+          <p className='filter-category'>
+            구/군
+          </p>
+          <hr className='p-text' />
+          <div className="scrollable-table">
+            <Table hover borderless>
+              <tbody>
+                <tr>
+                  <td>서울시 전체</td>
+                </tr>
+                <tr>
+                  <td>서울시 전체</td>
+                </tr>
+                <tr>
+                  <td>서울시 전체</td>
+                </tr>
+                <tr>
+                  <td>서울시 전체</td>
+                </tr>
+                <tr>
+                  <td>서울시 전체</td>
+                </tr>
+                <tr>
+                  <td>서울시 전체</td>
+                </tr>
+                <tr>
+                  <td>서울시 전체</td>
+                </tr>
+                <tr>
+                  <td>서울시 전체</td>
+                </tr>
+                <tr>
+                  <td>서울시 전체</td>
+                </tr>
+                <tr>
+                  <td>서울시 전체</td>
+                </tr>
+                <tr>
+                  <td>서울시 전체</td>
+                </tr>
+                <tr>
+                  <td>서울시 전체</td>
+                </tr>
+              </tbody>
+            </Table>
+          </div>
+        </div>
+      </Stack>
+    </>
+  );
+}
+
+function HomeInfo() {
+  return (
+    <>
+      <Stack direction='horizontal' style={{ width: '100%', padding: '0' }} gap={1}>
+        <div className='border-div'>
+          <p className='filter-category'>
+            주택분류
+          </p>
+          <hr className='p-text' />
+          <div className="scrollable-table">
+            <Table hover borderless>
+              <tbody>
+                <tr>
+                  <td>국민주택</td></tr>
+                <tr>
+                  <td>민영주택</td></tr>
+                <tr>
+                  <td>무순위</td></tr>
+              </tbody>
+
+            </Table>
+          </div>
+        </div>
+
+        <div className='border-div'>
+          <p className='filter-category'>
+            면적
+          </p>
+          <hr className='p-text' />
+          <div className="scrollable-table">
+            <Table hover borderless>
+              <tbody>
+                <tr>
+                  <td>85m² 미만</td>
+                </tr>
+                <tr>
+                  <td>85m² 이상 100m² 미만</td>
+                </tr>
+                <tr>
+                  <td>85m² 미만</td>
+                </tr>
+                <tr>
+                  <td>85m² 미만</td>
+                </tr>
+                <tr>
+                  <td>85m² 미만</td>
+                </tr>
+              </tbody>
+            </Table>
+          </div>
+        </div>
+
+        <div className='border-div'>
+          <p className='filter-category'>
+            공급금액
+          </p>
+          <hr className='p-text' />
+          <div className="scrollable-table">
+            <Table hover borderless>
+              <tbody>
+                <tr>
+                  <td>1개월 이상</td>
+                </tr>
+                <tr>
+                  <td>6개월 이상</td>
+                </tr>
+                <tr>
+                  <td>1년 이상</td>
+                </tr>
+                <tr>
+                  <td>2년 이상</td>
+                </tr>
+              </tbody>
+            </Table>
+          </div>
+        </div>
+
+        <div className='border-div'>
+          <p className='filter-category'>
+            특별공급
+          </p>
+          <hr className='p-text' />
+          <div className="scrollable-table">
+            <Table hover borderless>
+              <tbody>
+                <tr>
+                  <td>다자녀가구</td>
+                </tr>
+                <tr>
+                  <td>신혼부부</td>
+                </tr>
+                <tr>
+                  <td>생애최초</td>
+                </tr>
+                <tr>
+                  <td>청년</td>
+                </tr>
+              </tbody>
+            </Table>
+          </div>
+        </div>
+
+      </Stack>
+    </>
+  );
+}
+
+function ApplicationPeriod() {
+  return (
+    <>
+      <Stack direction='horizontal' style={{ width: '100%', padding: '0' }} gap={1}>
+
+        <div className='border-div'>
+          <p className='filter-category'>
+            접수상태
+          </p>
+          <hr className='p-text' />
+          <div className="scrollable-table">
+            <Table hover borderless>
+              <tbody>
+                <tr>
+                  <td>국민주택</td></tr>
+                <tr>
+                  <td>민영주택</td></tr>
+                <tr>
+                  <td>무순위</td></tr>
+              </tbody>
+
+            </Table>
+          </div>
+        </div>
+
+        <div className='border-div'>
+          <p className='filter-category'>
+            상세조회
+          </p>
+          <hr className='p-text' />
+          <div className="scrollable-table">
+            <Table hover borderless>
+              <tbody>
+                <tr>
+                  <td>국민주택</td></tr>
+                <tr>
+                  <td>민영주택</td></tr>
+                <tr>
+                  <td>무순위</td></tr>
+              </tbody>
+
+            </Table>
+          </div>
+        </div>
+
+
+      </Stack>
     </>
   );
 }
@@ -122,25 +420,13 @@ export default function MainContent() {
     <>
       <Container>
         <Row className="mb-5">
-          <Col>
-            <div className="main-image-container">
-              <Image
-                src="https://flexible.img.hani.co.kr/flexible/normal/900/670/imgdb/original/2024/0701/20240701502688.jpg"
-                className='main-image'
-                fluid
-              />
-            </div>
-          </Col>
+          <Conditions />
         </Row>
         <Row className="mb-5">
-          <Col>
-            <Conditions />
-          </Col>
+          <Filters />
         </Row>
         <Row>
-          <Col>
-            <NewSubscriptionCards />
-          </Col>
+          <NewSubscriptionCards />
         </Row>
       </Container>
     </>

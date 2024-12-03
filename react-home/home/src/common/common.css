@@ -15,13 +15,13 @@
 p {
     flex-grow: 0;
   flex-shrink: 0;
-  font-size: 24px;
+  font-size: 22px;
   text-align: left;
   color: #000;
 }
 
 .nav-bar-links {
-  font-size: 16px;
+  font-size: 14px;
   color: #1e1e1e;
 }
 
@@ -31,7 +31,7 @@ p {
 
 .card-header-text {
     font-weight: 600;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .card-body-text {
@@ -41,16 +41,73 @@ p {
 
 .filter-category {
     font-weight: 600;
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .filter-values {
     font-weight: 400;
-    font-size: 16px;
+    font-size: 14px;
   }
 
 * {
     font-family: "Inter", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
+}
+
+.badge-custom {
+  background-color: #F5F5F5; /* 원하는 배경색 */
+  color: #000000 !important;         /* 텍스트 색상 */
+  align-items: center;
+  padding: 0rem 0.5rem !important; 
+  font-weight: 400 !important;
+}
+
+.btn-no-bg {
+  background-color: transparent !important; /* 배경색 제거 */
+  border: none !important;                /* 보더 제거 */
+  color: inherit !important;              /* 기본 텍스트 색상 유지 */
+  padding: 0.5rem !important;  
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+.scrollable-table {
+  min-height: 15vh;
+  max-height: 15vh; /* 스크롤 영역 높이 제한 */
+  overflow-y: auto; /* 수직 스크롤 활성화 */
+}
+
+.border-div {
+  flex: 1;
+  border: 1px solid #D9D9D9 !important;
+  padding: 1rem;
+}
+
+.p-text {
+    border: 0; /* 기본 테두리 제거 */
+    border-top: 2px solid #D9D9D9; /* 수평선의 색상 및 두께 설정 */
+    margin: 10px 0;
+}
+
+.div-search {
+  background: #FFFFFF;
+  border: 1px solid #D9D9D9;
+  border-radius: 9999px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding-left: 0.5rem;
+}
+
+.btn-search {
+    border-color: transparent;
+    background-color: transparent;
+    background-image: none;
+}
+
+.text-search {
+  border-color: transparent;
+  border-radius: 10px;
+  outline: none;
 }
