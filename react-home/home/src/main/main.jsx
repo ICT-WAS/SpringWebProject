@@ -3,8 +3,6 @@ import MainContent from "./MainContent";
 import Stack from "react-bootstrap/Stack";
 import Container from "react-bootstrap/Container";
 import Footer from "../common/Footer";
-import Signup from "../components/signup/Signup";
-import Login from "../components/login/Login";
 
 export default function Main() {
   return (
@@ -14,8 +12,6 @@ export default function Main() {
           <Header />
           <MainContent />
           <Footer />
-          <Signup />
-          <Login />
         </Stack>
       </Container>
     </>

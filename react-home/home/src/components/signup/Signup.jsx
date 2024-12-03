@@ -86,29 +86,31 @@ const Signup = () => {
   };
 
   return (
-    <div className="form-container">
-      <form className="form-container-signin">
-        <h2>회원가입</h2>
-        <Email email={email} setEmail={setEmail} />
-        <Password password={password} setPassword={setPassword} />
-        <Username username={username} setUsername={setUsername} />
-        <Phone phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} />
-        <button
-          type="submit"
-          className="submit-button"
-          onClick={handleSignup}
-          disabled={loading}
-        >
-          {loading ? "가입 중..." : "회원가입"}
-        </button>
-        {isModal && (
-          <Modal
-            title={singupErrorTitle}
-            message={signupError}
-            onClose={closeModal}
-          />
-        )}
-      </form>
+    <div className="body-container">
+      <div className="form-container">
+        <form className="form-container-signin">
+          <h2>회원가입</h2>
+          <Email email={email} setEmail={setEmail} />
+          <Password password={password} setPassword={setPassword} />
+          <Username username={username} setUsername={setUsername} />
+          <Phone phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} />
+          <button
+            type="submit"
+            className="submit-button"
+            onClick={handleSignup}
+            disabled={loading}
+          >
+            {loading ? "가입 중..." : "회원가입"}
+          </button>
+          {isModal && (
+            <Modal
+              title={singupErrorTitle}
+              message={signupError}
+              onClose={closeModal}
+            />
+          )}
+        </form>
+      </div>
     </div>
   );
 };
