@@ -51,7 +51,7 @@ function NavBar() {
   const navigate = useNavigate();
 
   function handleListClick() {
-    navigate("/list");
+    navigate("/subscriptions");
   }
                 
   return (

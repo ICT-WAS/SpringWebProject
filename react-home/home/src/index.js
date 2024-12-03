@@ -8,9 +8,10 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom"; //라
 import AppProvider from "./Context"; //전역변수 설정
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import ApplyAnnouncement from "./apply_announcement/ApplyAnouncement";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
+import ApplyAnnouncementList from "./apply_announcement/ApplyAnouncementList";
+import ApplyAnnouncement from "./apply_announcement/ApplyAnouncement";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -27,7 +28,8 @@ root.render(
         />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/list" element={<ApplyAnnouncement />} />
+        <Route path="/subscriptions" element={<ApplyAnnouncementList />} />
+        <Route path="/subscriptions/info" element={<ApplyAnnouncement />} />
       </Routes>
     </Router>
   </AppProvider>
