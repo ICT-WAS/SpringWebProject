@@ -12,13 +12,20 @@ const Password = ({ password, setPassword }) => {
     setPassword(e.target.value);
     setIsValid(true);
     setError("");
-    setCheckError("");
+  };
+
+  const handleChangeCheck = (e) => {
+    setPasswordCheck(e.target.value);
   };
 
   const checkPassword = async () => {
     if (passwordCheck !== password) {
+      console.log(password);
+      console.log(passwordCheck);
       setCheckError("비밀번호가 다릅니다. ");
       return;
+    } else if (passwordCheck === password) {
+      setCheckError("");
     }
   };
 
@@ -49,21 +56,23 @@ const Password = ({ password, setPassword }) => {
       <label htmlFor="password">비밀번호</label>
       <input
         type="password"
-        id="password"
-        name="password"
+        id="signup-password"
+        name="signup-password"
         value={password}
         onBlur={check}
         onChange={handleChange}
         placeholder="비밀번호를 입력해주세요."
       />
       {error && <span style={{ color: "red" }}>{error}</span>}
-      <div className="form-group">
+      <div className="form-group" style={{ marginTop: "12px" }}>
         <label htmlFor="password-check">비밀번호 확인</label>
         <input
           type="password"
           id="password-check"
           name="password-check"
+          value={passwordCheck}
           onBlur={checkPassword}
+          onChange={handleChangeCheck}
           placeholder="비밀번호를 확인해주세요."
         />
         {checkError && <span style={{ color: "red" }}>{checkError}</span>}

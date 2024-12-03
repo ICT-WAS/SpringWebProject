@@ -27,6 +27,7 @@ public enum BaseResponseStatus {
      * 3000: Response 오류
      */
     FAILED_TO_LOGIN(false,3001,"이메일과 비밀번호를 다시 확인해주세요."),
+    FAILED_TO_LOGOUT(false, 3002, "로그아웃에 실패하였습니다"),
 
     /**
      * 4000: Database, Server 오류

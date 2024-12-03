@@ -1,0 +1,72 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #888;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.modal-body h3 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333; /* 에러 메시지를 강조하는 빨간색 */
+  margin-bottom: 10px; /* 타이틀과 메시지 간격 */
+  text-align: center; /* 타이틀 중앙 정렬 */
+}
+
+.modal-body p {
+  font-size: 1rem;
+  color: #333; /* 어두운 글씨 색 */
+  line-height: 1.6; /* 메시지 간격 */
+  text-align: center; /* 메시지 중앙 정렬 */
+}
+
+.modal-footer button {
+  background-color: #3ca6e5;
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal-footer button:hover {
+  background-color: #0488d4;
+}
+
+.modal-footer button:focus {
+  outline: none; /* 포커스 시 기본 테두리 제거 */
+}

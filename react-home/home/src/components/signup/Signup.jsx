@@ -5,6 +5,7 @@ import Email from "./Email";
 import Password from "./Password";
 import Username from "./Username";
 import Phone from "./phone";
+import Modal from "../modal/Modal";
 
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -26,42 +27,36 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [phoneNumberError, setPhoneNumberError] = useState("");
 
   //회원가입
-  const [loginError, setLoginError] = useState("");
+  const [signupError, setSignupError] = useState("");
+  const [singupErrorTitle, setSignupErrorTitle] = useState("");
   const [loading, setLoading] = useState(false);
 
-  //핸드폰 중복확인
-  const handlePhoneNumberChange = (e) => {
-    const value = e.target.value;
-    setPhoneNumber(value);
+  //모달 상태 관리
+  const [isModal, setIsModal] = useState(false);
 
-    if (value) {
-      axios
-        .get(`http://localhost:8989/users/check-phone?phone=${value}`)
-        .then((response) => {
-          if (response.data) {
-            //response.date=true or false
-            setPhoneNumberError("이미 사용 중인 핸드폰 번호입니다.");
-          } else {
-            setPhoneNumberError("");
-          }
-        })
-        .catch((error) => console.error(error));
-    } else {
-      setPhoneNumberError("");
+  //에러 메시지 출력
+  useEffect(() => {
+    if (signupError) {
+      //signupError 빈문자열 아닐 때만 modal 호출
+      setIsModal(true);
     }
+  }, [signupError]);
+
+  //모달 닫기
+  const closeModal = () => {
+    setIsModal(false);
   };
 
   //회원가입 버튼 클릭
   const handleSignup = async (e) => {
     e.preventDefault(); //폼 제출 시 페이지 새로고침
     setLoading(true); //로딩 초기화
-    setLoginError(""); //로그인 에러 초기화
+    setSignupError(""); //회원가입 에러 초기화
 
+    //보낼 데이터
     const postData = {
       email,
       password,
@@ -69,6 +64,7 @@ const Signup = () => {
       username,
     };
 
+    //경로
     try {
       const response = await axios.post(
         "http://localhost:8989/users",
@@ -78,11 +74,12 @@ const Signup = () => {
       if (response.data.success) {
         alert("회원가입 성공");
         setTimeout(() => {
-          window.location.href = "http://localhost:8989";
+          window.location.href = "http://localhost:3000/login";
         }, 500);
       }
     } catch (error) {
-      setLoginError("회원가입 실패: " + error.response.data.message);
+      setSignupError("입력하신 정보를 다시 확인해주세요.");
+      setSignupErrorTitle("회원가입 실패");
     } finally {
       setLoading(false);
     }
@@ -90,8 +87,8 @@ const Signup = () => {
 
   return (
     <div className="form-container">
-      <h2>Sign Up</h2>
       <form className="form-container-signin">
+        <h2>회원가입</h2>
         <Email email={email} setEmail={setEmail} />
         <Password password={password} setPassword={setPassword} />
         <Username username={username} setUsername={setUsername} />
@@ -104,6 +101,13 @@ const Signup = () => {
         >
           {loading ? "가입 중..." : "회원가입"}
         </button>
+        {isModal && (
+          <Modal
+            title={singupErrorTitle}
+            message={signupError}
+            onClose={closeModal}
+          />
+        )}
       </form>
     </div>
   );

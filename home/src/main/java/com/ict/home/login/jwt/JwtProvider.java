@@ -1,9 +1,7 @@
 package com.ict.home.login.jwt;
 
 import com.ict.home.user.User;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -60,5 +58,40 @@ public class JwtProvider {
                 .setExpiration(expiration)  //위에서 정의한 만료 시간
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    //리프레시 토큰 유효성 검증
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+               log.info("잘못된 JWT Token", e);
+            } catch (ExpiredJwtException e) {
+                log.info("만료된 JWT Token", e);
+            } catch (UnsupportedJwtException e) {
+                log.info("지원되지 않는 JWT Token", e);
+            } catch (IllegalArgumentException e) {
+                log.info("JWT 클레임 빈 문자열", e);
+            }
+            return false;
+    }
+
+    //토큰의 Bearer 제거 메서드
+    public String BearerRemove(String token) {
+        return token.substring("Bearer ".length());
+    }
+
+    //토큰의 남은 유효시간
+    public Long getExpiration(String token) {
+        Date expiration = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+        // 현재 시간
+        long now = System.currentTimeMillis();
+        return (expiration.getTime() - now);
     }
 }
