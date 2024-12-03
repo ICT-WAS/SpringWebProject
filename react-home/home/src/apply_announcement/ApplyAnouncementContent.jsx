@@ -9,21 +9,22 @@ function InformationalPost({subscription}) {
         <Row>
             <Col>
               <Container>
-              <Row className="mb-5">
+              <Row>
                   <Col md="auto"><p className='card-body-text'>{subscription.type}</p></Col>
                   <Col md="auto"><p className='card-body-text'>{subscription.region}</p></Col>
                   <Col><p className='card-body-text'>{subscription.date}</p></Col>
                 </Row>
 
-                <Row className="mb-5">
+                <Row>
                   <Col>
-                  <p className='card-header-text'>
-                  {subscription.title}
+                  <p className='housing-subtitle'>
+                    {subscription.title}
                   </p>
                   </Col>
                 </Row>
+                
                 <Row>
-                    <HousingPage housingData={subscription.detail} />
+                    <HousingData housingData={subscription.detail} />
                 </Row>
               </Container>
             </Col>
@@ -36,9 +37,9 @@ function InformationalPost({subscription}) {
     );
 }
 
-function HousingPage({housingData}) {
+function HousingData({housingData}) {
     return (
-      <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      <div className='housing-data'>
         <h1>청약 공고 상세 정보</h1>
   
         <section>
@@ -221,9 +222,6 @@ export default function ApplyAnnouncementContent() {
     return (
         <>
         <Container>
-        <Row className="mb-5">
-            {/* 뒤로가기 버튼 등 */}
-        </Row>
         <Row>
           <InformationalPost subscription={subscription} />
         </Row>
