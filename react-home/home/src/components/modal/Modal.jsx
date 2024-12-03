@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import "./Modal.css";
 
 const Modal = React.forwardRef((props, ref) => {
@@ -6,6 +6,7 @@ const Modal = React.forwardRef((props, ref) => {
   const { title, message, onClose } = props;
   useEffect(() => {
     if (ref.current) {
+      ref.current.style.display = "block";
       ref.current.focus();
     }
   }, [ref]);

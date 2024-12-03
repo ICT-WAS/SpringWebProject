@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from "react";
-import Email from "./Email";
-import Password from "./Password";
-import "../signup/Signup.css";
+import Email from "../components/login/Email";
+import Password from "../components/login/Password";
+import "../components/signup/Signup.css";
 import axios from "axios";
-import { useGlobalContext } from "../../Context";
-import Modal from "../modal/Modal";
+import Modal from "../components/modal/Modal";
+import { useGlobalContext } from "../Context";
 
 const Login = () => {
   const [email, setEmail] = useState("");

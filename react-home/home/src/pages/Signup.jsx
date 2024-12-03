@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
-import "./Signup.css";
+import { useEffect, useState, useRef } from "react";
+import "../components/signup/Signup.css";
 import axios from "axios";
-import Email from "./Email";
-import Password from "./Password";
-import Username from "./Username";
-import Phone from "./phone";
-import Modal from "../modal/Modal";
+import Email from "../components/signup/Email";
+import Password from "../components/signup/Password";
+import Username from "../components/signup/Username";
+import Phone from "../components/signup/phone";
+import Modal from "../components/modal/Modal";
+import { useGlobalContext } from "../Context";
+import { useNavigate } from "react-router-dom";
 
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -36,6 +38,23 @@ const Signup = () => {
 
   //모달 상태 관리
   const [isModal, setIsModal] = useState(false);
+  const confirmModalRef = useRef(null);
+
+  //로그인 상태를 관리하는 전역 변수
+  const { setIsLogin } = useGlobalContext();
+
+  //페이지 이동 훅
+  const navigate = useNavigate();
+
+  //로그인 페이지 이동
+  const handleLoginPage = () => {
+    navigate("/login");
+  };
+
+  //메인 페이지 이동
+  const handleMainPage = () => {
+    navigate("/");
+  };
 
   //에러 메시지 출력
   useEffect(() => {
@@ -48,6 +67,7 @@ const Signup = () => {
   //모달 닫기
   const closeModal = () => {
     setIsModal(false);
+    setSignupError("");
   };
 
   //회원가입 버튼 클릭
@@ -56,27 +76,62 @@ const Signup = () => {
     setLoading(true); //로딩 초기화
     setSignupError(""); //회원가입 에러 초기화
 
-    //보낼 데이터
-    const postData = {
+    //회원가입 요청 시 보낼 데이터
+    const SignupData = {
       email,
       password,
       phoneNumber,
       username,
     };
 
-    //경로
     try {
+      //1. 회원가입 요청
       const response = await axios.post(
         "http://localhost:8989/users",
-        postData
+        SignupData
       );
 
-      if (response.data.success) {
-        alert("회원가입 성공");
-        setTimeout(() => {
-          window.location.href = "http://localhost:3000/login";
-        }, 500);
+      //1-1. 회원가입 실패
+      if (response.data.IsSuccess === false) {
+        console.log(response.data.IsSuccess);
+        setSignupErrorTitle("회원가입 실패");
+        setSignupError("입력하신 정보를 확인하세요.");
+        return;
       }
+
+      //2. 회원가입 성공
+      alert("회원가입 성공");
+
+      //3. 로그인 요청
+      const { email, password } = SignupData;
+      const loginData = { email, password };
+      const loginResponse = await axios.post(
+        "http://localhost:8989/users/login",
+        loginData,
+        {
+          withCredentials: true, //쿠키 포함 요청
+        }
+      );
+
+      //3-1. 로그인 실패 - 로그인 페이지로 이동
+      if (loginResponse.data.success === false) {
+        setSignupErrorTitle("자동 로그인 실패");
+        setSignupError("다시 로그인 해주세요.");
+        handleLoginPage();
+        return;
+      }
+
+      //4. 로그인 성공
+      const { accessToken } = response.data.result;
+      localStorage.setItem("accessToken", accessToken);
+      setIsLogin(true);
+
+      //4-1. 메인 페이지 리다이렉트 / 상태 초기화
+      setEmail("");
+      setPassword("");
+      setUsername("");
+      setPhoneNumber("");
+      handleMainPage();
     } catch (error) {
       setSignupError("입력하신 정보를 다시 확인해주세요.");
       setSignupErrorTitle("회원가입 실패");
@@ -107,6 +162,7 @@ const Signup = () => {
               title={singupErrorTitle}
               message={signupError}
               onClose={closeModal}
+              ref={confirmModalRef}
             />
           )}
         </form>
