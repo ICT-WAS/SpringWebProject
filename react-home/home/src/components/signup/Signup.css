@@ -9,18 +9,32 @@
   padding: 24px;
   gap: 24px;
 
-  width: 600px;
+  width: 100%;
   min-width: 320px;
-  height: 622px;
+  max-width: 510px;
+  min-height: 622px;
 
   background: #ffffff;
-  border: 1px solid #d9d9d9;
-  border-radius: 8px;
 
   /* Inside auto layout */
   flex: none;
   order: 1;
   flex-grow: 0;
+}
+
+.form-container-signin {
+  /* Add styling specific to the sign-in section */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: 16px; /* Adjust gap between form groups */
+}
+
+.form-container-signin h2 {
+  text-align: center; /* 부모 기준으로 가운데 정렬 */
+  font-weight: bold; /* 글씨를 굵게 설정 */
+  width: 100%;
 }
 
 .form-group {
@@ -37,19 +51,71 @@
 
 .form-group input {
   padding: 8px;
-  border: 1px solid #d9d9d9;
+  background-color: #f0f0f0;
+  border: 1px solid #f0f0f0;
   border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .submit-button {
+  margin-top: 8px;
   padding: 12px 16px;
-  background-color: #4caf50;
+  background-color: #3ca6e5;
   color: white;
   border: none;
   border-radius: 4px;
+  width: 100%;
   cursor: pointer;
 }
 
 .submit-button:hover {
-  background-color: #45a049;
+  background-color: #0488d4;
+}
+
+/* 휴대전화 */
+.form-group-phone {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.form-group-phone label {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.form-group-phone .input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* 입력 필드와 버튼 간 간격 */
+  width: 100%;
+}
+
+.form-group-phone input {
+  padding: 8px;
+  background-color: #f0f0f0;
+  border: 1px solid #f0f0f0;
+  flex: 1; /* 입력 필드가 남은 공간 채우도록*/
+  box-sizing: border-box;
+  border-radius: 4px;
+  border-top-right-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+}
+
+.form-group-phone button {
+  padding: 8px;
+  color: #fff;
+  border: 1px solid #0179be;
+  background-color: #0179be;
+  cursor: pointer;
+  border-radius: 4px;
+  border-top-left-radius: 4px !important;
+  border-bottom-left-radius: 4px !important;
+}
+
+.form-group-phone .error-message {
+  color: red;
+  margin-top: 8px; /* 입력 그룹과의 간격 */
 }
