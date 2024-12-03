@@ -4,7 +4,7 @@ import Stack from 'react-bootstrap/Stack';
 import Container from 'react-bootstrap/Container';
 import Footer from '../common/Footer';
 
-export default function Main() {
+export default function ApplyAnnouncement() {
     return (
         <>
         <Container className="p-5" fluid="md">
