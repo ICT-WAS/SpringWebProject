@@ -1,24 +1,28 @@
-import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
-import { Container, Row, Col, Button, Card, CardBody } from 'react-bootstrap';
+import Form from "react-bootstrap/Form";
+import InputGroup from "react-bootstrap/InputGroup";
+import { Container, Row, Col, Button, Card, CardBody } from "react-bootstrap";
+import LoginStateButton from "../components/login/LoginStateButton";
 
 function Logo() {
   return (
     <>
-      <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
+      <a
+        href="#"
+        className="link-body-emphasis link-underline link-underline-opacity-0"
+      >
         <Container>
           <Row>
             <Col>
-              <p><i className="bi bi-house-door" /></p>
+              <p>
+                <i className="bi bi-house-door" />
+              </p>
             </Col>
             <Col md="auto">
-              <p className='heading-text'>내집마련</p>
+              <p className="heading-text">내집마련</p>
             </Col>
           </Row>
         </Container>
       </a>
-
-
     </>
   );
 }
@@ -27,10 +31,7 @@ function SearchField() {
   return (
     <>
       <InputGroup>
-        <Form.Control
-          placeholder='공고 제목으로 검색'
-          aria-label='Search'
-        />
+        <Form.Control placeholder="공고 제목으로 검색" aria-label="Search" />
         <Button variant="light">
           <i className="bi bi-search" />
         </Button>
@@ -43,10 +44,13 @@ function NavBar() {
   return (
     <>
       <Container>
-        <Row className='align-items-center'>
+        <Row className="align-items-center">
           <Col md="auto">
             <p className="nav-bar-links">
-              <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
+              <a
+                href="#"
+                className="link-body-emphasis link-underline link-underline-opacity-0"
+              >
                 청약 공고
               </a>
             </p>
@@ -54,7 +58,10 @@ function NavBar() {
 
           <Col md="auto">
             <p className="nav-bar-links">
-              <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
+              <a
+                href="#"
+                className="link-body-emphasis link-underline link-underline-opacity-0"
+              >
                 커뮤니티
               </a>
             </p>
@@ -62,7 +69,10 @@ function NavBar() {
 
           <Col md="auto">
             <p className="nav-bar-links">
-              <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
+              <a
+                href="#"
+                className="link-body-emphasis link-underline link-underline-opacity-0"
+              >
                 조건 등록
               </a>
             </p>
@@ -70,7 +80,10 @@ function NavBar() {
 
           <Col md="auto">
             <p className="nav-bar-links">
-              <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
+              <a
+                href="#"
+                className="link-body-emphasis link-underline link-underline-opacity-0"
+              >
                 Q&amp;A
               </a>
             </p>
@@ -78,28 +91,16 @@ function NavBar() {
 
           <Col md="auto">
             <p>
-              <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
+              <a
+                href="#"
+                className="link-body-emphasis link-underline link-underline-opacity-0"
+              >
                 <i className="bi bi-bell" />
               </a>
             </p>
           </Col>
 
-          <Col md="auto">
-            <p className="nav-bar-links">
-            <Button variant="light">
-            로그인
-              </Button>
-            </p>
-          </Col>
-
-          <Col md="auto">
-            <p className="nav-bar-links">
-            <Button variant="dark">
-              회원가입
-              </Button>
-            </p>
-          </Col>
-
+          <LoginStateButton />
         </Row>
       </Container>
     </>

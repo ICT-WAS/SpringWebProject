@@ -10,9 +10,6 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  //전역 변수에 유저 정보 담기
-  // const [user, setUser] = useGlobalContext();
-
   //모달 상태 관리
   const [isModal, setIsModal] = useState(false);
 
@@ -24,6 +21,8 @@ const Login = () => {
   const [loginError, setLoginError] = useState("");
   const [loginErrorTitle, setLoginErrorTitle] = useState("");
   const [loading, setLoading] = useState(false);
+  //로그인 상태를 관리하는 전역 변수
+  const { setIsLogin } = useGlobalContext();
 
   //에러 메시지가 변할 시 모달 출력
   useEffect(() => {
@@ -69,7 +68,9 @@ const Login = () => {
           //토큰 추출
           const { accessToken } = response.data.result;
           localStorage.setItem("accessToken", accessToken);
-          // window.location.href = "http://localhost:3000";
+          setIsLogin(true);
+          //로그인 성공 시 리다이렉트
+          window.location.href = "http://localhost:3000";
         }, 500);
       }
     } catch (error) {
@@ -81,28 +82,30 @@ const Login = () => {
   };
 
   return (
-    <div className="form-container">
-      <form className="form-container-signin">
-        <h2>로그인</h2>
-        <Email email={email} setEmail={setEmail} ref={emailRef} />
-        <Password password={password} setPassword={setPassword} />
-        <button
-          type="submit"
-          className="submit-button"
-          onClick={handleLogin}
-          disabled={loading}
-        >
-          {loading ? "로그인 중..." : "로그인"}
-        </button>
-        {isModal && (
-          <Modal
-            title={loginErrorTitle}
-            message={loginError}
-            onClose={closeModal}
-            ref={confirmModalRef}
-          />
-        )}
-      </form>
+    <div className="body-container">
+      <div className="form-container">
+        <form className="form-container-signin">
+          <h2>로그인</h2>
+          <Email email={email} setEmail={setEmail} ref={emailRef} />
+          <Password password={password} setPassword={setPassword} />
+          <button
+            type="submit"
+            className="submit-button"
+            onClick={handleLogin}
+            disabled={loading}
+          >
+            {loading ? "로그인 중..." : "로그인"}
+          </button>
+          {isModal && (
+            <Modal
+              title={loginErrorTitle}
+              message={loginError}
+              onClose={closeModal}
+              ref={confirmModalRef}
+            />
+          )}
+        </form>
+      </div>
     </div>
   );
 };
