@@ -43,3 +43,6 @@ Thumbs.db
 
 # 환경 설정 파일
 .env
+
+# info.txt 파일을 무시
+/api-to-db/info.txt
