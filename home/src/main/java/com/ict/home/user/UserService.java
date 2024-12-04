@@ -1,7 +1,6 @@
 package com.ict.home.user;
 
 import com.ict.home.exception.BaseException;
-import com.ict.home.login.dto.JwtResponseDto;
 import com.ict.home.login.jwt.JwtProvider;
 import com.ict.home.login.jwt.Secret;
 import com.ict.home.login.jwt.Token;
@@ -20,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.WebUtils;
+
+import java.time.LocalDateTime;
 
 import static com.ict.home.exception.BaseResponseStatus.*;
 
@@ -88,17 +89,21 @@ public class UserService {
             String refreshToken;
             if (tokenRepository.existsByUserId(user.getId())) {
                 //리프레시 토큰이 저장되어 있는 경우 - 해당 리프레시 토큰 반환
-                refreshToken = tokenRepository.findByUserId(user.getId()).getRefreshToken();
+                Token token = tokenRepository.findByUserId(user.getId());
+                refreshToken = token.getRefreshToken();
+
+
+                //리프레시 토큰의 만료 확인
+                if (token.isExpired()) {
+                    //만료 되었을 시 기존 리프레시 토큰 삭제
+                    tokenRepository.deleteByUserId(user.getId());
+
+                    //리프레시 토큰을 재발급 후 저장
+                    refreshToken = createAndSaveRefreshToken(user);
+                }
             }else {
                 //리프레시 토큰이 없는 경우 - 리프레시 토큰 발급 후 디비 저장
-                refreshToken = jwtProvider.createRefreshToken(user);
-
-                //리프레시 토큰 DB 저장
-                Token token = Token.builder()
-                        .refreshToken(refreshToken)
-                        .user(user)
-                        .build();
-                tokenRepository.save(token);
+                refreshToken = createAndSaveRefreshToken(user);
             }
 
             //리프레시 토큰을 HTTP-Only 쿠키에 할당 -> 클라이언트에서 접근 불가
@@ -115,6 +120,24 @@ public class UserService {
         } else {
             throw new BaseException(FAILED_TO_LOGIN);
         }
+    }
+
+    //액세스 토큰 발급 - 재발급 시 사용
+    public String createAccessToken(Long userId) {
+        User user = userUtilService.findByIdWithValidation(userId);
+        return jwtProvider.createAccessToken(user);
+    }
+
+    //리프레시 토큰 발급 및 저장
+    private String createAndSaveRefreshToken(User user) {
+        String refreshToken = jwtProvider.createRefreshToken(user);
+        
+        Token token = Token.builder()
+                .refreshToken(refreshToken)
+                .user(user)
+                .build();
+        tokenRepository.save(token);
+        return refreshToken;
     }
 
     /**
@@ -142,7 +165,6 @@ public class UserService {
         } else{
             throw new BaseException(FAILED_TO_LOGOUT);
         }
-
     }
 
     /**
