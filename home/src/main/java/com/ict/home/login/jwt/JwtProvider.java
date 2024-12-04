@@ -1,13 +1,17 @@
 package com.ict.home.login.jwt;
 
+import com.ict.home.exception.BaseException;
 import com.ict.home.user.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.io.Decoders;
+
 import java.security.Key;
 import java.util.Date;
+
+import static com.ict.home.exception.BaseResponseStatus.EXPIRED_USER_JWT;
 
 @Slf4j
 @Component
@@ -17,8 +21,7 @@ public class JwtProvider {
 
     private static final String BEARER_TYPE = "Bearer ";
 
-    private Key key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(Secret.JWT_SECRET_KEY));
-
+    private final Key key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(Secret.JWT_SECRET_KEY));
 
     /**
      * Access 토큰 생성
@@ -60,21 +63,26 @@ public class JwtProvider {
                 .compact();
     }
 
-    //리프레시 토큰 유효성 검증
+    //토큰 유효성 검증
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            //유효할 시 true
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
+
+            //에러 발생 시 false
+        } catch (ExpiredJwtException e) {
+            log.error("만료된 JWT Token", e);
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-               log.info("잘못된 JWT Token", e);
-            } catch (ExpiredJwtException e) {
-                log.info("만료된 JWT Token", e);
-            } catch (UnsupportedJwtException e) {
-                log.info("지원되지 않는 JWT Token", e);
-            } catch (IllegalArgumentException e) {
-                log.info("JWT 클레임 빈 문자열", e);
-            }
-            return false;
+            log.info("잘못된 JWT Token", e);
+        } catch (UnsupportedJwtException e) {
+            log.info("지원되지 않는 JWT Token", e);
+        } catch (IllegalArgumentException e) {
+            log.info("JWT 클레임 빈 문자열", e);
+        } catch (Exception e) {
+            log.error("알 수 없는 오류", e);
+        }
+        return false;
     }
 
     //토큰의 Bearer 제거 메서드

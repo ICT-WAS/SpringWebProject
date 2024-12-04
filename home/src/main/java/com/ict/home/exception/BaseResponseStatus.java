@@ -18,6 +18,7 @@ public enum BaseResponseStatus {
     POST_USERS_NONE_EXISTS_EMAIL(false,2002,"등록되지 않은 이메일입니다."),
     POST_USERS_NONE_EXISTS_USERNAME(false, 2003, "등록되지 않은 유저 이름입니다."),
     LOG_OUT_USER(false,2004,"이미 로그아웃된 유저입니다."),
+    POST_USERS_NONE_EXISTS_ID(false, 2004, "등록되지 않은 유저 정보입니다."),
     // users
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
     INVALID_MEMBER_ID(false, 2011, "멤버 아이디와 이메일이 일치하지 않습니다."),
@@ -33,7 +34,12 @@ public enum BaseResponseStatus {
      * 4000: Database, Server 오류
      */
     PASSWORD_ENCRYPTION_ERROR(false, 4001, "비밀번호 암호화에 실패하였습니다."),
-    PASSWORD_DECRYPTION_ERROR(false, 4002, "비밀번호 복호화에 실패하였습니다.");
+    PASSWORD_DECRYPTION_ERROR(false, 4002, "비밀번호 복호화에 실패하였습니다."),
+
+    /**
+     * 5000: 토큰 만료 오류
+     */
+    EXPIRED_USER_JWT(false,5000,"만료된 JWT입니다.");
 
     private final boolean isSuccess;
     private final int code;

@@ -79,4 +79,16 @@ public class UserController {
     public boolean checkUsername(@RequestParam("username") String username) {
         return userService.checkUsernameExists(username);
     }
+
+    /**
+     * 액세스 토큰을 재발급하기 위한 엔드포인트
+     */
+    @PostMapping("/access-token/reset")
+    public BaseResponse<String> resetAccessToken(@RequestBody Long userId) {
+        try{
+            return new BaseResponse<>(userService.createAccessToken(userId));
+        } catch(BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 }

@@ -72,6 +72,9 @@ const Login = () => {
           //로그인 성공 시 리다이렉트
           window.location.href = "http://localhost:3000";
         }, 500);
+      } else {
+        setLoginErrorTitle("로그인 실패");
+        setLoginError(response.data.message);
       }
     } catch (error) {
       setLoginErrorTitle("로그인 실패");
