@@ -4,6 +4,8 @@ import FilteredTag from './FilteredTag';
 import Nav from 'react-bootstrap/Nav';
 import React, { useState } from 'react';
 import NotificationButton from './NotificationButton';
+import { conditions } from './conditions';
+
 
 function NewSubscriptionCard({ subscription }) {
   return (
@@ -38,7 +40,7 @@ function NewSubscriptionCard({ subscription }) {
   );
 }
 
-/* 모집공고 */
+/* 공고 리스트 */
 function NewSubscriptionCards() {
   /* 임시 데이터 */
   const subscriptions = [
@@ -55,12 +57,12 @@ function NewSubscriptionCards() {
   return (
     <>
       <p className='heading-text'>
-          모집공고
-        </p>
-        <p className='card-body-text mb-0'>0,000 건</p>
+        모집공고
+      </p>
+      <p className='card-body-text mb-0'>0,000 건</p>
 
       <Stack direction='vertical' gap={3}>
-      <Dropdown className="ms-auto px-3">
+        <Dropdown className="ms-auto px-3">
           <Dropdown.Toggle variant="warning" className='dropdown-transparent' >
             최신순
           </Dropdown.Toggle>
@@ -76,63 +78,42 @@ function NewSubscriptionCards() {
   );
 }
 
-function Filters() {
+/* 선택된 태그 목록*/
+function Filters({ selectedFilter, handleClose }) {
+  const filters = selectedFilter.map((filter) => {
+    const subcategories = filter.subcategories;
+
+    const subcategoriesTag = subcategories.map((sub) => {
+      return <><FilteredTag filterName={sub.value} handleClose={handleClose} /></>;
+    })
+
+    return (
+      <>
+        <Row>
+          <Col>
+            <p className='filter-category mb-2'>
+              {filter.category}
+            </p>
+          </Col>
+        </Row>
+        <Row className='mb-3'>
+          <Col>
+            <Stack direction="horizontal" gap={2}>
+              {subcategoriesTag}
+            </Stack>
+          </Col>
+        </Row>
+      </>
+    );
+  });
+
+
   return (
     <>
       <Stack direction='horizontal' gap={2} style={{ alignItems: 'flex-end' }}>
-
-
         <Container>
-          <Row>
-            <Col>
-              <p className='filter-category mb-2'>
-                희망지역
-              </p>
-            </Col>
-          </Row>
-          <Row className='mb-3'>
-            <Col>
-              <Stack direction="horizontal" gap={2}>
-                <FilteredTag filterName={'서울 전체'} />
-                <FilteredTag filterName={'경기도 광명시'} />
-                <FilteredTag filterName={'경기도 성남시'} />
-              </Stack>
-            </Col>
-          </Row>
 
-          <Row>
-            <Col>
-              <p className='filter-category mb-2'>
-                주택정보
-              </p>
-            </Col>
-          </Row>
-          <Row className='mb-3'>
-            <Col>
-              <Stack direction="horizontal" gap={2}>
-                <FilteredTag filterName={'국민주택'} />
-                <FilteredTag filterName={'85m² 미만'} />
-                <FilteredTag filterName={'3억 이상 4억 미만'} />
-                <FilteredTag filterName={'생애최초'} />
-              </Stack>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col>
-              <p className='filter-category mb-2'>
-                모집기간
-              </p>
-            </Col>
-          </Row>
-          <Row className='mb-3'>
-            <Col>
-              <Stack direction="horizontal" gap={2}>
-                <FilteredTag filterName={'접수중'} />
-                <FilteredTag filterName={'일반공급접수기간:'} />
-              </Stack>
-            </Col>
-          </Row>
+          {filters}
 
         </Container>
 
@@ -145,21 +126,22 @@ function Filters() {
   );
 }
 
-function Conditions() {
+/* 조건 선택박스 */
+function Conditions({ onClickedFilter }) {
 
   const conditionCards = {
-    WishRegion: WishRegion,
-    HomeInfo: HomeInfo,
-    ApplicationPeriod: ApplicationPeriod
+    WishRegion: (props) => <WishRegion {...props} />,
+    HomeInfo: (props) => <HomeInfo {...props} />,
+    ApplicationPeriod: (props) => <ApplicationPeriod {...props} />,
   };
-  const [selectedCondition, setSelectedCondition] = useState(conditionCards['WishRegion']());
+
+  const [selectedCondition, setSelectedCondition] = useState(<WishRegion onClickedFilter={onClickedFilter} />);
 
   const handleSelect = (eventKey) => {
     if (conditionCards[eventKey]) {
-      const result = conditionCards[eventKey]();
-      setSelectedCondition(result);
+      const ResultComponent = conditionCards[eventKey];
+      setSelectedCondition(<ResultComponent onClickedFilter={onClickedFilter} />);
     }
-
   };
 
   return (
@@ -184,7 +166,39 @@ function Conditions() {
   );
 }
 
-function WishRegion() {
+/* 희망지역 */
+function WishRegion({ onClickedFilter }) {
+
+  const category = conditions.wishRegion.category;
+  const sidoData = conditions.wishRegion.subcategories;
+  const [gunguData, setGunguData] = useState(conditions.wishRegion.subcategories[0].values);
+
+  function handleClickSido(e) {
+    const index = e.target.getAttribute('data-index');
+    setGunguData(conditions.wishRegion.subcategories[index].values);
+  }
+
+  function handleClick(e) {
+    const selectedValue = e.target.getAttribute('data-value');
+    onClickedFilter({ category: category, subcategoryId: e.target.getAttribute('data-index'), value: selectedValue });
+  }
+
+  const sidoList = () => {
+    return sidoData.map((item, index) => (
+      <tr key={index} onClick={handleClickSido}>
+        <td data-index={index} data-value={item.subcategoryName}>{item.subcategoryName}</td>
+      </tr>
+    ));
+  }
+
+  const gunguList = () => {
+    return gunguData.map((item, index) => (
+      <tr key={index} onClick={handleClick}>
+        <td data-index={index} data-value={item.value}>{item.value}</td>
+      </tr>
+    ));
+  }
+
   return (
     <>
       <Stack direction='horizontal' style={{ width: '100%', padding: '0' }} gap={1}>
@@ -196,40 +210,7 @@ function WishRegion() {
           <div className="scrollable-table">
             <Table hover borderless>
               <tbody>
-                <tr>
-                  <td>서울특별시</td></tr>
-                <tr>
-                  <td>부산광역시</td></tr>
-                <tr>
-                  <td>대구광역시</td></tr>
-                <tr>
-                  <td>인천광역시</td></tr>
-                <tr>
-                  <td>광주광역시</td></tr>
-                <tr>
-                  <td>대전광역시</td></tr>
-                <tr>
-                  <td>울산광역시</td></tr>
-                <tr>
-                  <td>세종특별자치시</td></tr>
-                <tr>
-                  <td>경기도</td></tr>
-                <tr>
-                  <td>충청북도</td></tr>
-                <tr>
-                  <td>충청남도</td></tr>
-                <tr>
-                  <td>전라남도</td></tr>
-                <tr>
-                  <td>경상북도</td></tr>
-                <tr>
-                  <td>경상남도</td></tr>
-                <tr>
-                  <td>강원특별자치도</td></tr>
-                <tr>
-                  <td>전북특별자치도</td></tr>
-                <tr>
-                  <td>제주특별자치도</td></tr>
+                {sidoList()}
               </tbody>
 
             </Table>
@@ -244,42 +225,7 @@ function WishRegion() {
           <div className="scrollable-table">
             <Table hover borderless>
               <tbody>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
+                {gunguList()}
               </tbody>
             </Table>
           </div>
@@ -289,10 +235,53 @@ function WishRegion() {
   );
 }
 
-function HomeInfo() {
+/* 주택정보 */
+function HomeInfo({ onClickedFilter }) {
+
+  const subcategories = conditions.homeInfo.subcategories;
+
+  function handleClick(e) {
+    const selectedValue = e.target.getAttribute('data-value');
+    const selectedIndex = e.target.getAttribute('data-index');
+    onClickedFilter({ category: conditions.homeInfo.category, subcategoryId: selectedIndex, value: selectedValue });
+  }
+
+  function subcategorySection({ category, values }) {
+    return <>
+      <div className='border-div'>
+        <p className='filter-category'>
+          {category}
+        </p>
+        <hr className='p-text' />
+        <div className="scrollable-table">
+          <Table hover borderless>
+            <tbody>
+
+              {values.map((item, index) => (
+              <tr key={index} onClick={handleClick}>
+                <td data-index={index} data-value={item.value}>{item.value}</td>
+              </tr>
+              ))}
+
+            </tbody>
+
+          </Table>
+        </div>
+      </div>
+    </>
+  }
+
+  const subCategorieSections = () => {
+    return subcategories.map((subCategory) => {
+      subcategorySection({category: subCategory.category, values: subCategory.values});
+    });
+  }
+
   return (
     <>
       <Stack direction='horizontal' style={{ width: '100%', padding: '0' }} gap={1}>
+        {subCategorieSections()}
+
         <div className='border-div'>
           <p className='filter-category'>
             주택분류
@@ -396,7 +385,8 @@ function HomeInfo() {
   );
 }
 
-function ApplicationPeriod() {
+/* 모집기간 */
+function ApplicationPeriod({ onClickedFilter }) {
   return (
     <>
       <Stack direction='horizontal' style={{ width: '100%', padding: '0' }} gap={1}>
@@ -487,14 +477,67 @@ function ApplicationPeriod() {
 }
 
 export default function MainContent() {
+  const [selectedFilter, setSelectedFilter] = useState([]);
+
+  /* 필터 적용시 */
+  function onClickedFilter({ category, subcategoryId, value }) {
+
+    setSelectedFilter((prevFilters) => {
+      let handledUpdate = false;
+
+      const updatedFilters = prevFilters.map((filter) => {
+        if (filter.category !== category) {
+          return filter;
+        }
+
+        // 존재하는 옵션값 바뀌었을 때(최대n개?)
+        const updatedSubcategories = filter.subcategories.map((sub) => {
+          if (sub.subcategoryId === subcategoryId) {
+            handledUpdate = true;
+            return { ...sub, value: value };
+          } else {
+            return sub;
+          }
+        });
+
+        // 존재하는 카테고리에 값을 추가할 때
+        if (!handledUpdate) {
+          updatedSubcategories.push({ subcategoryId: subcategoryId, value: value });
+          handledUpdate = true;
+        }
+
+        return { ...filter, subcategories: updatedSubcategories };
+      })
+
+      // 새로운 카테고리에 새 값 추가
+      if (!handledUpdate) {
+        return [...prevFilters, { category: category, subcategories: [{ subcategoryId: subcategoryId, value: value }] }];
+      }
+
+      return updatedFilters;
+    });
+
+  }
+
+  /* 필터 삭제시 */
+  function handleClose(filterName) {
+    setSelectedFilter((prevFilters) =>
+      prevFilters.map(filter => ({
+        ...filter, subcategories:
+          filter.subcategories.filter(sub => sub.value !== filterName)
+      }))
+        .filter((filter) => filter.subcategories.length > 0)
+    );
+  }
+
   return (
     <>
       <Container>
         <Row className="mb-5">
-          <Conditions />
+          <Conditions onClickedFilter={onClickedFilter} />
         </Row>
         <Row className="mb-5">
-          <Filters />
+          <Filters selectedFilter={selectedFilter} handleClose={handleClose} />
         </Row>
         <Row>
           <NewSubscriptionCards />
