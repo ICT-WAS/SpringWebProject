@@ -3,7 +3,7 @@ export const conditions = {
         {
             category: '희망지역', subcategories: [
                 {
-                    subcategoryName: '서울특별시', values: [
+                    category: '서울특별시', values: [
                         { value: '강남구' },
                         { value: '강동구' },
                         { value: '강북구' },
@@ -32,7 +32,7 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '부산광역시', values: [
+                    category: '부산광역시', values: [
                         { value: '강서구' },
                         { value: '금정구' },
                         { value: '기장군' },
@@ -53,7 +53,7 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '대구광역시', values: [
+                    category: '대구광역시', values: [
                         { value: '남구' },
                         { value: '달서구' },
                         { value: '달성군' },
@@ -65,7 +65,7 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '인천광역시', values: [
+                    category: '인천광역시', values: [
                         { value: '강화군' },
                         { value: '계양구' },
                         { value: '남구' },
@@ -80,7 +80,7 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '광주광역시', values: [
+                    category: '광주광역시', values: [
                         { value: '광산구' },
                         { value: '남구' },
                         { value: '동구' },
@@ -89,7 +89,7 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '대전광역시', values: [
+                    category: '대전광역시', values: [
                         { value: '대덕구' },
                         { value: '동구' },
                         { value: '서구' },
@@ -98,7 +98,7 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '울산광역시', values: [
+                    category: '울산광역시', values: [
                         { value: '남구' },
                         { value: '동구' },
                         { value: '북구' },
@@ -107,12 +107,12 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '세종특별자치시', values: [
+                    category: '세종특별자치시', values: [
                         { value: '세종시' }
                     ]
                 },
                 {
-                    subcategoryName: '경기도', values: [
+                    category: '경기도', values: [
                         { value: '가평군' },
                         { value: '고양시' },
                         { value: '과천시' },
@@ -144,7 +144,7 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '충청북도', values: [
+                    category: '충청북도', values: [
                         { value: '괴산군' },
                         { value: '단양군' },
                         { value: '보은군' },
@@ -158,7 +158,7 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '충청남도', values: [
+                    category: '충청남도', values: [
                         { value: '계룡시' },
                         { value: '공주시' },
                         { value: '금산군' },
@@ -176,7 +176,7 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '전라남도', values: [
+                    category: '전라남도', values: [
                         { value: '강진군' },
                         { value: '고흥군' },
                         { value: '곡성군' },
@@ -201,7 +201,7 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '경상북도', values: [
+                    category: '경상북도', values: [
                         { value: '경산시' },
                         { value: '경주시' },
                         { value: '고령군' },
@@ -228,7 +228,7 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '경상남도', values: [
+                    category: '경상남도', values: [
                         { value: '거제시' },
                         { value: '거창군' },
                         { value: '김해시' },
@@ -249,7 +249,7 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '강원특별자치도', values: [
+                    category: '강원특별자치도', values: [
                         { value: '강릉시' },
                         { value: '고성군' },
                         { value: '동해시' },
@@ -271,7 +271,7 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '전북특별자치도', values: [
+                    category: '전북특별자치도', values: [
                         { value: '고창군' },
                         { value: '군산시' },
                         { value: '김제시' },
@@ -289,7 +289,7 @@ export const conditions = {
                     ]
                 },
                 {
-                    subcategoryName: '제주특별자치도', values: [
+                    category: '제주특별자치도', values: [
                         { value: '서귀포시' },
                         { value: '제주시' }
                     ]
@@ -327,6 +327,15 @@ export const conditions = {
                 {value: '기관추천'},
                 {value: '이전기관'},
                 {value: '기타'},
+            ]},
+        ]
+    },
+    applicationPeriod : {
+        category: '모집기간', subcategories: [
+            {category: '접수상태', values: [
+                {value: '접수전'},
+                {value: '접수중'},
+                {value: '계약중'},
             ]},
         ]
     }
