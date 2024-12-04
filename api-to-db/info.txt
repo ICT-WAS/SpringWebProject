@@ -1,0 +1,8 @@
+{
+  "data.go.kr_key" : "api 인증키",
+  "username" : "아이디",
+  "password" : "비밀번호",
+  "database" : "데이터베이스 이름",
+  "host" : "localhost",
+  "port" : "포트번호"
+}
