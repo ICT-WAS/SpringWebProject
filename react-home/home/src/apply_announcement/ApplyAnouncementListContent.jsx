@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import NotificationButton from './NotificationButton';
 import { conditions } from './conditions';
 
-
 function NewSubscriptionCard({ subscription, index }) {
   return (
     <>

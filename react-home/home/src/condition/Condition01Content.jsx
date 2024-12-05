@@ -1,6 +1,7 @@
 import { Button, Dropdown, Form, Stack } from "react-bootstrap";
 import RadioButtonItem from "./RadioButtonItem";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function Condition01Content() {
 
@@ -8,9 +9,19 @@ export default function Condition01Content() {
 
     const houseHolderButtons = { name: 'isHouseholder', values: [{ value: '세대원' }, { value: '세대주' }] }
     const marriedButtons = { name: 'isMarried', values: [{ value: '미혼' }, { value: '기혼' }, { value: '예비신혼부부' }, { value: '한부모' }] }
+    const [formData, setFormData] = useState({});
+
+    function handleChangedSidoDropdown(e) {
+
+    }
+
+    function handleChangedGuGunDropdown(e) {
+        
+    }
 
     function handleClick(e) {
-        navigate("/condition-2");
+        console.log(formData);
+        // navigate("/condition-2");
     }
 
     return (
@@ -34,7 +45,7 @@ export default function Condition01Content() {
                 <div>
                     <p className="card-header-text">현재 거주지</p>
                     <Stack direction='horizontal' gap={2} >
-                        <Dropdown style={{ flex: 1 }}>
+                        <Dropdown style={{ flex: 1 }} onChange={handleChangedSidoDropdown}>
                             <Dropdown.Toggle variant="warning" className='dropdown-transparent flex-fill' >
                                 시/도
                             </Dropdown.Toggle>
@@ -43,7 +54,7 @@ export default function Condition01Content() {
                                 <Dropdown.Item href="#/action-1">서울특별시</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
-                        <Dropdown style={{ flex: 1 }}>
+                        <Dropdown style={{ flex: 1 }} onChange={handleChangedGuGunDropdown}>
                             <Dropdown.Toggle variant="warning" className='dropdown-transparent flex-fill' >
                                 구/군
                             </Dropdown.Toggle>
@@ -59,7 +70,7 @@ export default function Condition01Content() {
                 <div>
                     <p className="card-header-text">세대주 여부</p>
                     <Stack direction='horizontal' gap={2} >
-                        <RadioButtonItem buttons={houseHolderButtons} />
+                        <RadioButtonItem buttons={houseHolderButtons} onChange={({name, value}) => setFormData({...formData, [name]: value})} />
                     </Stack>
                 </div>
 
@@ -68,7 +79,7 @@ export default function Condition01Content() {
                 <div>
                     <p className="card-header-text">결혼을 하셨습니까?</p>
                     <Stack direction='vertical' gap={2} >
-                        <RadioButtonItem buttons={marriedButtons} />
+                        <RadioButtonItem buttons={marriedButtons} onChange={({name, value}) => setFormData({...formData, [name]: value})} />
                     </Stack>
                 </div>
 
