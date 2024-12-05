@@ -404,7 +404,6 @@ export default function MainContent() {
 
     
     setSelectedFilter((prevFilters) => {
-      console.log('prevFilters', {prevFilters}); 
       let handledUpdate = false;
 
       const updatedFilters = prevFilters.map((filter) => {
