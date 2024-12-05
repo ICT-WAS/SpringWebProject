@@ -42,6 +42,9 @@ dependencies {
 
 	//스프링 유효성 검사
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// openAPI
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
 }
 
 tasks.named('test') {
