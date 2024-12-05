@@ -28,8 +28,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String token = parseBearerToken(request);
             log.info("Filter is running...");
+            String token = parseBearerToken(request);
             Long userId;
 
             //토큰 검사. JWT -> 인가를 서버에 요청하지 않고도 검증 가능
@@ -54,11 +54,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.setContext(securityContext);
                 }
             }
+            //다음 필터 체인 실행
+            filterChain.doFilter(request, response);
+            log.info("Filter passed, request forwarded to next filter or handler or filter closing");
+
         } catch (Exception e) {
             logger.error("Could not set user authentication in security context", e);
         }
-        //다음 필터 체인 실행
-        filterChain.doFilter(request, response);
     }
 
     //요청에서 토큰 가져오기

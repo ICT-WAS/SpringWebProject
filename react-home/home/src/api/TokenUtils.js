@@ -1,7 +1,7 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
-export const CheckTokenExpired = (token) => {
+export const refreshTokenIfExpired = (token) => {
   //1. 토큰에 값이 없을 시 임의료 만료 처리
   if (!token) {
     return true;
@@ -19,15 +19,19 @@ export const CheckTokenExpired = (token) => {
       if (newToken) {
         localStorage.removeItem("accessToken");
         localStorage.setItem("accessToken", newToken);
+        //새로 설정한 토큰을 반환
+        return newToken;
       }
     }
-    //만료되지 않았을 시 아무런 변화 없음
+    //만료되지 않았을 시 기존 토큰 반환
+    return token;
   } catch (error) {
     console.error("토큰 디코딩 및 재발급 오류", error);
   }
 };
 
-const getUserIdFromToken = (token) => {
+//토큰에서 유저Id 가져오기
+export const getUserIdFromToken = (token) => {
   try {
     const decodedToken = jwtDecode(token);
     const userId = decodedToken.sub;
@@ -37,15 +41,15 @@ const getUserIdFromToken = (token) => {
   }
 };
 
+//서버에 액세스 토큰 재발급 API 호출
 const refreshAccessToken = async (token) => {
   try {
-    //서버에 액세스 토큰 재발급 API 호출
     const userId = getUserIdFromToken(token);
 
     const response = await axios.post(
       "http://localhost:8989/users/access-token/reset",
       { userId },
-      { withCredentials: true } // 쿠키 포함
+      { withCredentials: true } // 쿠키 포함, 리프레시 토큰을 함께 보냄
     );
 
     if (response.data.isSuccess) {
@@ -53,6 +57,31 @@ const refreshAccessToken = async (token) => {
       localStorage.setItem("accessToken", accessToken);
     }
   } catch (error) {
+    return null;
+  }
+};
+
+//로그인 한 유저 아이디 가져오기
+export const getUserId = () => {
+  try {
+    //로컬 스토리지에서 토큰 가져오기
+    const token = localStorage.getItem("accessToken");
+
+    if (!token) {
+      console.warn("현재 로그인 된 사용자가 없습니다.");
+      return null;
+    }
+
+    //토큰에서 유저 id 추출
+    const userId = getUserIdFromToken(token);
+
+    if (!userId) {
+      console.warn("유효한 유저 ID를 토큰에서 찾을 수 없습니다.");
+      return null;
+    }
+    return userId;
+  } catch (error) {
+    console.error("유저 id 가져오는 중 오류 발생:", error);
     return null;
   }
 };
