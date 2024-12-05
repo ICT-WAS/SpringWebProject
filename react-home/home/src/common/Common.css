@@ -120,6 +120,10 @@ td {
   align-content: center;
 }
 
+table tr:hover {
+  cursor: pointer;
+}
+
 .text-search {
   border-color: transparent;
   border-radius: 10px;

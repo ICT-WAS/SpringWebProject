@@ -4,15 +4,17 @@ import FilteredTag from './FilteredTag';
 import Nav from 'react-bootstrap/Nav';
 import React, { useState } from 'react';
 import NotificationButton from './NotificationButton';
+import { conditions } from './conditions';
 
-function NewSubscriptionCard({ subscription }) {
+
+function NewSubscriptionCard({ subscription, index }) {
   return (
     <>
       <Container>
         <Card body>
           <Row>
             <Col>
-              <Container>
+              <Container >
                 <Row>
                   <Col><p className='card-header-text'>
                     <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
@@ -38,7 +40,7 @@ function NewSubscriptionCard({ subscription }) {
   );
 }
 
-/* 모집공고 */
+/* 공고 리스트 */
 function NewSubscriptionCards() {
   /* 임시 데이터 */
   const subscriptions = [
@@ -48,19 +50,23 @@ function NewSubscriptionCards() {
     { title: '화성 비봉지구 B1블록 금성백조 예미지2차', type: '민영', region: '경기도 > 화성시', date: '2024-05-02' }
   ];
 
-  const newSubscriptionList = subscriptions.map(subscription =>
-    NewSubscriptionCard({ subscription })
+  const newSubscriptionList = subscriptions.map((subscription, index) =>
+    <NewSubscriptionCard  
+      key={subscription.title + index}
+      subscription={subscription}
+      index={index}
+   />
   );
 
   return (
     <>
       <p className='heading-text'>
-          모집공고
-        </p>
-        <p className='card-body-text mb-0'>0,000 건</p>
+        모집공고
+      </p>
+      <p className='card-body-text mb-0'>0,000 건</p>
 
       <Stack direction='vertical' gap={3}>
-      <Dropdown className="ms-auto px-3">
+        <Dropdown className="ms-auto px-3">
           <Dropdown.Toggle variant="warning" className='dropdown-transparent' >
             최신순
           </Dropdown.Toggle>
@@ -76,67 +82,44 @@ function NewSubscriptionCards() {
   );
 }
 
-function Filters() {
+/* 선택된 태그 목록*/
+function Filters({ selectedFilter, handleClose }) {
+  const filters = selectedFilter.map((filter) => {
+    const subcategories = filter.subcategories;
+
+    const subcategoriesTag = subcategories.map((sub, subIndex) => {
+      return sub.values.map((value, valueIndex) =>
+        <FilteredTag key={subIndex + '-' + valueIndex} filterName={value.value} handleClose={handleClose} />
+      );
+    })
+
+    return (
+      <React.Fragment key={filter.category}>
+        <Row>
+          <Col>
+            <p className='filter-category mb-2'>
+              {filter.category}
+            </p>
+          </Col>
+        </Row>
+        <Row className='mb-3'>
+          <Col>
+            <Stack direction="horizontal" gap={2} style={{ flexWrap: 'wrap' }}>
+              {subcategoriesTag}
+            </Stack>
+          </Col>
+        </Row>
+        </React.Fragment>
+    );
+  });
+
+
   return (
     <>
       <Stack direction='horizontal' gap={2} style={{ alignItems: 'flex-end' }}>
-
-
         <Container>
-          <Row>
-            <Col>
-              <p className='filter-category mb-2'>
-                희망지역
-              </p>
-            </Col>
-          </Row>
-          <Row className='mb-3'>
-            <Col>
-              <Stack direction="horizontal" gap={2}>
-                <FilteredTag filterName={'서울 전체'} />
-                <FilteredTag filterName={'경기도 광명시'} />
-                <FilteredTag filterName={'경기도 성남시'} />
-              </Stack>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col>
-              <p className='filter-category mb-2'>
-                주택정보
-              </p>
-            </Col>
-          </Row>
-          <Row className='mb-3'>
-            <Col>
-              <Stack direction="horizontal" gap={2}>
-                <FilteredTag filterName={'국민주택'} />
-                <FilteredTag filterName={'85m² 미만'} />
-                <FilteredTag filterName={'3억 이상 4억 미만'} />
-                <FilteredTag filterName={'생애최초'} />
-              </Stack>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col>
-              <p className='filter-category mb-2'>
-                모집기간
-              </p>
-            </Col>
-          </Row>
-          <Row className='mb-3'>
-            <Col>
-              <Stack direction="horizontal" gap={2}>
-                <FilteredTag filterName={'접수중'} />
-                <FilteredTag filterName={'일반공급접수기간:'} />
-              </Stack>
-            </Col>
-          </Row>
-
+          {filters}
         </Container>
-
-
         <Button variant='dark' style={{ whiteSpace: 'nowrap' }}>
           0,000 건의 공고 보기
         </Button>
@@ -145,21 +128,22 @@ function Filters() {
   );
 }
 
-function Conditions() {
+/* 조건 선택박스 */
+function Conditions({ onClickedFilter }) {
 
   const conditionCards = {
-    WishRegion: WishRegion,
-    HomeInfo: HomeInfo,
-    ApplicationPeriod: ApplicationPeriod
+    WishRegion: (props) => <WishRegion {...props} />,
+    HomeInfo: (props) => <HomeInfo {...props} />,
+    ApplicationPeriod: (props) => <ApplicationPeriod {...props} />,
   };
-  const [selectedCondition, setSelectedCondition] = useState(conditionCards['WishRegion']());
+
+  const [selectedCondition, setSelectedCondition] = useState(<WishRegion onClickedFilter={onClickedFilter} />);
 
   const handleSelect = (eventKey) => {
     if (conditionCards[eventKey]) {
-      const result = conditionCards[eventKey]();
-      setSelectedCondition(result);
+      const ResultComponent = conditionCards[eventKey];
+      setSelectedCondition(<ResultComponent onClickedFilter={onClickedFilter} />);
     }
-
   };
 
   return (
@@ -184,7 +168,66 @@ function Conditions() {
   );
 }
 
-function WishRegion() {
+function SubcategorySection({ subcategoryIndex, category, values, handleClick }) {
+  return <>
+    <div className='border-div'>
+      <p className='filter-category'>
+        {category}
+      </p>
+      <hr className='p-text' />
+      <div className="scrollable-table">
+        <Table hover borderless>
+          <tbody>
+
+            {values.map((item, index) => (
+              <tr key={item + index} onClick={handleClick}>
+                <td data-subcategory-index={subcategoryIndex} data-index={index} data-value={item.value}>{item.value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
+    </div>
+  </>
+}
+
+/* 희망지역 */
+function WishRegion({ onClickedFilter }) {
+
+  const categoryName = conditions.wishRegion.category;
+  const sidoData = conditions.wishRegion.subcategories;
+  const [sidoIndex, setSidoIndex] = useState(0);
+  const [gunguData, setGunguData] = useState(sidoData[0].values);
+
+
+  function handleClickSido(e) {
+    const selectedIndex = e.target.getAttribute('data-index');
+    setSidoIndex(selectedIndex);
+    setGunguData(sidoData[selectedIndex].values);
+  }
+
+  function handleClick(e) {
+    const selectedValue = e.target.getAttribute('data-value');
+    const subcategoryName = sidoData[sidoIndex].category;
+    onClickedFilter({ category: categoryName, subcategoryName: subcategoryName, value: selectedValue });
+  }
+
+  const sidoList = () => {
+    return sidoData.map((item, index) => (
+      <tr key={item + index} onClick={handleClickSido}>
+        <td data-index={index} data-value={item.category}>{item.category}</td>
+      </tr>
+    ));
+  }
+
+  const gunguList = () => {
+    return gunguData.map((item, index) => (
+      <tr key={item + index} onClick={handleClick}>
+        <td data-index={index} data-value={sidoData[sidoIndex].category + '>' + item.value}>{item.value}</td>
+      </tr>
+    ));
+  }
+
   return (
     <>
       <Stack direction='horizontal' style={{ width: '100%', padding: '0' }} gap={1}>
@@ -196,40 +239,7 @@ function WishRegion() {
           <div className="scrollable-table">
             <Table hover borderless>
               <tbody>
-                <tr>
-                  <td>서울특별시</td></tr>
-                <tr>
-                  <td>부산광역시</td></tr>
-                <tr>
-                  <td>대구광역시</td></tr>
-                <tr>
-                  <td>인천광역시</td></tr>
-                <tr>
-                  <td>광주광역시</td></tr>
-                <tr>
-                  <td>대전광역시</td></tr>
-                <tr>
-                  <td>울산광역시</td></tr>
-                <tr>
-                  <td>세종특별자치시</td></tr>
-                <tr>
-                  <td>경기도</td></tr>
-                <tr>
-                  <td>충청북도</td></tr>
-                <tr>
-                  <td>충청남도</td></tr>
-                <tr>
-                  <td>전라남도</td></tr>
-                <tr>
-                  <td>경상북도</td></tr>
-                <tr>
-                  <td>경상남도</td></tr>
-                <tr>
-                  <td>강원특별자치도</td></tr>
-                <tr>
-                  <td>전북특별자치도</td></tr>
-                <tr>
-                  <td>제주특별자치도</td></tr>
+                {sidoList()}
               </tbody>
 
             </Table>
@@ -244,42 +254,10 @@ function WishRegion() {
           <div className="scrollable-table">
             <Table hover borderless>
               <tbody>
-                <tr>
-                  <td>서울시 전체</td>
+                <tr key={'전체0'} onClick={handleClick}>
+                  <td data-index={0} data-value={sidoData[sidoIndex].category}>{'전체'}</td>
                 </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
-                <tr>
-                  <td>서울시 전체</td>
-                </tr>
+                {gunguList()}
               </tbody>
             </Table>
           </div>
@@ -289,137 +267,65 @@ function WishRegion() {
   );
 }
 
-function HomeInfo() {
+/* 주택정보 */
+function HomeInfo({ onClickedFilter }) {
+
+  const categoryName = conditions.homeInfo.category;
+  const subcategories = conditions.homeInfo.subcategories;
+
+  function handleClick(e) {
+    const selectedValue = e.target.getAttribute('data-value');
+    const subcategoryIndex = e.target.getAttribute('data-subcategory-index');
+    const subcategoryName = subcategories[subcategoryIndex].category;
+    onClickedFilter({ category: categoryName, subcategoryName: subcategoryName, value: selectedValue });
+  }
+
+  const subCategorieSections = () => {
+    return subcategories.map((subCategory, index) =>
+      <SubcategorySection key={subCategory + index}
+        subcategoryIndex = {index}
+        category={subCategory.category}
+           values={subCategory.values}
+          handleClick={handleClick} />
+    );
+  }
+
   return (
     <>
       <Stack direction='horizontal' style={{ width: '100%', padding: '0' }} gap={1}>
-        <div className='border-div'>
-          <p className='filter-category'>
-            주택분류
-          </p>
-          <hr className='p-text' />
-          <div className="scrollable-table">
-            <Table hover borderless>
-              <tbody>
-                <tr>
-                  <td>국민주택</td></tr>
-                <tr>
-                  <td>민영주택</td></tr>
-                <tr>
-                  <td>무순위</td></tr>
-              </tbody>
-
-            </Table>
-          </div>
-        </div>
-
-        <div className='border-div'>
-          <p className='filter-category'>
-            면적
-          </p>
-          <hr className='p-text' />
-          <div className="scrollable-table">
-            <Table hover borderless>
-              <tbody>
-                <tr>
-                  <td>85m² 미만</td>
-                </tr>
-                <tr>
-                  <td>85m² 이상 100m² 미만</td>
-                </tr>
-                <tr>
-                  <td>85m² 미만</td>
-                </tr>
-                <tr>
-                  <td>85m² 미만</td>
-                </tr>
-                <tr>
-                  <td>85m² 미만</td>
-                </tr>
-              </tbody>
-            </Table>
-          </div>
-        </div>
-
-        <div className='border-div'>
-          <p className='filter-category'>
-            공급금액
-          </p>
-          <hr className='p-text' />
-          <div className="scrollable-table">
-            <Table hover borderless>
-              <tbody>
-                <tr>
-                  <td>1개월 이상</td>
-                </tr>
-                <tr>
-                  <td>6개월 이상</td>
-                </tr>
-                <tr>
-                  <td>1년 이상</td>
-                </tr>
-                <tr>
-                  <td>2년 이상</td>
-                </tr>
-              </tbody>
-            </Table>
-          </div>
-        </div>
-
-        <div className='border-div'>
-          <p className='filter-category'>
-            특별공급
-          </p>
-          <hr className='p-text' />
-          <div className="scrollable-table">
-            <Table hover borderless>
-              <tbody>
-                <tr>
-                  <td>다자녀가구</td>
-                </tr>
-                <tr>
-                  <td>신혼부부</td>
-                </tr>
-                <tr>
-                  <td>생애최초</td>
-                </tr>
-                <tr>
-                  <td>청년</td>
-                </tr>
-              </tbody>
-            </Table>
-          </div>
-        </div>
-
+        {subCategorieSections()}
       </Stack>
     </>
   );
 }
 
-function ApplicationPeriod() {
+/* 모집기간 */
+function ApplicationPeriod({ onClickedFilter }) {
+
+  const categoryName = conditions.applicationPeriod.category;
+  const subcategories = conditions.applicationPeriod.subcategories;
+
+  function handleClick(e) {
+    const selectedValue = e.target.getAttribute('data-value');
+    const subcategoryIndex = e.target.getAttribute('data-subcategory-index');
+    const subcategoryName = subcategories[subcategoryIndex].category;
+    onClickedFilter({ category: categoryName, subcategoryId: subcategoryName, value: selectedValue });
+  }
+
+  const subCategorieSections = () => {
+    return subcategories.map((subCategory, index) =>
+      <SubcategorySection key={subCategory + index}
+        subcategoryIndex = {index}
+        category={subCategory.category}
+           values={subCategory.values}
+          handleClick={handleClick} />
+    );
+  }
+
   return (
     <>
       <Stack direction='horizontal' style={{ width: '100%', padding: '0' }} gap={1}>
-
-        <div className='border-div'>
-          <p className='filter-category'>
-            접수상태
-          </p>
-          <hr className='p-text' />
-          <div className="scrollable-table">
-            <Table hover borderless>
-              <tbody>
-                <tr>
-                  <td>접수전</td></tr>
-                <tr>
-                  <td>접수중</td></tr>
-                <tr>
-                  <td>계약중</td></tr>
-              </tbody>
-
-            </Table>
-          </div>
-        </div>
+        {subCategorieSections()}
 
         <div className='border-div'>
           <p className='filter-category'>
@@ -487,14 +393,88 @@ function ApplicationPeriod() {
 }
 
 export default function MainContent() {
+  const [selectedFilter, setSelectedFilter] = useState([]);
+
+  // 카테고리('희망지역') > 서브카테고리('시/도') > 값 ('군/구')
+  // 카테고리('주택정보') > 서브카테고리('주택분류') > 값 ('민영주택')
+  // {category: '주택정보', subcategories: [{category: '주택분류', values: [{value: '민영주택'}]}]}
+
+  /* 필터 적용시 */
+  function onClickedFilter({ category, subcategoryName, value }) {
+
+    
+    setSelectedFilter((prevFilters) => {
+      let handledUpdate = false;
+
+      const updatedFilters = prevFilters.map((filter) => {
+        if (filter.category !== category) {
+          return filter;
+        }
+
+        let updatedSubcategories = filter.subcategories.map((sub) => {
+          if (sub.category !== subcategoryName) {
+            return sub;
+          }
+
+          handledUpdate = true;
+
+          // 중복 여부를 확인하고 값 추가
+          const valueExists = sub.values.some((v) => v.value === value);
+
+          if (valueExists) {
+            return sub;
+          }
+
+          // 서브카테고리에 새로운 값을 추가한 객체 반환
+          return {
+            ...sub,
+            values: [...sub.values, { value: value }]
+          };
+        });
+
+        // 존재하는 카테고리에 서브카테고리와 값 추가
+        if (!handledUpdate) {
+          updatedSubcategories.push({ category: subcategoryName, values: [{ value }] });
+          handledUpdate = true;
+        }
+
+        return { ...filter, subcategories: updatedSubcategories };
+      })
+
+      // 새로운 카테고리에 새 값 추가
+      if (!handledUpdate) {
+        return [...prevFilters, { category: category, subcategories: [{ category: subcategoryName, values: [{ value }] }] }];
+      }
+
+      return updatedFilters;
+    });
+
+  }
+
+  /* 필터 삭제시 */
+  function handleClose(filterName) {
+    setSelectedFilter((prevFilters) =>
+      prevFilters.map(filter => ({
+        ...filter, subcategories:
+          filter.subcategories.map(sub => ({
+            ...sub, values:
+              sub.values.filter(value => value.value !== filterName),
+          })),
+        }))
+        .filter((filter) =>
+          filter.subcategories.some((sub) => sub.values.length > 0)
+        )
+    );
+  }
+
   return (
     <>
       <Container>
         <Row className="mb-5">
-          <Conditions />
+          <Conditions onClickedFilter={onClickedFilter} />
         </Row>
         <Row className="mb-5">
-          <Filters />
+          <Filters selectedFilter={selectedFilter} handleClose={handleClose} />
         </Row>
         <Row>
           <NewSubscriptionCards />
