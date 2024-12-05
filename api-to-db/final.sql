@@ -123,6 +123,7 @@ CREATE TABLE `post` (
 	`title`	VARCHAR(100)	NOT NULL,
 	`subject`	TEXT	NOT NULL,
 	`created_at`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
+	`updated_at`	DATETIME	NULL,
 	PRIMARY KEY (`post_id`),
 	FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`) ON DELETE CASCADE
 );
@@ -135,6 +136,7 @@ CREATE TABLE `comment` (
 	`comment_id2`	BIGINT	NULL,
 	`comment`	TEXT	NOT NULL,
 	`created_at`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
+	`updated_at`	DATETIME	NULL,
 	PRIMARY KEY (`comment_id`),
 	FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`) ON DELETE CASCADE,
 	FOREIGN KEY (`post_id`) REFERENCES `post` (`post_id`)   ON DELETE CASCADE,
