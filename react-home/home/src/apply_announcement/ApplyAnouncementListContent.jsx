@@ -7,14 +7,14 @@ import NotificationButton from './NotificationButton';
 import { conditions } from './conditions';
 
 
-function NewSubscriptionCard({ subscription }) {
+function NewSubscriptionCard({ subscription, index }) {
   return (
     <>
       <Container>
         <Card body>
           <Row>
             <Col>
-              <Container>
+              <Container >
                 <Row>
                   <Col><p className='card-header-text'>
                     <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
@@ -50,8 +50,12 @@ function NewSubscriptionCards() {
     { title: '화성 비봉지구 B1블록 금성백조 예미지2차', type: '민영', region: '경기도 > 화성시', date: '2024-05-02' }
   ];
 
-  const newSubscriptionList = subscriptions.map(subscription =>
-    NewSubscriptionCard({ subscription })
+  const newSubscriptionList = subscriptions.map((subscription, index) =>
+    <NewSubscriptionCard  
+      key={subscription.title + index}
+      subscription={subscription}
+      index={index}
+   />
   );
 
   return (
@@ -83,14 +87,14 @@ function Filters({ selectedFilter, handleClose }) {
   const filters = selectedFilter.map((filter) => {
     const subcategories = filter.subcategories;
 
-    const subcategoriesTag = subcategories.map((sub) => {
-      return sub.values.map((value) =>
-        <><FilteredTag filterName={value.value} handleClose={handleClose} /></>
+    const subcategoriesTag = subcategories.map((sub, subIndex) => {
+      return sub.values.map((value, valueIndex) =>
+        <FilteredTag key={subIndex + '-' + valueIndex} filterName={value.value} handleClose={handleClose} />
       );
     })
 
     return (
-      <>
+      <React.Fragment key={filter.category}>
         <Row>
           <Col>
             <p className='filter-category mb-2'>
@@ -100,12 +104,12 @@ function Filters({ selectedFilter, handleClose }) {
         </Row>
         <Row className='mb-3'>
           <Col>
-            <Stack direction="horizontal" gap={2}>
+            <Stack direction="horizontal" gap={2} style={{ flexWrap: 'wrap' }}>
               {subcategoriesTag}
             </Stack>
           </Col>
         </Row>
-      </>
+        </React.Fragment>
     );
   });
 
@@ -114,12 +118,8 @@ function Filters({ selectedFilter, handleClose }) {
     <>
       <Stack direction='horizontal' gap={2} style={{ alignItems: 'flex-end' }}>
         <Container>
-
           {filters}
-
         </Container>
-
-
         <Button variant='dark' style={{ whiteSpace: 'nowrap' }}>
           0,000 건의 공고 보기
         </Button>
@@ -168,7 +168,7 @@ function Conditions({ onClickedFilter }) {
   );
 }
 
-function SubcategorySection({ category, values, handleClick }) {
+function SubcategorySection({ subcategoryIndex, category, values, handleClick }) {
   return <>
     <div className='border-div'>
       <p className='filter-category'>
@@ -180,8 +180,8 @@ function SubcategorySection({ category, values, handleClick }) {
           <tbody>
 
             {values.map((item, index) => (
-              <tr key={index} onClick={handleClick}>
-                <td data-index={index} data-value={item.value}>{item.value}</td>
+              <tr key={item + index} onClick={handleClick}>
+                <td data-subcategory-index={subcategoryIndex} data-index={index} data-value={item.value}>{item.value}</td>
               </tr>
             ))}
           </tbody>
@@ -207,15 +207,14 @@ function WishRegion({ onClickedFilter }) {
   }
 
   function handleClick(e) {
-    const selectedIndex = e.target.getAttribute('data-index');
     const selectedValue = e.target.getAttribute('data-value');
-    const subcategoryName = sidoData[selectedIndex].category;
+    const subcategoryName = sidoData[sidoIndex].category;
     onClickedFilter({ category: categoryName, subcategoryName: subcategoryName, value: selectedValue });
   }
 
   const sidoList = () => {
     return sidoData.map((item, index) => (
-      <tr key={index} onClick={handleClickSido}>
+      <tr key={item + index} onClick={handleClickSido}>
         <td data-index={index} data-value={item.category}>{item.category}</td>
       </tr>
     ));
@@ -223,7 +222,7 @@ function WishRegion({ onClickedFilter }) {
 
   const gunguList = () => {
     return gunguData.map((item, index) => (
-      <tr key={index} onClick={handleClick}>
+      <tr key={item + index} onClick={handleClick}>
         <td data-index={index} data-value={sidoData[sidoIndex].category + '>' + item.value}>{item.value}</td>
       </tr>
     ));
@@ -255,7 +254,7 @@ function WishRegion({ onClickedFilter }) {
           <div className="scrollable-table">
             <Table hover borderless>
               <tbody>
-                <tr key={0} onClick={handleClick}>
+                <tr key={'전체0'} onClick={handleClick}>
                   <td data-index={0} data-value={sidoData[sidoIndex].category}>{'전체'}</td>
                 </tr>
                 {gunguList()}
@@ -276,14 +275,18 @@ function HomeInfo({ onClickedFilter }) {
 
   function handleClick(e) {
     const selectedValue = e.target.getAttribute('data-value');
-    const selectedIndex = e.target.getAttribute('data-index');
-    const subcategoryName = subcategories[selectedIndex].category;
+    const subcategoryIndex = e.target.getAttribute('data-subcategory-index');
+    const subcategoryName = subcategories[subcategoryIndex].category;
     onClickedFilter({ category: categoryName, subcategoryName: subcategoryName, value: selectedValue });
   }
 
   const subCategorieSections = () => {
-    return subcategories.map((subCategory) =>
-      SubcategorySection({ category: subCategory.category, values: subCategory.values, handleClick: handleClick })
+    return subcategories.map((subCategory, index) =>
+      <SubcategorySection key={subCategory + index}
+        subcategoryIndex = {index}
+        category={subCategory.category}
+           values={subCategory.values}
+          handleClick={handleClick} />
     );
   }
 
@@ -304,13 +307,18 @@ function ApplicationPeriod({ onClickedFilter }) {
 
   function handleClick(e) {
     const selectedValue = e.target.getAttribute('data-value');
-    const selectedIndex = e.target.getAttribute('data-index');
-    onClickedFilter({ category: categoryName, subcategoryId: selectedIndex, value: selectedValue });
+    const subcategoryIndex = e.target.getAttribute('data-subcategory-index');
+    const subcategoryName = subcategories[subcategoryIndex].category;
+    onClickedFilter({ category: categoryName, subcategoryId: subcategoryName, value: selectedValue });
   }
 
   const subCategorieSections = () => {
-    return subcategories.map((subCategory) =>
-      SubcategorySection({ category: subCategory.category, values: subCategory.values, handleClick: handleClick })
+    return subcategories.map((subCategory, index) =>
+      <SubcategorySection key={subCategory + index}
+        subcategoryIndex = {index}
+        category={subCategory.category}
+           values={subCategory.values}
+          handleClick={handleClick} />
     );
   }
 
@@ -394,7 +402,9 @@ export default function MainContent() {
   /* 필터 적용시 */
   function onClickedFilter({ category, subcategoryName, value }) {
 
+    
     setSelectedFilter((prevFilters) => {
+      console.log('prevFilters', {prevFilters}); 
       let handledUpdate = false;
 
       const updatedFilters = prevFilters.map((filter) => {
