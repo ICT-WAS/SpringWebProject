@@ -37,9 +37,11 @@ public enum BaseResponseStatus {
     PASSWORD_DECRYPTION_ERROR(false, 4002, "비밀번호 복호화에 실패하였습니다."),
 
     /**
-     * 5000: 토큰 만료 오류
+     * 5000: 토큰 오류
      */
-    EXPIRED_USER_JWT(false,5000,"만료된 JWT입니다.");
+    EXPIRED_USER_JWT(false,5000,"만료된 JWT입니다."),
+    INVALID_JWT(false, 5001, "유효하지 않은 JWT입니다."),
+    USER_NOT_FOUND_IN_TOKEN(false, 5001, "토큰에서 유저 정보를 찾는 데 실패하였습니다.");
 
     private final boolean isSuccess;
     private final int code;

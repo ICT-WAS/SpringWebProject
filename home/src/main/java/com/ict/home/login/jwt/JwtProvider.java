@@ -4,6 +4,7 @@ import com.ict.home.exception.BaseException;
 import com.ict.home.user.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.io.Decoders;
@@ -11,7 +12,8 @@ import io.jsonwebtoken.io.Decoders;
 import java.security.Key;
 import java.util.Date;
 
-import static com.ict.home.exception.BaseResponseStatus.EXPIRED_USER_JWT;
+import static com.ict.home.exception.BaseResponseStatus.*;
+import static java.lang.Long.parseLong;
 
 @Slf4j
 @Component
@@ -86,8 +88,8 @@ public class JwtProvider {
     }
 
     //토큰의 Bearer 제거 메서드
-    public String BearerRemove(String token) {
-        return token.substring("Bearer ".length());
+    public String bearerRemove(String token) {
+        return token.substring(BEARER_TYPE.length());
     }
 
     //토큰의 남은 유효시간
@@ -101,5 +103,45 @@ public class JwtProvider {
         // 현재 시간
         long now = System.currentTimeMillis();
         return (expiration.getTime() - now);
+    }
+
+    /**
+     * 토큰에서 유저 아이디 추출
+     */
+    public Long getUserIdFromToken(HttpServletRequest request) {
+        //요청 header 에서 Authorization 부분만 추출
+        String authHeader = request.getHeader("Authorization");
+        log.info("authHeader: {}", authHeader);
+
+        //추출한 문장이 null 이거나 Bearer 로 시작하지 않을 시 '유효하지 않은 토큰'
+        if (authHeader == null || !authHeader.startsWith(BEARER_TYPE)) {
+            throw new BaseException(INVALID_JWT);
+        }
+
+        //추출한 풀 토큰에서 맨 앞 Bearer 제거
+        String token = bearerRemove(authHeader);
+
+        //토큰 유효성 검사 - 실패 시 '유효하지 않은 토큰'
+        if (!validateToken(token)) {
+            throw new BaseException(INVALID_JWT);
+        }
+
+        //사용자 정보 추출
+        long userId;
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            //유저 확인
+            userId = parseLong(claims.get("userId", String.class));
+
+        } catch (Exception e) {
+            throw new BaseException(USER_NOT_FOUND_IN_TOKEN);
+        }
+
+        return userId;
     }
 }
