@@ -41,7 +41,8 @@ public enum BaseResponseStatus {
      */
     EXPIRED_USER_JWT(false,5000,"만료된 JWT입니다."),
     INVALID_JWT(false, 5001, "유효하지 않은 JWT입니다."),
-    USER_NOT_FOUND_IN_TOKEN(false, 5001, "토큰에서 유저 정보를 찾는 데 실패하였습니다.");
+    USER_NOT_FOUND_IN_TOKEN(false, 5002, "토큰으로 유저 정보를 찾는 데 실패하였습니다."),
+    TOKEN_NOT_FOUND_IN_USER(false, 5003, "유저 정보로 토큰을 찾는 데 실패하였습니다.");
 
     private final boolean isSuccess;
     private final int code;

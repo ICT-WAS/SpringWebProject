@@ -65,7 +65,7 @@ const LoginStateButton = () => {
         setTimeout(() => {
           localStorage.removeItem("accessToken");
           setIsLogin(false);
-          window.location.href = "http://localhost:3000";
+          // window.location.href = "http://localhost:3000"; 서버에서 리다이렉트
         }, 500);
       }
     } catch (error) {
