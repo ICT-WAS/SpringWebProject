@@ -19,7 +19,7 @@ public class Token {
     @Column
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int tokenId; // 토큰의 식별자
+    private Long id; // 토큰의 식별자
 
     @Column(nullable = true)
     private String refreshToken;
@@ -46,7 +46,7 @@ public class Token {
         this.expirationDate = expirationDate;
     }
 
-    //만료일 확인 - 만료일이 지금보다 이후일 시 true(지금보다 이전이거나 널이 아닐 시 true)
+    //만료일 확인 - 만료일이 지금보다 이전일 시 true(지금보다 이전이거나 널이 아닐 시 true)
     public boolean isExpired() {
         return expirationDate != null && expirationDate.isBefore(LocalDateTime.now());
     }

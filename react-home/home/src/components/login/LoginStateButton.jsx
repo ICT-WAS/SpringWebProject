@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGlobalContext } from "../../Context";
 import { Col, Button } from "react-bootstrap";
 import axios from "axios";
@@ -11,6 +11,7 @@ const LoginStateButton = () => {
 
   //모달 상태 관리
   const [isModal, setIsModal] = useState(false);
+  const confirmModalRef = useRef(null);
 
   //로그아웃
   const [logoutError, setLogoutError] = useState("");
@@ -53,7 +54,10 @@ const LoginStateButton = () => {
         "http://localhost:8989/users/logout",
         {},
         {
-          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true, //쿠키에 저장된 리프레시 토큰을 요청 데이터에 추가
         }
       );
 
@@ -108,6 +112,7 @@ const LoginStateButton = () => {
           title={logoutErrorTitle}
           message={logoutError}
           onClose={closeModal}
+          ref={confirmModalRef}
         />
       )}
     </>
