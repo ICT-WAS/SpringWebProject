@@ -53,6 +53,10 @@ function NavBar() {
   function handleListClick() {
     navigate("/subscriptions");
   }
+
+  function handleConditionsClick() {
+    navigate("/conditions");
+  }
                 
   return (
     <>
@@ -80,14 +84,13 @@ function NavBar() {
           </Col>
 
           <Col md="auto">
-            <p className="nav-bar-links">
-              <a
-                href="#"
+            <Button variant="link" onClick={handleConditionsClick}
                 className="link-body-emphasis link-underline link-underline-opacity-0"
               >
+                <p className="nav-bar-links">
                 조건 등록
-              </a>
-            </p>
+                </p>
+              </Button>
           </Col>
 
           <Col md="auto">
