@@ -20,7 +20,7 @@ public class Family {
     private Long memberId;
 
     @Schema(description = "관계")
-    private String relationship;
+    private String relationship; // https://miro.com/app/board/uXjVLQRFe_4=/ 찾기 '가족관계'
 
     @Schema(description = "동거여부 (0: 동거x, 1: 동거o, 2: 배우자와 동거o)")
     private Integer livingTogether;
