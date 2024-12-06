@@ -14,6 +14,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/community")
 public class CommunityController {
 
+    @GetMapping("")
+    @Operation(summary = "게시글 목록", description = "게시글을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 조회 성공",
+                    content = @Content(schema = @Schema(implementation = Post.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
+    })
+    public ResponseEntity<?> getPostList(
+            @Parameter(name = "keyword", description = "조회할 키워드") String keyword) {
+
+        return ResponseEntity.ok(new Post());
+    }
+
     @PostMapping("")
     @Operation(summary = "게시글 등록", description = "새로운 게시글을 등록합니다.")
     @ApiResponses(value = {
@@ -23,7 +38,7 @@ public class CommunityController {
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
     })
-    public ResponseEntity<?> posting(
+    public ResponseEntity<?> addPost(
             @Parameter(name = "memberId", description = "게시글 작성자의 고유 ID") Long memberId,
             @Parameter(name = "title", description = "게시글 제목") String title,
             @Parameter(name = "subject", description = "게시글 본문 내용") String subject) {
