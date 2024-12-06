@@ -1,5 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
+/* input type이 number일 때 스피너 감추기 */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
 .main-image-container {
     width: 100%; /* Container의 가로에 맞추기 */
     overflow: hidden; /* 넘치는 부분을 잘라냄 */
