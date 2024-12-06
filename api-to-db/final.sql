@@ -195,7 +195,7 @@ CREATE TABLE `condition01` (
 	`si_do`	VARCHAR(60)	NOT NULL,
 	`gun_gu`	VARCHAR(60)	NOT NULL,
 	`transfer_date`	DATE	NOT NULL,
-	`Gyungi_date`	DATE	NULL,
+	`gyunggi_date`	DATE	NULL,
 	`metropolitan_area_date`	DATE	NULL,
 	`householder`	INTEGER	NOT NULL	COMMENT '0: 본인이 세대원 / 1 : 본인이 세대주',
 	`married`	INTEGER	NOT NULL	COMMENT '0: 미혼 / 1: 기혼 / 2: 예비신혼부부 / 3: 한부모',
