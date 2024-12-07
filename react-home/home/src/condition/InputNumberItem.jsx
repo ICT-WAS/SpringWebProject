@@ -1,32 +1,32 @@
 import { Form } from "react-bootstrap";
 import { useState } from "react";
 
-export function InputNumberItem({ number, question, name, onChange, maxLength }) {
+export function InputNumberItem({ number, question, name, onChange, maxLength, placeholder }) {
 
     return (
         <>
             <div key={`${number}-${question}`}>
                 <p className="card-header-text"><b className="px-2">{number.toString().padStart(2, '0')}</b>{question}</p>
-                <InputText name={name} onChange={onChange} maxLength={maxLength} />
+                <InputText name={name} onChange={onChange} maxLength={maxLength} placeholder={placeholder} />
             </div>
         </>
     );
 }
 
-export function InputNumberSubItem({ number, question, depth = 1, name, onChange, maxLength }) {
+export function InputNumberSubItem({ number, question, depth = 1, name, onChange, maxLength, placeholder }) {
     const marginClass = `ms-${depth * 1}`;
 
     return (
         <>
             <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
                 <p className="card-header-text">{number}.&nbsp;{question}</p>
-                <InputText name={name} onChange={onChange} maxLength={maxLength} />
+                <InputText name={name} onChange={onChange} maxLength={maxLength} placeholder={placeholder} />
             </div>
         </>
     );
 }
 
-export function InputText({ name, onChange, maxLength }) {
+export function InputText({ name, onChange, maxLength, placeholder }) {
 
     function handleInputChange(e) {
         const name = e.target.getAttribute('name');
@@ -38,7 +38,7 @@ export function InputText({ name, onChange, maxLength }) {
         <>
             <Form.Control
                     type="number"
-                    placeholder="19991210"
+                    placeholder={placeholder}
                     name={name}
                     onChange={handleInputChange}
                     required
@@ -47,7 +47,7 @@ export function InputText({ name, onChange, maxLength }) {
     );
 }
 
-export function InputNumberLoopSubItemWithFollowQuestions({ number, question, depth = 1, name, onChange, handleFollowUpQuestion, subQuestion, maxLength }) {
+export function InputNumberLoopSubItemWithFollowQuestions({ number, question, depth = 1, name, onChange, handleFollowUpQuestion, subQuestion, maxLength, placeholder, unit }) {
     const marginClass = `ms-${depth * 1}`;
 
     return (
@@ -55,13 +55,13 @@ export function InputNumberLoopSubItemWithFollowQuestions({ number, question, de
             <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
                 <p className="card-header-text">{number}.&nbsp;{question}</p>
                 <InputTextWithFollowQuestions name={name} onChange={onChange} 
-                    handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} maxLength={maxLength} />
+                    handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} maxLength={maxLength} placeholder={placeholder} unit={unit} />
             </div>
         </>
     );
 }
 
-function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, subQuestion, maxLength }) {
+function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, subQuestion, maxLength = 8, placeholder, unit }) {
 
     const [repeatCount, setRepeatCount] = useState(0);
 
@@ -84,12 +84,12 @@ function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, 
         <>
             <Form.Control
                     type="number"
-                    placeholder="19991210"
+                    placeholder={placeholder}
                     name={name}
                     onChange={handleInputChange}
                     required
                 />
-            
+
             {Array.from({ length: repeatCount }).map((_, index) => (
             <div key={index}>
                 {subQuestion({ 
