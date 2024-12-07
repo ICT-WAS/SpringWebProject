@@ -31,8 +31,8 @@ public class Condition01 {
     @Schema(description = "입주 일자")
     private LocalDate transferDate;
 
-    @Schema(description = "경기도 입주일")
-    private LocalDate gyeonggiDate;
+    @Schema(description = "현재 지역 입주일")
+    private LocalDate regionMoveInDate;
 
     @Schema(description = "수도권 입주일")
     private LocalDate metropolitanAreaDate;
