@@ -20,7 +20,7 @@ export function RadioButtonSubItem({ number, question, buttons, direction, depth
 
     return (
         <>
-            <div key={`${number}-${question}`} style={{ backgroundColor: '#E6E6E6'}} className={marginClass}>
+            <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
                 <p className="card-header-text">{number}.{question}</p>
                 <StackedRadioButtons buttons={buttons} direction={direction} flexAuto={flexAuto} onChange={onChange}
                     handleFollowUpQuestion={handleFollowUpQuestion} />

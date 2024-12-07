@@ -18,7 +18,7 @@ export function InputNumberSubItem({ number, question, depth = 1, name, onChange
 
     return (
         <>
-            <div key={`${number}-${question}`} style={{ backgroundColor: '#E6E6E6'}} className={marginClass}>
+            <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
                 <p className="card-header-text">{number}.&nbsp;{question}</p>
                 <InputText name={name} onChange={onChange} maxLength={maxLength} />
             </div>
@@ -47,12 +47,12 @@ export function InputText({ name, onChange, maxLength }) {
     );
 }
 
-export function InputNumberSubItemWithFollowQuestions({ number, question, depth = 1, name, onChange, handleFollowUpQuestion, subQuestion, maxLength }) {
+export function InputNumberLoopSubItemWithFollowQuestions({ number, question, depth = 1, name, onChange, handleFollowUpQuestion, subQuestion, maxLength }) {
     const marginClass = `ms-${depth * 1}`;
 
     return (
         <>
-            <div key={`${number}-${question}`} style={{ backgroundColor: '#E6E6E6'}} className={marginClass}>
+            <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
                 <p className="card-header-text">{number}.&nbsp;{question}</p>
                 <InputTextWithFollowQuestions name={name} onChange={onChange} 
                     handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} maxLength={maxLength} />
@@ -63,13 +63,13 @@ export function InputNumberSubItemWithFollowQuestions({ number, question, depth 
 
 function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, subQuestion, maxLength }) {
 
-    const [subQuestionVisibility, setSubQuestionVisibility] = useState(false);
+    const [repeatCount, setRepeatCount] = useState(0);
 
     function handleInputChange(e) {
         const name = e.target.getAttribute('name');
         const value = e.target.value;
         onChange({name: name, value: value});
-        setSubQuestionVisibility(e.target.value > 0);
+        setRepeatCount(e.target.value);
 
         if (typeof handleFollowUpQuestion === 'function') {
             let visible = false;
@@ -89,8 +89,15 @@ function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, 
                     onChange={handleInputChange}
                     required
                 />
-
-            {subQuestion({ onChangedInputValue: onChange, visibility: subQuestionVisibility })}
+            
+            {Array.from({ length: repeatCount }).map((_, index) => (
+            <div key={index}>
+                {subQuestion({ 
+                    onChangedInputValue: onChange, 
+                    childCount: index + 1
+                })}
+            </div>
+            ))}
         </>
     );
 }
