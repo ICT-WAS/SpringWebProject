@@ -216,6 +216,7 @@ function LivingWithChildrenFollwUpQuestion({ onChangedInputValue, hasSpouse, han
 
     return (
         <InputNumberLoopSubItemWithFollowQuestions number={'3-1'} question={'몇 명의 자녀와 살고 계신가요?'} depth={3}
+
             name={'livingWithChildren'} onChange={onChangedInputValue} 
             handleFollowUpQuestion={handleFollowUpQuestion}
             subQuestion={LivingWithChildrenInfoQuestion} unit={'명'} maxLength={2} placeholder={placeholderText.peopleCountType} />
@@ -227,7 +228,7 @@ function LivingWithChildrenInfoQuestion({ onChangedInputValue, handleFollowUpQue
 
     return (
         <CheckButtonSubItemWithFollowQuestions number={'3-2'} question={`자녀${childCount} `} depth={4}
-            buttons={{name: 'isFetus', values:[{value: '태아', hasFollowUpQuestion: true }]}} 
+            buttons={{name: `isFetus${childCount}`, values:[{value: '태아', hasFollowUpQuestion: true }]}} 
             onChange={onChangedInputValue} handleFollowUpQuestion={handleFollowUpQuestion} 
             subQuestion={LivingWithChildrenFollwUpQuestion2} reverseCheck={true} />
     );
