@@ -37,7 +37,7 @@ const Phone = ({ phoneNumber, setPhoneNumber }) => {
     setIsChecking(true); //중복 체크 시작
     if (phoneNumber) {
       axios
-        .get(`http://localhost:8989/users/check-phone?phone=${phoneNumber}`)
+        .get(`http://localhost:8989/users/check/phone?phone=${phoneNumber}`)
         .then((response) => {
           if (response.data) {
             //response.date=true or false

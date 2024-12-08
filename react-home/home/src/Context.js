@@ -10,6 +10,8 @@ export const AppProvider = ({ children }) => {
   const [isLogin, setIsLogin] = useState(false);
   //로그인한 유저 id 설정
   const [userId, setUserId] = useState(null);
+  //로딩 상태 추가
+  const [loading, setLoading] = useState(true);
 
   //토큰 정보로 로그인 여부와 로그인 아이디 반환하기
   const updateLoginStatus = (token) => {
@@ -20,6 +22,7 @@ export const AppProvider = ({ children }) => {
       setIsLogin(false);
       setUserId(null);
     }
+    setLoading(false); //상태 설정 후 세팅 완료
   };
 
   //토큰 및 유저 ID 초기화
@@ -27,6 +30,10 @@ export const AppProvider = ({ children }) => {
     const token = localStorage.getItem("accessToken");
     updateLoginStatus(token);
   }, []);
+
+  if (loading) {
+    return "로그인 여부 로딩 중...";
+  }
 
   return (
     //<AppContext.Provider>: 상태와 업데이트 함수 등을 자식 컴포넌트에 제공

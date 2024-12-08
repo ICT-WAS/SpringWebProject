@@ -21,7 +21,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping
+    @GetMapping("test")
     public String userTest() {
         return "cors 유저 테스트";
     }
@@ -65,17 +65,17 @@ public class UserController {
     /**
      * 비동기 처리를 위한 email & phoneNumber 중복 체크
      */
-    @GetMapping("/check-email")
+    @GetMapping("/check/email")
     public boolean checkEmail(@RequestParam("email") String email) {
         return userService.checkEmailExists(email);
     }
 
-    @GetMapping("/check-phone")
+    @GetMapping("/check/phone")
     public boolean checkPhoneNumber(@RequestParam("phone") String phone) {
         return userService.checkPhoneNumberExists(phone);
     }
 
-    @GetMapping("/check-username")
+    @GetMapping("/check/username")
     public boolean checkUsername(@RequestParam("username") String username) {
         return userService.checkUsernameExists(username);
     }
@@ -83,8 +83,8 @@ public class UserController {
     /**
      * 액세스 토큰을 재발급하기 위한 엔드포인트
      */
-    @PostMapping("/access-token/reset")
-    public BaseResponse<String> resetAccessToken(@RequestBody Long userId) {
+    @PostMapping("/check/access-token/reset")
+    public BaseResponse<String> resetAccessToken(@RequestParam("userId") Long userId) {
         try{
             return new BaseResponse<>(userService.createAccessToken(userId));
         } catch(BaseException exception) {
