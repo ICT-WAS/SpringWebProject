@@ -22,7 +22,7 @@ const Login = () => {
   const [loginErrorTitle, setLoginErrorTitle] = useState("");
   const [loading, setLoading] = useState(false);
   //로그인 상태를 관리하는 전역 변수
-  const { setIsLogin } = useGlobalContext();
+  const { isLogin, setIsLogin } = useGlobalContext();
 
   //에러 메시지가 변할 시 모달 출력
   useEffect(() => {
@@ -31,6 +31,8 @@ const Login = () => {
       setIsModal(true);
     }
   }, [loginError]);
+
+  useEffect(() => {}, [isLogin]); // isLogin이 변경될 때마다 실행됨
 
   //모달 닫을 때
   const closeModal = () => {
@@ -64,14 +66,16 @@ const Login = () => {
       );
 
       if (response.data.isSuccess) {
-        setTimeout(() => {
-          //토큰 추출
-          const { accessToken } = response.data.result;
-          localStorage.setItem("accessToken", accessToken);
-          setIsLogin(true);
-          //로그인 성공 시 리다이렉트 - 로그인 성공해도 해당 페이지에 머물러야 할 수 있음, 차후 조건 처리 필요함!
-          window.location.href = "http://localhost:3000";
-        }, 500);
+        // setTimeout(() => {
+        //토큰 추출
+        const { accessToken } = response.data.result;
+        localStorage.setItem("accessToken", accessToken);
+        setIsLogin(true);
+
+        //로그인 성공 시 리다이렉트 - 로그인 성공해도 해당 페이지에 머물러야 할 수 있음, 차후 조건 처리 필요함!
+        window.location.href = "http://localhost:3000";
+
+        // }, 500);
       } else {
         setLoginErrorTitle("로그인 실패");
         setLoginError(response.data.message);

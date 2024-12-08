@@ -34,7 +34,7 @@ const Username = ({ username, setUsername }) => {
     setIsChecking(true); //중복 체크 시작
     if (username) {
       axios
-        .get(`http://localhost:8989/users/check-username?username=${username}`)
+        .get(`http://localhost:8989/users/check/username?username=${username}`)
         .then((response) => {
           if (response.data) {
             //response.date=true or false

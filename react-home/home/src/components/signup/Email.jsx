@@ -36,7 +36,7 @@ const Email = ({ email, setEmail }) => {
     setIsChecking(true); //중복 체크 시작
     if (email) {
       axios
-        .get(`http://localhost:8989/users/check-email?email=${email}`)
+        .get(`http://localhost:8989/users/check/email?email=${email}`)
         .then((response) => {
           if (response.data) {
             //response.date=true or false

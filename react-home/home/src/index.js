@@ -16,6 +16,9 @@ import Condition01 from "./condition/Condition01";
 import Condition02 from "./condition/Condition02";
 import Condition03 from "./condition/Condition03";
 import Conditions from "./condition/Conditions";
+import UserTest from "./components/user/UserTest";
+import PrivateRoute from "./components/routes/PrivateRoute";
+import LoginRoute from "./components/routes/LoginRoute";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -31,14 +34,35 @@ root.render(
           }
         />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
         <Route path="/subscriptions" element={<ApplyAnnouncementList />} />
         <Route path="/subscriptions/info" element={<ApplyAnnouncement />} />
-
         <Route path="/conditions" element={<Conditions />} />
         <Route path="/condition-1" element={<Condition01 />} />
         <Route path="/condition-2" element={<Condition02 />} />
         <Route path="/condition-3" element={<Condition03 />} />
+
+        {/* 로그인한 사용자는 접근할 수 없음 - LoginRoute 컴포넌트로 감싸면 보호 설정 됨 */}
+        {/* 로그인한 사용자가 login 페이지 접근 시 메인 페이지("/")로 리다이렉트 */}
+        <Route
+          path="/login"
+          element={
+            <LoginRoute>
+              <Login />
+            </LoginRoute>
+          }
+        />
+
+        {/* 로그인한 사용자만 접근할 수 있는 페이지 - PrivateRoute 컴포넌트로 감싸면 보호 설정 됨 */}
+        {/* 로그인하지 않으면 로그인 페이지(/login)로 리다이렉트 */}
+        {/* 테스트 페이지입니다. -hw */}
+        <Route
+          path="/test"
+          element={
+            <PrivateRoute>
+              <UserTest />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </Router>
   </AppProvider>

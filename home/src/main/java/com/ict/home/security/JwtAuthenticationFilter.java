@@ -1,6 +1,7 @@
 package com.ict.home.security;
 
 import com.ict.home.login.jwt.JwtProvider;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,36 +31,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             log.info("Filter is running...");
             String token = parseBearerToken(request);
+            log.info("JwtAuthenticationFilter token: {}", token);
             Long userId;
 
             //토큰 검사. JWT -> 인가를 서버에 요청하지 않고도 검증 가능
             if (token != null && !token.equalsIgnoreCase("null")) {
 
                 //유효할 시 true
-                if (jwtProvider.validateToken(token)) {
-                    userId = jwtProvider.getUserIdFromToken(request);
+//                if (jwtProvider.validateToken(token)) {
+                log.info("JwtAuthenticationFilter is running...");
+                userId = jwtProvider.getUserIdFromToken(request, response);
+                log.info("userId:{}", userId);
 
-                    //인증 완료
-                    AbstractAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            userId,  //인증된 사용자 정보, 보통 UserDetails 라는 오브젝트 할당
-                            null,
-                            AuthorityUtils.NO_AUTHORITIES
-                    );
+                //인증 완료
+                AbstractAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userId,  //인증된 사용자 정보, 보통 UserDetails 라는 오브젝트 할당
+                        null,
+                        AuthorityUtils.NO_AUTHORITIES  //권한 따로 지정하지 않았으므로 권한 없음.
+                        // 차후 권한 설정 시 AuthorityUtils.createAuthorityList("ROLE_USER", "ROLE_ADMIN") 형식으로 사용 가능
+                );
+                log.info("authenticationToken:{}", authenticationToken);
 
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                    //SecurityContextHolder 업데이트
-                    SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-                    securityContext.setAuthentication(authenticationToken);
-                    SecurityContextHolder.setContext(securityContext);
-                }
+                //SecurityContextHolder 업데이트
+                SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+                securityContext.setAuthentication(authenticationToken);
+                SecurityContextHolder.setContext(securityContext);
+//                }
             }
             //다음 필터 체인 실행
             filterChain.doFilter(request, response);
             log.info("Filter passed, request forwarded to next filter or handler or filter closing");
 
-        } catch (Exception e) {
-            logger.error("Could not set user authentication in security context", e);
+        } catch (ExpiredJwtException e) {
+            logger.error("JWT 토큰 만료, 사용자 인증 실패", e);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  //401 에러 반환
+            response.getWriter().write("JWT 토큰 만료, 사용자 인증 실패");
         }
     }
 
