@@ -4,22 +4,26 @@ import com.ict.home.exception.BaseException;
 import com.ict.home.user.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SecurityException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.io.Decoders;
 
+import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
 
 import static com.ict.home.exception.BaseResponseStatus.*;
-import static java.lang.Long.parseLong;
 
 @Slf4j
 @Component
 public class JwtProvider {
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 15; //15일
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 15; // 15분
+    //만료 테스트 10초
+//    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 10; // 10초
 
     private static final String BEARER_TYPE = "Bearer ";
 
@@ -75,7 +79,7 @@ public class JwtProvider {
             //에러 발생 시 false
         } catch (ExpiredJwtException e) {
             log.error("만료된 JWT Token", e);
-        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+        } catch (SecurityException | MalformedJwtException e) {
             log.info("잘못된 JWT Token", e);
         } catch (UnsupportedJwtException e) {
             log.info("지원되지 않는 JWT Token", e);
@@ -108,10 +112,10 @@ public class JwtProvider {
     /**
      * 토큰에서 유저 아이디 추출
      */
-    public Long getUserIdFromToken(HttpServletRequest request) {
+    public Long getUserIdFromToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         //요청 header 에서 Authorization 부분만 추출
         String authHeader = request.getHeader("Authorization");
-        log.info("authHeader: {}", authHeader);
+        log.info("jwtProvider authHeader: {}", authHeader);
 
         //추출한 문장이 null 이거나 Bearer 로 시작하지 않을 시 '유효하지 않은 토큰'
         if (authHeader == null || !authHeader.startsWith(BEARER_TYPE)) {
@@ -120,14 +124,15 @@ public class JwtProvider {
 
         //추출한 풀 토큰에서 맨 앞 Bearer 제거
         String token = bearerRemove(authHeader);
+        log.info("jwtProvider token: {}", token);
 
         //토큰 유효성 검사 - 실패 시 '유효하지 않은 토큰'
-        if (!validateToken(token)) {
-            throw new BaseException(INVALID_JWT);
-        }
+//        if (!validateToken(token)) {
+//            throw new BaseException(INVALID_JWT);
+//        }
 
         //사용자 정보 추출
-        long userId;
+        long userId = 0;
         try {
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(key)
@@ -136,12 +141,15 @@ public class JwtProvider {
                     .getBody();
 
             //유저 확인
-            userId = parseLong(claims.get("userId", String.class));
-
-        } catch (Exception e) {
+            claims.forEach((key1, value) -> log.info("Key: {}, Value:{}", key1, value));
+            userId = claims.get("userId", Long.class);
+            
+        }catch (ExpiredJwtException e) {
+            log.error("JWT 토큰 만료, 사용자 인증 실패", e);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  //401 에러 반환
+        }catch (Exception e) {
             throw new BaseException(USER_NOT_FOUND_IN_TOKEN);
         }
-
         return userId;
     }
 }

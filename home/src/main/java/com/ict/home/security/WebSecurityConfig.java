@@ -30,8 +30,9 @@ public class WebSecurityConfig {
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests ->
 //                        authorizeRequests
-//                                //메인페이지, 회원가입,로그인,로그아웃 허용 - > 차후 페이지 별로 인증 여부 확인
+                                //메인페이지, 회원가입,로그인,로그아웃 허용 - > 차후 페이지 별로 인증 여부 확인
 //                                .requestMatchers("/", "/users/**").permitAll()
+//                                .requestMatchers("/", "/users", "/users/login", "/users/logout", "/users/check/**", "/users/check/access-token/reset" ).permitAll()
 //                                .anyRequest().authenticated()
                         authorizeRequests
                                 .anyRequest().permitAll()

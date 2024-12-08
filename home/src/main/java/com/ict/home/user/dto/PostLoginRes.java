@@ -1,8 +1,6 @@
 package com.ict.home.user.dto;
 
-import com.ict.home.login.dto.JwtResponseDto;
 import com.ict.home.user.User;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

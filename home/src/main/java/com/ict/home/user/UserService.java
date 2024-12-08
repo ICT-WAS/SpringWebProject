@@ -15,6 +15,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ import static com.ict.home.exception.BaseResponseStatus.*;
 import static com.ict.home.exception.BaseResponseStatus.PASSWORD_ENCRYPTION_ERROR;
 import static com.ict.home.exception.BaseResponseStatus.POST_USERS_EXISTS_EMAIL;
 
-
+@Slf4j
 @EnableTransactionManagement
 @Service
 @RequiredArgsConstructor
@@ -130,6 +131,7 @@ public class UserService {
 
     //액세스 토큰 발급 - 재발급 시 사용
     public String createAccessToken(Long userId) {
+        log.info("재발급 로직 탔음~!!! userId:{}", userId);
         User user = userUtilService.findByIdWithValidation(userId);
         
         if (user == null) {
@@ -141,8 +143,14 @@ public class UserService {
             throw new BaseException(TOKEN_NOT_FOUND_IN_USER);
         }
 
-        //리프레시 토큰의 만료 확인 후 사용자 정보에 맞는 유저 반환
-        return CheckRefreshTokenExpire(token, user);
+        //리프레시 토큰의 만료 확인 후 사용자 정보에 맞는 리프레시 토큰 반환
+        String refreshToken = CheckRefreshTokenExpire(token, user);
+
+        String accessToken = null;
+        if (refreshToken != null) {
+            accessToken = jwtProvider.createAccessToken(user);
+        }
+        return accessToken;
     }
 
     //리프레시 토큰 발급 및 저장
