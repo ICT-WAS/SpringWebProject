@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -65,7 +66,11 @@ public class HouseController {
 
         }
 
-        return ResponseEntity.ok(houseInfoList);
+        List<HouseInfo> finalHouseInfoList = houseInfoList;
+        return ResponseEntity.ok(new HashMap<String, Object>(){{
+            put("totalCount", finalHouseInfoList.size());
+            put("houseInfoList", finalHouseInfoList);
+                                 }});
     }
 
 
