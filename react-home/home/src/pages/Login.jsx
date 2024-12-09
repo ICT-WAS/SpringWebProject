@@ -5,6 +5,9 @@ import "../components/signup/Signup.css";
 import axios from "axios";
 import Modal from "../components/modal/Modal";
 import { useGlobalContext } from "../Context";
+import { Container, Stack } from "react-bootstrap";
+import Header from "../common/Header";
+import Footer from "../common/Footer";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -89,31 +92,37 @@ const Login = () => {
   };
 
   return (
-    <div className="body-container">
-      <div className="form-container">
-        <form className="form-container-signin">
-          <h2>로그인</h2>
-          <Email email={email} setEmail={setEmail} ref={emailRef} />
-          <Password password={password} setPassword={setPassword} />
-          <button
-            type="submit"
-            className="submit-button"
-            onClick={handleLogin}
-            disabled={loading}
-          >
-            {loading ? "로그인 중..." : "로그인"}
-          </button>
-          {isModal && (
-            <Modal
-              title={loginErrorTitle}
-              message={loginError}
-              onClose={closeModal}
-              ref={confirmModalRef}
-            />
-          )}
-        </form>
-      </div>
-    </div>
+    <Container className="p-5" fluid="md">
+      <Stack direction="vertical" gap={5}>
+        <Header />
+        <div className="body-container">
+          <div className="form-container">
+            <form className="form-container-signin">
+              <h2>로그인</h2>
+              <Email email={email} setEmail={setEmail} ref={emailRef} />
+              <Password password={password} setPassword={setPassword} />
+              <button
+                type="submit"
+                className="submit-button"
+                onClick={handleLogin}
+                disabled={loading}
+              >
+                {loading ? "로그인 중..." : "로그인"}
+              </button>
+              {isModal && (
+                <Modal
+                  title={loginErrorTitle}
+                  message={loginError}
+                  onClose={closeModal}
+                  ref={confirmModalRef}
+                />
+              )}
+            </form>
+          </div>
+        </div>
+        <Footer />
+      </Stack>
+    </Container>
   );
 };
 

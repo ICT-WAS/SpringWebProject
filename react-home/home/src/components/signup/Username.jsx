@@ -65,7 +65,7 @@ const Username = ({ username, setUsername }) => {
         onChange={handleChange}
         placeholder="사용자 이름을 입력해주세요."
       />
-      {error && <span style={{ color: "red" }}>{error}</span>}
+      {error && <span className="error-message">{error}</span>}
     </div>
   );
 };
