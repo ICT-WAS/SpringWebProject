@@ -108,19 +108,11 @@ const Phone = ({ phoneNumber, setPhoneNumber }) => {
           onChange={handleChange}
           placeholder="휴대폰 번호를 입력해주세요."
         />
-        <button
-          type="button"
-          className="phone-auth-button"
-          onClick={handleClick}
-        >
+        <button type="button" onClick={handleClick}>
           인증하기
         </button>
       </div>
-      {error && (
-        <span className="error-message" style={{ color: "red" }}>
-          {error}
-        </span>
-      )}
+      {error && <span className="error-message">{error}</span>}
     </div>
   );
 };

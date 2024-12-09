@@ -90,11 +90,7 @@ const Email = ({ email, setEmail }) => {
           onChange={handleChange}
           placeholder="이메일을 입력해주세요."
         />
-        <button
-          type="button"
-          className="phone-auth-button"
-          onClick={handleClick}
-        >
+        <button type="button" onClick={handleClick}>
           인증하기
         </button>
       </div>
