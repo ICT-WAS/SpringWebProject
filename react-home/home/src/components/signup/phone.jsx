@@ -17,6 +17,28 @@ const Phone = ({ phoneNumber, setPhoneNumber }) => {
     setPhoneNumber(formattedNumber);
   };
 
+  //인증 요청을 보내는 함수
+  const sendVerification = async (email, phoneNumber, verificationType) => {
+    try {
+      const response = await axios.post("http://localhost:8989/auth/signup", {
+        email,
+        phoneNumber,
+        verificationType,
+      });
+
+      //성공 응답 처리
+      if (response.data.isSuccess) {
+        return response.data.result;
+      }
+    } catch (error) {
+      console.error("인증 요청 실패:", error);
+    }
+  };
+
+  const handleClick = async () => {
+    await sendVerification("", phoneNumber, "PHONE");
+  };
+
   const check = async () => {
     //null 체크
     if (phoneNumber === "") {
@@ -86,7 +108,11 @@ const Phone = ({ phoneNumber, setPhoneNumber }) => {
           onChange={handleChange}
           placeholder="휴대폰 번호를 입력해주세요."
         />
-        <button type="submit" className="phone-auth-button">
+        <button
+          type="button"
+          className="phone-auth-button"
+          onClick={handleClick}
+        >
           인증하기
         </button>
       </div>

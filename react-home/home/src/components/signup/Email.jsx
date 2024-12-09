@@ -14,6 +14,28 @@ const Email = ({ email, setEmail }) => {
     setError("");
   };
 
+  //인증 요청을 보내는 함수
+  const sendVerification = async (email, phoneNumber, verificationType) => {
+    try {
+      const response = await axios.post("http://localhost:8989/auth/signup", {
+        email,
+        phoneNumber,
+        verificationType,
+      });
+
+      //성공 응답 처리
+      if (response.data.isSuccess) {
+        return response.data.result;
+      }
+    } catch (error) {
+      console.error("인증 요청 실패:", error);
+    }
+  };
+
+  const handleClick = async () => {
+    await sendVerification(email, "", "EMAIL");
+  };
+
   const check = async () => {
     //null 체크
     if (email === "") {
@@ -56,18 +78,31 @@ const Email = ({ email, setEmail }) => {
   };
 
   return (
-    <div className="form-group">
-      <label htmlFor="signup-email">Email</label>
-      <input
-        type="email"
-        id="signup-email"
-        name="signup-email"
-        value={email}
-        onBlur={check}
-        onChange={handleChange}
-        placeholder="이메일을 입력해주세요."
-      />
-      {error && <span style={{ color: "red" }}>{error}</span>}
+    <div className="form-group-phone">
+      <label htmlFor="phoneNumber">Email</label>
+      <div className="input-group">
+        <input
+          type="email"
+          id="signup-email"
+          name="signup-email"
+          value={email}
+          onBlur={check}
+          onChange={handleChange}
+          placeholder="이메일을 입력해주세요."
+        />
+        <button
+          type="button"
+          className="phone-auth-button"
+          onClick={handleClick}
+        >
+          인증하기
+        </button>
+      </div>
+      {error && (
+        <span className="error-message" style={{ color: "red" }}>
+          {error}
+        </span>
+      )}
     </div>
   );
 };
