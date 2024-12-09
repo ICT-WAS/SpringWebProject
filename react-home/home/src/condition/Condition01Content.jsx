@@ -4,26 +4,27 @@ import { useEffect, useState } from "react";
 import { InputNumberItem, InputNumberSubItem } from "./InputNumberItem";
 import { RadioButtonItem, RadioButtonSubItem } from "./RadioButtonItem";
 import { conditions } from '../apply_announcement/conditions';
+import { placeholderText } from "./placeholderText";
 
 export default function Condition01Content() {
 
     const navigate = useNavigate();
 
-    const houseHolderButtons = { name: 'isHouseholder', values: [{ value: '세대원' }, { value: '세대주' }] }
-    const marriedButtons = { name: 'isMarried', values: [{ value: '미혼' }, { value: '기혼', hasFollowUpQuestion: true }, { value: '예비신혼부부' }, { value: '한부모' }] }
+    const houseHolderButtons = { name: 'householder', values: [{ data: '세대원', value: 'N', }, { data: '세대주', value: 'Y', }] }
+    const marriedButtons = { name: 'married', values: [{ data: '미혼', value: 0 }, { data: '기혼', value: 1, hasFollowUpQuestion: true }, { data: '예비신혼부부', value: 2 }, { data: '한부모', value: 3 }] }
 
     /* 제출용 데이터 */
     const [formData, setFormData] = useState({});
 
     /* 꼬리질문 가시성 */
-    const followUpQuestions = { isMarried: 'marriageDate', moveInDate: 'metropolitanDate' };
-    const [visibility, setVisibility] = useState({ marriageDate: false, metropolitanDate: true });
+    const followUpQuestions = { married: [{value: 1, subQuestionId: 'marriedDate'}], moveInDate: [{value: 1, subQuestionId: 'metropolitanAreaDate'}, {value: 2, subQuestionId: 'regionMoveInDate'}] };
+    const [visibility, setVisibility] = useState({ marriedDate: false, metropolitanAreaDate: true });
 
     function handleClick(e) {
 
-        console.log(formData);
+        // 폼 데이터 저장
+        sessionStorage.setItem('formData1', JSON.stringify(formData));
 
-        // 기존의 폼 데이터 유지한채로 페이지 이동? 데이터를 같이 보내?
         navigate("/condition-2");
     }
 
@@ -40,13 +41,22 @@ export default function Condition01Content() {
         });
     }
 
-    function handleFollowUpQuestion({ name, visible }) {
-        const questionName = followUpQuestions[name];
+    // value는 상위 질문 옵션값임
+    function handleFollowUpQuestion({ name, value, visible }) {
+        const matchedItem = followUpQuestions[name];
+        
+        if (!matchedItem || matchedItem.length < 1) {
+            return;
+        }
 
-        setVisibility(prevVisibility => ({
-            ...prevVisibility,
-            [questionName]: visible
-        }));
+        matchedItem.forEach((item) => {
+            const questionName = item.subQuestionId;
+
+            setVisibility((prevVisibility) => ({
+                ...prevVisibility,
+                [questionName]: visible,
+              }));
+          });
     }
 
     return (
@@ -55,22 +65,22 @@ export default function Condition01Content() {
 
                 {/* 신청자 생년월일 */}
                 <InputNumberItem number={1} question={'신청자 생년월일'}
-                    name={'userBirth'} onChange={onChangedInputValue} placeholder={'19991210'} />
+                    name={'birthday'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
 
                 {/* 현재 거주지 */}
                 <MoveInDate onChangedInputValue={onChangedInputValue} />
 
                 {/* 현재 거주지에 입주한 날 */}
                 <InputNumberItem number={3} question={'현재 거주지에 입주한 날(주민등록표등본에 있는 전입일자)'}
-                    name={'moveInDate'} onChange={onChangedInputValue} placeholder={'20100101'} />
+                    name={'moveInDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
 
-                {/* [꼬리질문] 경기에 거주하기 시작한 날 */}
+                {/* [꼬리질문] 현재 지역(시/도)에 거주하기 시작한 날 */}
                 <MoveInFollwUpQuestion1 onChangedInputValue={onChangedInputValue}
-                    visibility={visibility['metropolitanDate']} placeholder={'20100101'} />
+                    visibility={visibility['regionMoveInDate']} type='date' placeholder={placeholderText.dateType} />
 
                 {/* [꼬리질문] 서울, 경기, 인천에에 거주하기 시작한 날 */}
                 <MoveInFollwUpQuestion2 onChangedInputValue={onChangedInputValue}
-                    visibility={visibility['metropolitanDate']} placeholder={'20100101'} />
+                    visibility={visibility['metropolitanAreaDate']} type='date' placeholder={placeholderText.dateType} />
 
                 {/* 세대주 여부 */}
                 <RadioButtonItem number={4} question={'세대주 여부'}
@@ -82,7 +92,7 @@ export default function Condition01Content() {
                     handleFollowUpQuestion={handleFollowUpQuestion} />
 
                 {/* [꼬리질문] 혼인신고일 */}
-                <MarriedFollwUpQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['marriageDate']} />
+                <MarriedFollwUpQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['marriedDate']} />
 
                 {/* 다음으로 */}
                 <Button variant="dark" onClick={handleClick}>다음</Button>
@@ -111,6 +121,8 @@ function MoveInDate({ onChangedInputValue }) {
 
     function handleChangedGuGunDropdown({index}) {
         setGunguelectedName(gunguData[index].value);
+        onChangedInputValue({name: 'siDo', value: sidoData[sidoIndex].code});
+        onChangedInputValue({name: 'gunGu', value: gunguData[index].value});
         // 값 저장
     }
 
@@ -171,7 +183,7 @@ function MoveInFollwUpQuestion1({ onChangedInputValue, visibility }) {
 
     return (
         <InputNumberSubItem number={'3-1'} question={'경기에 거주하기 시작한 날'} depth={3}
-            name={'metropolitanDate'} onChange={onChangedInputValue} placeholder={'20100101'} />
+            name={'metropolitanAreaDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
     );
 }
 
@@ -184,7 +196,7 @@ function MoveInFollwUpQuestion2({ onChangedInputValue, visibility }) {
 
     return (
         <InputNumberSubItem number={'3-2'} question={'서울, 경기, 인천에 거주하기 시작한 날'} depth={3}
-            name={'metropolitanDate'} onChange={onChangedInputValue} placeholder={'20100101'} />
+            name={'metropolitanAreaDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
     );
 }
 
@@ -197,6 +209,6 @@ function MarriedFollwUpQuestion({ onChangedInputValue, visibility }) {
 
     return (
         <InputNumberSubItem number={'5-1'} question={'혼인신고일'} depth={3}
-            name={'marriageDate'} onChange={onChangedInputValue} placeholder={'20100101'} />
+            name={'marriageDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
     );
 }

@@ -45,10 +45,23 @@ function StackedCheckButtons({ buttons, direction = 'vertical', flexAuto, onChan
 function CheckButtons({ buttons, flexAuto = true, onChange, handleFollowUpQuestion, reverseCheck = false }) {
     const flexValue = flexAuto ? 1 : 'none';
 
+    const [checkedValues, setCheckedValues] = useState([]);
+
     function handleCheckChange(e) {
         const name = e.target.getAttribute('name');
         const value = buttons.values[e.target.value].value;
-        onChange({ name: name, value: value });
+
+        setCheckedValues((prevItems) => {
+            let updatedValues;
+            if (e.target.checked) {
+              updatedValues = [...prevItems, value];
+            } else {
+              updatedValues = prevItems.filter((v) => v !== value);
+            }
+        
+            onChange({ name: name, value: updatedValues });
+            return updatedValues;
+        });
 
         if (typeof handleFollowUpQuestion === 'function') {
 
@@ -66,7 +79,7 @@ function CheckButtons({ buttons, flexAuto = true, onChange, handleFollowUpQuesti
             <Form.Check
                 type={'checkbox'}
                 name={buttons.name}
-                label={button.value}
+                label={button.data}
                 value={index}
                 id={`${buttons.name}-${index}`}
                 style={{ flex: `${flexValue}` }}
@@ -76,7 +89,7 @@ function CheckButtons({ buttons, flexAuto = true, onChange, handleFollowUpQuesti
     );
 }
 
-export function CheckButtonSubItemWithFollowQuestions({ number, question, buttons, direction, depth = 1, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck }) {
+export function CheckButtonSubItemWithFollowQuestions({ number, question, buttons, direction, depth = 1, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue }) {
 
     const marginClass = `ms-${depth}`;
 
@@ -85,36 +98,48 @@ export function CheckButtonSubItemWithFollowQuestions({ number, question, button
             <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6' }} className={marginClass}>
                 <p className="card-header-text">{number}.{question}</p>
                 <StackedCheckButtonsWithFollowQuestions buttons={buttons} direction={direction} flexAuto={flexAuto} onChange={onChange}
-                    handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} reverseCheck={reverseCheck} />
+                    handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} reverseCheck={reverseCheck} onChangedFamilyValue={onChangedFamilyValue} />
             </div>
         </>
     );
 }
 
 
-function StackedCheckButtonsWithFollowQuestions({ buttons, direction = 'vertical', flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck }) {
+function StackedCheckButtonsWithFollowQuestions({ buttons, direction = 'vertical', flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue }) {
 
     return (
         <>
             <Stack direction={direction} gap={2} >
                 <CheckButtonsWithFollowQuestions buttons={buttons} flexAuto={flexAuto}
-                    onChange={onChange} handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} reverseCheck={reverseCheck} />
+                    onChange={onChange} handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} reverseCheck={reverseCheck} onChangedFamilyValue={onChangedFamilyValue} />
             </Stack>
         </>
     );
 }
 
-function CheckButtonsWithFollowQuestions({ buttons, flexAuto = true, onChange, handleFollowUpQuestion, subQuestion, reverseCheck = false }) {
+function CheckButtonsWithFollowQuestions({ buttons, flexAuto = true, onChange, handleFollowUpQuestion, subQuestion, reverseCheck = false, onChangedFamilyValue }) {
     const flexValue = flexAuto ? 1 : 'none';
 
     const [subQuestionVisibility, setSubQuestionVisibility] = useState(Array(buttons.values.length).fill(reverseCheck));
+    const [checkedValues, setCheckedValues] = useState([]);
 
     function handleCheckChange(e) {
+        
         const name = e.target.getAttribute('name');
         const index = e.target.value;
         const value = buttons.values[index].value;
 
-        onChange({ name: name, value: value });
+        setCheckedValues((prevItems) => {
+            let updatedValues;
+            if (e.target.checked) {
+              updatedValues = [...prevItems, value];
+            } else {
+              updatedValues = prevItems.filter((v) => v !== value);
+            }
+        
+            onChange({ name: name, value: updatedValues });
+            return updatedValues;
+        });
 
         let visibility = e.target.checked;
         visibility = reverseCheck ? !visibility : visibility;
@@ -139,14 +164,14 @@ function CheckButtonsWithFollowQuestions({ buttons, flexAuto = true, onChange, h
             <Form.Check
                 type={'checkbox'}
                 name={buttons.name}
-                label={button.value}
+                label={button.data}
                 value={index}
                 id={`${buttons.name}-${index}`}
                 style={{ flex: `${flexValue}` }}
                 onChange={handleCheckChange}
             />
 
-            {subQuestion({ onChangedInputValue: onChange, visibility: subQuestionVisibility[index] })}
+            {subQuestion({ onChangedFamilyValue: onChangedFamilyValue, visibility: subQuestionVisibility[index], code: button.value })}
         </React.Fragment>
     );
 }

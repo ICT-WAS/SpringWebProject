@@ -1,36 +1,102 @@
 import { Form } from "react-bootstrap";
 import { useState } from "react";
 
-export function InputNumberItem({ number, question, name, onChange, maxLength, placeholder }) {
+export function InputNumberItem({ number, question, name, onChange, type, placeholder }) {
 
     return (
         <>
             <div key={`${number}-${question}`}>
                 <p className="card-header-text"><b className="px-2">{number.toString().padStart(2, '0')}</b>{question}</p>
-                <InputText name={name} onChange={onChange} maxLength={maxLength} placeholder={placeholder} />
+                <InputText name={name} onChange={onChange} type={type} placeholder={placeholder} />
             </div>
         </>
     );
 }
 
-export function InputNumberSubItem({ number, question, depth = 1, name, onChange, maxLength, placeholder }) {
+export function InputNumberSubItem({ number, question, depth = 1, name, onChange, type, placeholder }) {
     const marginClass = `ms-${depth * 1}`;
 
     return (
         <>
             <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
                 <p className="card-header-text">{number}.&nbsp;{question}</p>
-                <InputText name={name} onChange={onChange} maxLength={maxLength} placeholder={placeholder} />
+                <InputText name={name} onChange={onChange} type={type} placeholder={placeholder} />
             </div>
         </>
     );
 }
 
-export function InputText({ name, onChange, maxLength, placeholder }) {
+export function FamilyInputNumberSubItem({ code, number, question, depth = 1, name, onChangedFamilyValue, type, placeholder }) {
+    const marginClass = `ms-${depth * 1}`;
+
+    return (
+        <>
+            <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
+                <p className="card-header-text">{number}.&nbsp;{question}</p>
+                <FamilyInputText code={code} name={name} onChangedFamilyValue={onChangedFamilyValue} type={type} placeholder={placeholder} />
+            </div>
+        </>
+    );
+}
+
+function FamilyInputText({ code, index = 0, name, onChangedFamilyValue, type='normal', placeholder }) {
+
+    const [hasError, setHasError] = useState(false);
 
     function handleInputChange(e) {
+
+        let value = null;
+
+        if(type === 'date') {
+            value = formatDateToCustomFormat(e.target.value.toString());
+            if(value == null) {
+                setHasError(true);
+            }
+        } else {
+            e.target.value = Math.max(0, e.target.value);
+            value = Number(e.target.value);
+        }
+
+        onChangedFamilyValue({ code: code, index: index, updates: { [name] : value } });
+    }
+
+    return (
+        <>
+            <Form.Control
+                    type="number"
+                    placeholder={placeholder}
+                    name={name}
+                    onBlur={handleInputChange}
+                    required
+                />
+            {hasError && <p className="inputTypeError">올바르지 않은 형식입니다.</p>}
+        </>
+    );
+}
+
+export function InputText({ name, onChange, type='normal', placeholder }) {
+
+    const [hasError, setHasError] = useState(false);
+
+    function handleInputChange(e) {
+
+        const today = new Date();
+        const formattedDate = today.getFullYear().toString() + (today.getMonth() + 1).toString() + today.getDate().toString();
+        console.log(formattedDate);
+
         const name = e.target.getAttribute('name');
-        const value = e.target.value;
+        let value = null;
+
+        if(type === 'date') {
+            value = formatDateToCustomFormat(e.target.value.toString());
+            if(value == null) {
+                setHasError(true);
+            }
+        } else {
+            e.target.value = Math.max(0, e.target.value);
+            value = Number(e.target.value);
+        }
+
         onChange({name: name, value: value});
     }
 
@@ -40,14 +106,15 @@ export function InputText({ name, onChange, maxLength, placeholder }) {
                     type="number"
                     placeholder={placeholder}
                     name={name}
-                    onChange={handleInputChange}
+                    onBlur={handleInputChange}
                     required
                 />
+            {hasError && <p className="inputTypeError">올바르지 않은 형식입니다.</p>}
         </>
     );
 }
 
-export function InputNumberLoopSubItemWithFollowQuestions({ number, question, depth = 1, name, onChange, handleFollowUpQuestion, subQuestion, maxLength, placeholder, unit }) {
+export function InputNumberLoopSubItemWithFollowQuestions({ number, question, depth = 1, name, onChange, handleFollowUpQuestion, subQuestion, type, placeholder, unit }) {
     const marginClass = `ms-${depth * 1}`;
 
     return (
@@ -55,19 +122,28 @@ export function InputNumberLoopSubItemWithFollowQuestions({ number, question, de
             <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
                 <p className="card-header-text">{number}.&nbsp;{question}</p>
                 <InputTextWithFollowQuestions name={name} onChange={onChange} 
-                    handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} maxLength={maxLength} placeholder={placeholder} unit={unit} />
+                    handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} type={type} placeholder={placeholder} unit={unit} />
             </div>
         </>
     );
 }
 
-function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, subQuestion, maxLength = 8, placeholder, unit }) {
+function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, subQuestion, type='normal', placeholder, unit }) {
 
     const [repeatCount, setRepeatCount] = useState(0);
 
     function handleInputChange(e) {
+
         const name = e.target.getAttribute('name');
         const value = e.target.value;
+
+        if(type === 'date') {
+            value = formatDateToCustomFormat(e.target.value.toString());
+        } else {
+            e.target.value = Math.max(0, e.target.value);
+            value = Number(e.target.value);
+        }
+
         onChange({name: name, value: value});
         setRepeatCount(e.target.value);
 
@@ -86,8 +162,9 @@ function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, 
                     type="number"
                     placeholder={placeholder}
                     name={name}
-                    onChange={handleInputChange}
+                    onBlur={handleInputChange}
                     required
+                    onWheel={(e) => e.target.blur()} 
                 />
 
             {Array.from({ length: repeatCount }).map((_, index) => (
@@ -100,4 +177,20 @@ function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, 
             ))}
         </>
     );
+}
+
+{/* yyyy-MM-dd 의 형식으로 반환 */}
+function formatDateToCustomFormat(dateString) {
+
+    if (!/^\d{8}$/.test(dateString)) {
+        return null;
+    }
+
+    const year = dateString.substring(0, 4); // yyyy
+    const month = dateString.substring(4, 6); // MM
+    const day = dateString.substring(6, 8); // dd
+
+    const formattedValue = `${year}-${day}-${month}`;
+
+    return formattedValue;
 }

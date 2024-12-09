@@ -3,6 +3,7 @@ export const conditions = {
         {
             category: '희망지역', subcategories: [
                 {
+                    code: 100,
                     category: '서울특별시', values: [
                         { value: '강남구' },
                         { value: '강동구' },
@@ -32,6 +33,7 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 600,
                     category: '부산광역시', values: [
                         { value: '강서구' },
                         { value: '금정구' },
@@ -53,6 +55,7 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 700,
                     category: '대구광역시', values: [
                         { value: '남구' },
                         { value: '달서구' },
@@ -65,6 +68,7 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 400,
                     category: '인천광역시', values: [
                         { value: '강화군' },
                         { value: '계양구' },
@@ -80,6 +84,7 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 500,
                     category: '광주광역시', values: [
                         { value: '광산구' },
                         { value: '남구' },
@@ -89,6 +94,7 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 300,
                     category: '대전광역시', values: [
                         { value: '대덕구' },
                         { value: '동구' },
@@ -98,6 +104,7 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 680,
                     category: '울산광역시', values: [
                         { value: '남구' },
                         { value: '동구' },
@@ -107,11 +114,13 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 338,
                     category: '세종특별자치시', values: [
                         { value: '세종시' }
                     ]
                 },
                 {
+                    code: 410,
                     category: '경기도', values: [
                         { value: '가평군' },
                         { value: '고양시' },
@@ -144,6 +153,7 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 360,
                     category: '충청북도', values: [
                         { value: '괴산군' },
                         { value: '단양군' },
@@ -158,6 +168,7 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 312,
                     category: '충청남도', values: [
                         { value: '계룡시' },
                         { value: '공주시' },
@@ -176,6 +187,7 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 513,
                     category: '전라남도', values: [
                         { value: '강진군' },
                         { value: '고흥군' },
@@ -201,6 +213,7 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 712,
                     category: '경상북도', values: [
                         { value: '경산시' },
                         { value: '경주시' },
@@ -228,6 +241,7 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 621,
                     category: '경상남도', values: [
                         { value: '거제시' },
                         { value: '거창군' },
@@ -249,6 +263,7 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 200,
                     category: '강원특별자치도', values: [
                         { value: '강릉시' },
                         { value: '고성군' },
@@ -271,6 +286,7 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 560,
                     category: '전북특별자치도', values: [
                         { value: '고창군' },
                         { value: '군산시' },
@@ -289,6 +305,7 @@ export const conditions = {
                     ]
                 },
                 {
+                    code: 690,
                     category: '제주특별자치도', values: [
                         { value: '서귀포시' },
                         { value: '제주시' }

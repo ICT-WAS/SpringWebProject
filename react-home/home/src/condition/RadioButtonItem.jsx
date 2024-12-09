@@ -14,7 +14,7 @@ export function RadioButtonItem({ number, question, buttons, direction, depth, f
     );
 }
 
-export function RadioButtonSubItem({ number, question, buttons, direction, depth = 1, flexAuto, onChange, handleFollowUpQuestion }) {
+export function RadioButtonSubItem({ number, question, buttons, direction, depth = 1, flexAuto, onChange, handleFollowUpQuestion}) {
 
     const marginClass = `ms-${depth}`;
 
@@ -26,6 +26,41 @@ export function RadioButtonSubItem({ number, question, buttons, direction, depth
                     handleFollowUpQuestion={handleFollowUpQuestion} />
             </div>
         </>
+    );
+    
+}
+
+function RadioButtons({ buttons, flexAuto = true, onChange, handleFollowUpQuestion }) {
+    const flexValue = flexAuto ? 1 : 'none';
+
+    function handleRadioChange(e) {
+        const name = e.target.getAttribute('name');
+        const index = e.target.value;
+        let value = buttons.values[index].value;
+
+        onChange({ name: name, value: value });
+
+        if (typeof handleFollowUpQuestion === 'function') {
+            let visible = false;
+            if (buttons.values[index].hasFollowUpQuestion === true) {
+                visible = true;
+            }
+            handleFollowUpQuestion({ name: name, value: value, visible: visible });
+        }
+    }
+
+    return buttons.values.map((button, index) =>
+        <React.Fragment key={`buttons-${index}`}>
+            <Form.Check
+                type={'radio'}
+                name={buttons.name}
+                label={button.data}
+                value={index}
+                id={`${buttons.name}-${index}`}
+                style={{ flex: `${flexValue}` }}
+                onChange={handleRadioChange}
+            />
+        </React.Fragment>
     );
 }
 
@@ -41,29 +76,50 @@ function StackedRadioButtons({ buttons, direction = 'vertical', flexAuto, onChan
     );
 }
 
-function RadioButtons({ buttons, flexAuto = true, onChange, handleFollowUpQuestion }) {
+
+export function FamilyRadioButtonSubItem({ index, number, question, buttons, depth = 1, onChangedFamilyValue}) {
+
+    const marginClass = `ms-${depth}`;
+
+    return (
+        <>
+            <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
+                <p className="card-header-text">{number }.{question}</p>
+                <FamilyStackedRadioButtons index={index} buttons={buttons}
+                    onChangedFamilyValue={onChangedFamilyValue} />
+            </div>
+        </>
+    );
+}
+
+function FamilyStackedRadioButtons({ index, buttons, onChangedFamilyValue }) {
+
+    return (
+        <>
+            <Stack direction={'vertical'} gap={2} >
+                <FamilyRadioButtons index={index} buttons={buttons}
+                     onChangedFamilyValue={onChangedFamilyValue} />
+            </Stack>
+        </>
+    );
+}
+
+function FamilyRadioButtons({ index = 0, buttons, flexAuto = true, onChangedFamilyValue }) {
     const flexValue = flexAuto ? 1 : 'none';
 
     function handleRadioChange(e) {
-        const name = e.target.getAttribute('name');
-        const value = buttons.values[e.target.value].value;
-        onChange({ name: name, value: value });
+        const name = buttons.name;
+        let value = buttons.values[e.target.value].value;
 
-        if (typeof handleFollowUpQuestion === 'function') {
-            let visible = false;
-            if (buttons.values[e.target.value].hasFollowUpQuestion === true) {
-                visible = true;
-            }
-            handleFollowUpQuestion({ name: name, visible: visible });
-        }
+        onChangedFamilyValue({ code: buttons.code, index: index, updates: { [name] : value } });
     }
 
     return buttons.values.map((button, index) =>
         <React.Fragment key={`buttons-${index}`}>
             <Form.Check
                 type={'radio'}
-                name={buttons.name}
-                label={button.value}
+                name={`${buttons.code}-${buttons.name}`}
+                label={button.data}
                 value={index}
                 id={`${buttons.name}-${index}`}
                 style={{ flex: `${flexValue}` }}

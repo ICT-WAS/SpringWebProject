@@ -11,7 +11,7 @@ export default function Condition03Content() {
     const navigate = useNavigate();
 
     /*
-    SAVINGS_ACCOUNT("청약통장"),
+    SAVINGS_ACCOUNT("청약예금"),
     SAVINGS_PLAN("청약부금"),
     SAVINGS_DEPOSIT("청약저축"),
     COMBINED_SAVINGS("주택청약종합저축");
@@ -31,6 +31,22 @@ export default function Condition03Content() {
 
     /* 제출용 데이터 */
     const [formData, setFormData] = useState({});
+    const [familyData, setFamilyData] = useState({});
+
+    /* 이전 폼 데이터 읽어오기 */
+   const sessionData = sessionStorage.getItem('formData2');
+   const prevFamilyData = sessionStorage.getItem('familyData');
+
+   let userData = null;
+   try {
+    userData = JSON.parse(sessionData);
+    hasSpouse = userData.married === 2;
+
+    prevFamilyData = JSON.parse(sessionData);
+    setFamilyData(prevFamilyData);
+
+    sessionStorage.removeItem('formData2');
+   } catch(error) {}
 
     /* 꼬리질문 가시성 */
     const followUpQuestions = { accountType: 'accountInfo', spouseHasAccount: 'spouseAccountDate', hasVehicle: 'vehicleValue', incomeActivityType: 'spouseIncome', familyHasHouse: 'hasHouseInfo', soldHouseHistory: 'soldHouseInfo', winningHistory: 'winningDate', wasDisqualified: 'disqualifiedDate' };
@@ -48,7 +64,14 @@ export default function Condition03Content() {
 
         console.log(formData);
 
+        console.log(formData);
+        console.log(familyData);
+
+        // 제출
+
         // navigate("/condition-3");
+        sessionStorage.removeItem('formData3');
+        sessionStorage.removeItem('familyData');
     }
 
     function onChangedInputValue({ name, value }) {
@@ -64,13 +87,17 @@ export default function Condition03Content() {
         });
     }
 
-    function handleFollowUpQuestion({ name, visible }) {
-        const questionName = followUpQuestions[name];
+    function handleFollowUpQuestion({ name, value, visible }) {
+        const matchedItem = followUpQuestions[name]?.find(item => item.value === value);
 
-        setVisibility(prevVisibility => ({
-            ...prevVisibility,
-            [questionName]: visible
-        }));
+        if (matchedItem) {
+            const questionName = matchedItem.subQuestionId;
+
+            setVisibility(prevVisibility => ({
+                ...prevVisibility,
+                [questionName]: visible
+            }));
+        }
     }
 
     return (
@@ -94,6 +121,7 @@ export default function Condition03Content() {
                 <SpouseAccountInfoQuestion onChangedInputValue={onChangedInputValue}  visibility={visibility['spouseAccountDate']} />
 
                 {/* 차량가액을 입력해주세요 */}
+                {/* 미보유 체크시 0원 */}
                 <CheckButtonItem number={3} question={'차량가액을 입력해주세요'}
                     buttons={{name: 'hasVehicle', values:[{value: '차량 미보유', hasFollowUpQuestion: true }]}} 
                     onChange={onChangedInputValue} handleFollowUpQuestion={handleFollowUpQuestion} 

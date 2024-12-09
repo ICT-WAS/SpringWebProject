@@ -187,3 +187,9 @@ table tr:hover {
 .housing-data ul li {
   margin-bottom: 5px;
 }
+
+.inputTypeError {
+  font-weight: 400;
+  font-size: 14px;
+  color: red;
+}
