@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class User extends BaseTimeEntity { //아이디, 유저이름, 패스워드, 상태,
     @Id
-    @Column
+    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
