@@ -1,6 +1,7 @@
 package com.ict.home.community.controller;
 
 import com.ict.home.community.model.Post;
+import com.ict.home.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,12 +40,14 @@ public class CommunityController {
             @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
     })
     public ResponseEntity<?> addPost(
-            @Parameter(name = "memberId", description = "게시글 작성자의 고유 ID") Long memberId,
+            @Parameter(name = "userId", description = "게시글 작성자의 고유 ID") Long userId,
             @Parameter(name = "title", description = "게시글 제목") String title,
             @Parameter(name = "subject", description = "게시글 본문 내용") String subject) {
 
         Post post = new Post();
-        post.setMemberId(memberId);
+        User user = new User();
+        user.setId(userId);
+        post.setUser(user);
         post.setTitle(title);
         post.setSubject(subject);
         return ResponseEntity.ok(post);
@@ -73,13 +76,13 @@ public class CommunityController {
         return ResponseEntity.ok(post);
     }
 
-    @GetMapping("/{memberId}/posts")
+    @GetMapping("/{userId}/posts")
     @Operation(summary = "회원의 게시글 조회", description = "주어진 ID에 해당하는 회원이 작성한 게시글을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글을 조회하였습니다.")
     })
-    public ResponseEntity<?> getPostByMemberId(
-            @Parameter(name = "memberId", description = "조회할 회원의 고유 ID") @PathVariable Long memberId){
+    public ResponseEntity<?> getPostByUserId(
+            @Parameter(name = "userId", description = "조회할 회원의 고유 ID") @PathVariable Long userId){
 
         return null;
     }
@@ -117,13 +120,13 @@ public class CommunityController {
         return null;
     }
 
-    @GetMapping("/{memberId}/comments")
+    @GetMapping("/{userId}/comments")
     @Operation(summary = "회원의 댓글 조회", description = "주어진 ID에 해당하는 회원이 작성한 댓글을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "댓글을 조회하였습니다.")
     })
-    public ResponseEntity<?> getCommentByMemberId(
-            @Parameter(name = "memberId", description = "조회할 회원의 고유 ID") @PathVariable Long memberId){
+    public ResponseEntity<?> getCommentByUserId(
+            @Parameter(name = "userId", description = "조회할 회원의 고유 ID") @PathVariable Long userId){
 
         return null;
     }
