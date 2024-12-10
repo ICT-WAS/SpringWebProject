@@ -36,4 +36,8 @@ public class PostUserReq {
     @NotNull(message = "휴대전화 번호는 필수 항목입니다.")
     @Pattern(regexp = "^01([0-9])-([0-9]{3,4})-([0-9]{4})$", message = "유효한 전화번호 형식을 입력해주세요.")  //스프링이 제공하는 패턴 검증
     private String phoneNumber;
+
+    @Size(min = 6, max = 6, message = "인증 코드는 6자리 문자 및 숫자의 조합입니다.")
+    @NotNull(message = "휴대전화 번호는 필수 항목입니다.")
+    private String verificationCode;
 }

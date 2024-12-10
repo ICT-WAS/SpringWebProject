@@ -12,4 +12,10 @@ public interface VerificationRepository extends JpaRepository<Verification, Long
     Optional<Verification> findByEmail(String email);
 
     Optional<Verification> findByPhoneNumber(String phoneNumber);
+
+    Optional<Verification> findByPhoneNumberAndVerificationCode(String phoneNumber, String verificationCode);
+
+    Optional<Verification> findByEmailAndVerificationCode(String email, String verificationCode);
+
+
 }

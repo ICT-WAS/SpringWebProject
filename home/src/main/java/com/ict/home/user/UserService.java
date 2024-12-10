@@ -61,7 +61,7 @@ public class UserService {
         }
 
         //인증 테이블(Verification) 상태 확인 - 이메일 혹은 휴대전화 인증정보가 있는지 확인
-        Verification verification = checkVerification(postUserReq.getEmail(), postUserReq.getPhoneNumber());
+        Verification verification = checkVerification(postUserReq.getEmail(), postUserReq.getPhoneNumber(), postUserReq.getVerificationCode());
         //인증 정보에서 인증 완료가 아닐 시 에러
         if (!verification.isVerified()) {
             throw new BaseException(VERIFICATION_FAILED);
@@ -76,16 +76,18 @@ public class UserService {
     }
 
     //인증 테이블 생성 확인
-    private Verification checkVerification(String email, String phoneNumber) {
-        //이메일 인증 확인
-        Verification verification = verificationRepository.findByEmail(email).orElseThrow(()->new BaseException(EMAIL_VERIFICATION_FAILED));
+    private Verification checkVerification(String email, String phoneNumber, String verificationCode) {
+        //인증여부 확인
+        Verification verification = verificationRepository.findByEmailAndVerificationCode(email, verificationCode).orElse(null);
 
         //이메일 인증이 없을 경우 핸드폰 인증 확인
         if (verification == null || !verification.isVerified()) {
-            verification = verificationRepository.findByPhoneNumber(phoneNumber).orElseThrow(()->new BaseException(PHONE_VERIFICATION_FAILED));
-        } else {
-            //이메일 인증 확인 시 반환
-            return verification;
+            verification = verificationRepository.findByPhoneNumberAndVerificationCode(phoneNumber, verificationCode).orElse(null);
+        }
+
+        //핸드폰 인증까지 확인한 후에도 null 이거나 인증 완료 여부가 false일 시
+        if (verification == null || !verification.isVerified()) {
+            return null;
         }
         //휴대폰 인증 확인 시 반환
         return verification;
