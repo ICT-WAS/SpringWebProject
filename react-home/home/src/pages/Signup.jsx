@@ -8,6 +8,9 @@ import Phone from "../components/signup/phone";
 import Modal from "../components/modal/Modal";
 import { useGlobalContext } from "../Context";
 import { useNavigate } from "react-router-dom";
+import { Container, Stack } from "react-bootstrap";
+import Header from "../common/Header";
+import Footer from "../common/Footer";
 
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -141,33 +144,42 @@ const Signup = () => {
   };
 
   return (
-    <div className="body-container">
-      <div className="form-container">
-        <form className="form-container-signin">
-          <h2>회원가입</h2>
-          <Email email={email} setEmail={setEmail} />
-          <Password password={password} setPassword={setPassword} />
-          <Username username={username} setUsername={setUsername} />
-          <Phone phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} />
-          <button
-            type="submit"
-            className="submit-button"
-            onClick={handleSignup}
-            disabled={loading}
-          >
-            {loading ? "가입 중..." : "회원가입"}
-          </button>
-          {isModal && (
-            <Modal
-              title={singupErrorTitle}
-              message={signupError}
-              onClose={closeModal}
-              ref={confirmModalRef}
-            />
-          )}
-        </form>
-      </div>
-    </div>
+    <Container className="p-5" fluid="md">
+      <Stack direction="vertical" gap={5}>
+        <Header />
+        <div className="body-container">
+          <div className="form-container">
+            <form className="form-container-signin">
+              <h2>회원가입</h2>
+              <Email email={email} setEmail={setEmail} />
+              <Password password={password} setPassword={setPassword} />
+              <Username username={username} setUsername={setUsername} />
+              <Phone
+                phoneNumber={phoneNumber}
+                setPhoneNumber={setPhoneNumber}
+              />
+              <button
+                type="submit"
+                className="submit-button"
+                onClick={handleSignup}
+                disabled={loading}
+              >
+                {loading ? "가입 중..." : "회원가입"}
+              </button>
+              {isModal && (
+                <Modal
+                  title={singupErrorTitle}
+                  message={signupError}
+                  onClose={closeModal}
+                  ref={confirmModalRef}
+                />
+              )}
+            </form>
+          </div>
+        </div>
+        <Footer />
+      </Stack>
+    </Container>
   );
 };
 

@@ -46,6 +46,7 @@ public class User extends BaseTimeEntity { //아이디, 유저이름, 패스워�
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.status = UserStatus.ACTIVE;  //회원가입 시 자동 활성화
+        this.userVerify = UserVerify.UNVERIFIED;
     }
 
 //    @PrePersist

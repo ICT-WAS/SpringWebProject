@@ -42,6 +42,7 @@
 .form-container-signin h2 {
   text-align: center; /* 부모 기준으로 가운데 정렬 */
   font-weight: bold; /* 글씨를 굵게 설정 */
+  font-size: 24px;
   width: 100%;
 }
 
@@ -59,17 +60,25 @@
 
 .form-group input {
   padding: 8px;
-  background-color: #f0f0f0;
-  border: 1px solid #f0f0f0;
+  background-color: #f8f9fa;
+  border: 1px solid #f8f9fa;
   border-radius: 4px;
   width: 100%;
   box-sizing: border-box;
 }
 
+.form-group input::placeholder {
+  font-size: small;
+}
+
+.input-group input:focus {
+  border: 0.5px solid #697077;
+}
+
 .submit-button {
   margin-top: 8px;
   padding: 12px 16px;
-  background-color: #3ca6e5;
+  background-color: #212529;
   color: white;
   border: none;
   border-radius: 4px;
@@ -78,7 +87,14 @@
 }
 
 .submit-button:hover {
-  background-color: #0488d4;
+  background-color: #424649;
+}
+
+.form-group .error-message {
+  color: red;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 5px;
 }
 
 /* 휴대전화 */
@@ -103,8 +119,8 @@
 
 .form-group-phone input {
   padding: 8px;
-  background-color: #f0f0f0;
-  border: 1px solid #f0f0f0;
+  background-color: #f8f9fa;
+  border: 1px solid #f8f9fa;
   flex: 1; /* 입력 필드가 남은 공간 채우도록*/
   box-sizing: border-box;
   border-radius: 4px;
@@ -112,18 +128,33 @@
   border-bottom-right-radius: 4px !important;
 }
 
+.form-group-phone input::placeholder {
+  font-size: small;
+}
+
 .form-group-phone button {
-  padding: 8px;
-  color: #fff;
-  border: 1px solid #0179be;
-  background-color: #0179be;
+  padding: 10px;
+  color: #000;
+  font-size: small;
+  border: 1px solid #f0f0f0;
+  background-color: #f0f0f0;
   cursor: pointer;
   border-radius: 4px;
   border-top-left-radius: 4px !important;
   border-bottom-left-radius: 4px !important;
+  height: 100%;
+}
+
+.form-group-phone button:hover {
+  color: #000;
+  border: 1px solid #d3d4d5;
+  background-color: #d3d4d5;
 }
 
 .form-group-phone .error-message {
   color: red;
+  font-size: 12px;
+  font-weight: 600;
   margin-top: 8px; /* 입력 그룹과의 간격 */
+  margin-left: 5px;
 }
