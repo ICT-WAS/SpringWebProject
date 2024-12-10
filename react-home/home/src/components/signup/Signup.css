@@ -4,6 +4,7 @@
   align-items: center; /* 수직 중앙 정렬 */
   height: auto; /* 화면 전체 높이 */
   margin: 12px;
+  background: #f8f9fa;
 }
 
 .form-container {
@@ -28,6 +29,10 @@
   flex: none;
   order: 1;
   flex-grow: 0;
+
+  margin-top: 40px;
+  margin-bottom: 40px;
+  border-radius: 8px;
 }
 
 .form-container-signin {
@@ -73,6 +78,10 @@
 
 .input-group input:focus {
   border: 0.5px solid #697077;
+}
+
+.input-group .verify {
+  margin-top: 5px;
 }
 
 .submit-button {
@@ -157,4 +166,18 @@
   font-weight: 600;
   margin-top: 8px; /* 입력 그룹과의 간격 */
   margin-left: 5px;
+}
+
+/* 비활성화 상태: 색상 진하게, 커서 해제*/
+.form-group-phone button:disabled {
+  color: #000;
+  border: 1px solid #d3d4d5;
+  background-color: #d3d4d5;
+  cursor: not-allowed; /* 마우스 포인터 변경 */
+}
+
+/* 비활성화 상태: 호버 스타일 비활성화 */
+.form-group-phone button:disabled:hover {
+  background-color: #d3d4d5; /* 동일한 색상 유지 */
+  transform: none;
 }

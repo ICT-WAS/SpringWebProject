@@ -3,6 +3,7 @@ package com.ict.home.login.auth.controller;
 import com.ict.home.exception.BaseException;
 import com.ict.home.exception.BaseResponse;
 import com.ict.home.login.auth.dto.PostSignupAuthReq;
+import com.ict.home.login.auth.dto.PostVerifyAuthReq;
 import com.ict.home.login.auth.entity.Verification;
 import com.ict.home.login.auth.VerifyEnum.VerificationType;
 import com.ict.home.login.auth.repository.VerificationRepository;
@@ -10,6 +11,7 @@ import com.ict.home.login.auth.service.VerifyService;
 import com.ict.home.user.UserRepository;
 import com.ict.home.user.UserService;
 import jakarta.mail.MessagingException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,12 +37,12 @@ public class AuthController {
     public BaseResponse<?> signupAuth(@RequestBody PostSignupAuthReq postSignupAuthReq) throws MessagingException {
         try {
             if (postSignupAuthReq.getVerificationType().equals(VerificationType.EMAIL)) {
-                verifyService.sendVerificationCode(postSignupAuthReq.getEmail(), "", postSignupAuthReq.getVerificationType());
-                return new BaseResponse<>("이메일 발송 완료");
+                String verificationCode = verifyService.sendVerificationCode(postSignupAuthReq.getEmail(), "", postSignupAuthReq.getVerificationType());
+                return new BaseResponse<>(verificationCode);
             }
             if (postSignupAuthReq.getVerificationType().equals(VerificationType.PHONE)) {
-                verifyService.sendVerificationCode("", postSignupAuthReq.getPhoneNumber(), postSignupAuthReq.getVerificationType());
-                return new BaseResponse<>("문자 발송 완료");
+                String verificationCode = verifyService.sendVerificationCode("", postSignupAuthReq.getPhoneNumber(), postSignupAuthReq.getVerificationType());
+                return new BaseResponse<>(verificationCode);
             }
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
@@ -49,18 +51,34 @@ public class AuthController {
     }
 
     @PostMapping("/verify")
-    public BaseResponse<?> verifyCode(@RequestParam String verificationCode) {
-        Verification verification = verificationRepository.findByVerificationCode(verificationCode).orElseThrow(() -> new BaseException(INVALID_EMAIL_CODE));
+    public BaseResponse<?> verifyCode(@RequestBody PostVerifyAuthReq postVerifyAuthReq) {
+
+        Verification verification = null;
+        try {
+            if (postVerifyAuthReq.getVerificationType().equals(VerificationType.EMAIL)) {
+                verification = verificationRepository.findByEmailAndVerificationCode(postVerifyAuthReq.getEmail(), postVerifyAuthReq.getVerificationCode()).orElse(null);
+            }
+            if (postVerifyAuthReq.getVerificationType().equals(VerificationType.PHONE)) {
+                verification = verificationRepository.findByPhoneNumberAndVerificationCode(postVerifyAuthReq.getPhoneNumber(), postVerifyAuthReq.getVerificationCode()).orElse(null);
+            }
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
 
         //인증 코드 만료 확인
-        if (verification.getExpirationDate().isBefore(LocalDateTime.now())) {
+        if (verification != null && verification.getExpirationDate().isBefore(LocalDateTime.now())) {
             throw new BaseException(CODE_EXPIRED);
         }
 
         //인증 완료 처리
-        verification.setVerified(true);
-        verification.setExpirationDate(LocalDateTime.now());  //인증완료 시 만료시간을 현재 시간으로 지정
-        verificationRepository.save(verification);
+        if (verification != null) {
+            //인증 완료 처리
+            verification.setVerified(true);
+            //인증완료 시 만료시간을 현재 시간으로 지정
+            verification.setExpirationDate(LocalDateTime.now());
+            //데이터베이스에 저장
+            verificationRepository.save(verification);
+        }
 
         return new BaseResponse<>("인증 성공");
     }

@@ -12,22 +12,6 @@ import { Container, Stack } from "react-bootstrap";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
 
-function useDebounce(value, delay) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
-
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,6 +26,10 @@ const Signup = () => {
   //모달 상태 관리
   const [isModal, setIsModal] = useState(false);
   const confirmModalRef = useRef(null);
+
+  //인증 상태 관리
+  const [isVerified, setIsVerified] = useState(false); // 인증 여부
+  const [code, setCode] = useState(""); //서버에서 넘어온 인증 코드
 
   //로그인 상태를 관리하는 전역 변수
   const { setIsLogin } = useGlobalContext();
@@ -85,6 +73,7 @@ const Signup = () => {
       password,
       phoneNumber,
       username,
+      verificationCode: code,
     };
 
     try {
@@ -151,12 +140,23 @@ const Signup = () => {
           <div className="form-container">
             <form className="form-container-signin">
               <h2>회원가입</h2>
-              <Email email={email} setEmail={setEmail} />
+              <Email
+                email={email}
+                setEmail={setEmail}
+                isVerified={isVerified}
+                setIsVerified={setIsVerified}
+                code={code}
+                setCode={setCode}
+              />
               <Password password={password} setPassword={setPassword} />
               <Username username={username} setUsername={setUsername} />
               <Phone
                 phoneNumber={phoneNumber}
                 setPhoneNumber={setPhoneNumber}
+                isVerified={isVerified}
+                setIsVerified={setIsVerified}
+                code={code}
+                setCode={setCode}
               />
               <button
                 type="submit"
@@ -184,3 +184,19 @@ const Signup = () => {
 };
 
 export default Signup;
+
+// function useDebounce(value, delay) {
+//   const [debouncedValue, setDebouncedValue] = useState(value);
+
+//   useEffect(() => {
+//     const handler = setTimeout(() => {
+//       setDebouncedValue(value);
+//     }, delay);
+
+//     return () => {
+//       clearTimeout(handler);
+//     };
+//   }, [value, delay]);
+
+//   return debouncedValue;
+// }

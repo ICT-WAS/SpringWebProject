@@ -31,7 +31,7 @@ public class VerifyService {
     @Value("${mail.username}")
     private String username;
 
-    public void sendVerificationCode(String email, String phoneNumber, VerificationType verificationType) throws MessagingException {
+    public String sendVerificationCode(String email, String phoneNumber, VerificationType verificationType) throws MessagingException {
         //인증 코드 생성
         String verificationCode = createVerificationCode();
 
@@ -42,25 +42,24 @@ public class VerifyService {
 
         //기존 인증 정보가 있을 시 해당 행 삭제
         if (verificationType == VerificationType.EMAIL) {
-            Verification existingVerification = verificationRepository.findByEmail(email).orElseThrow(()->new BaseException(EMAIL_VERIFICATION_FAILED));
-            if (existingVerification != null) {
+            Verification existingVerification = verificationRepository.findByEmailAndVerificationCode(email, verificationCode).orElse(null);
+            //기존 정보가 있고 인증 여부가 false 일 시
+            if (existingVerification != null && !existingVerification.isVerified()) {
                 verificationRepository.delete(existingVerification);  // 기존 이메일 인증 정보 삭제
             }
+
+            verification.setEmail(email);
         } else if (verificationType == VerificationType.PHONE) {
-            Verification existingVerification = verificationRepository.findByPhoneNumber(phoneNumber).orElseThrow(()->new BaseException(PHONE_VERIFICATION_FAILED));
-            if (existingVerification != null) {
+            Verification existingVerification = verificationRepository.findByPhoneNumberAndVerificationCode(phoneNumber, verificationCode).orElse(null);
+            //기존 정보가 있고 인증 여부가 false 일 시
+            if (existingVerification != null && !existingVerification.isVerified()) {
                 verificationRepository.delete(existingVerification);  // 기존 휴대폰 인증 정보 삭제
             }
+            verification.setPhoneNumber(phoneNumber);
         }
 
         //인증 정보 테이블 저장
         verification.setVerificationCode(verificationCode);
-        if (verificationType == VerificationType.EMAIL) {  //이메일 인증 시
-            verification.setEmail(email);
-        } else if (verificationType == VerificationType.PHONE) {  //휴대폰 인증 시
-            verification.setPhoneNumber(phoneNumber);
-        }
-
         verification.setVerificationType(verificationType);
         verification.setExpirationDate(expiresAt);
 
@@ -71,6 +70,7 @@ public class VerifyService {
         } else if (verificationType == VerificationType.PHONE) {
             sendPhoneVerification(phoneNumber, verificationCode);
         }
+        return verificationCode;
     }
 
     //넘어온 휴대전화 정보에 "-" 기호를 지움
