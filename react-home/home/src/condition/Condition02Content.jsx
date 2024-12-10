@@ -1,6 +1,6 @@
 import { Button, Dropdown, Form, Stack } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FamilyInputNumberSubItem, InputNumberItem, InputNumberLoopSubItemWithFollowQuestions, InputNumberSubItem } from "./InputNumberItem";
 import { FamilyRadioButtonSubItem, RadioButtonItem, RadioButtonSubItem } from "./RadioButtonItem";
 import { CheckButtonSubItem, CheckButtonSubItemWithFollowQuestions } from "./CheckButtonItem";
@@ -18,24 +18,27 @@ export default function Condition02Content() {
     const spouseLivingWithChildrenButtons = { name: 'isSpouseLivingWithChildren', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
     const livingWithInLawsButtons = { name: 'inLaws', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
 
-    let hasSpouse = false;
-    let hasMarried = false;
-    let hasInLaw = false;
+    const [hasSpouse, setHasSpouse] = useState(false);
+    const [hasMarried, setHasMarried] = useState(false);
+    const [hasInLaw, setHasInLaw] = useState(false);
 
-    /* 이전 폼 데이터 읽어오기 */
-    const sessionData = sessionStorage.getItem('formData1');
-    let userData = null;
-    try {
-        userData = JSON.parse(sessionData);
-        hasMarried = userData.married > 0;
-        hasSpouse = userData.married === 1 || userData.married === 2;
-        hasInLaw = userData.married === 1 || userData.married === 3;
+    useEffect(() => {
+        /* 이전 폼 데이터 읽어오기 */
+        const sessionData = sessionStorage.getItem('formData1');
+        let userData = null;
+        try {
+            userData = JSON.parse(sessionData);
+            setHasSpouse(userData.married === 1 || userData.married === 2);
+            setHasMarried(userData.married > 0);
+            setHasInLaw(userData.married === 1 || userData.married === 3);
 
-    } catch (error) { }
+        } catch (error) { }
+    }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행
+
 
     /* 제출용 데이터 */
     const [formData, setFormData] = useState({});
-    const [familyData, setFamilyData] = useState({});
+    const [familyData, setFamilyData] = useState({1 : []});
 
     /* 꼬리질문 가시성 */
     const followUpQuestions = {
@@ -64,11 +67,21 @@ export default function Condition02Content() {
         console.log(formData);
         console.log(familyData);
 
-        sessionStorage.removeItem('formData1');
-        sessionStorage.setItem('formData2', JSON.stringify(formData));
-        sessionStorage.setItem('familyData', JSON.stringify(familyData));
+        let finalFamilyData = familyData;
+        let finalHasSpouse = false;
 
-        // navigate("/condition-3");
+        sessionStorage.removeItem('hasSpouse');
+
+        if(formData['spouse'] === 'Y' ) {
+            finalFamilyData = {...familyData, [2]: []};
+            finalHasSpouse = true;
+        }
+
+        sessionStorage.setItem('hasSpouse', finalHasSpouse);
+        sessionStorage.setItem('formData2', JSON.stringify(formData));
+        sessionStorage.setItem('familyData', JSON.stringify(finalFamilyData));
+        
+        navigate("/condition-3");
     }
 
     /* formData 업데이트 */

@@ -19,6 +19,19 @@ export enum FamilyMember {
     GRANDCHILD_NO_GUARDIAN = 18 // 부모(신청자 본인의 자녀)가 사망하여 양육자가 없는 손자녀
 }
 
+export function getEnumKeyFromValue(enumObj: any, value: number): string | undefined {
+    const entry = Object.entries(enumObj).find(([key, val]) => val === value);
+    return entry ? entry[0] : undefined;
+}
+
+export function getFamilyMemberName(value: number): string | undefined {
+    // FamilyMember에서 숫자 값에 해당하는 키를 가져오기
+    const key = getEnumKeyFromValue(FamilyMember, value);
+    
+    // 해당 키로 familyMemberNames에서 이름을 반환
+    return key ? familyMemberNames[FamilyMember[key as keyof typeof FamilyMember]] : undefined;
+}
+
 export const familyMemberNames: { [key in FamilyMember]: string } = {
     [FamilyMember.SELF]: '본인',
     [FamilyMember.SPOUSE]: '배우자',

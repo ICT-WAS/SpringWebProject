@@ -18,12 +18,13 @@ export default function Condition01Content() {
 
     /* 꼬리질문 가시성 */
     const followUpQuestions = { married: [{value: 1, subQuestionId: 'marriedDate'}], moveInDate: [{value: 1, subQuestionId: 'metropolitanAreaDate'}, {value: 2, subQuestionId: 'regionMoveInDate'}] };
-    const [visibility, setVisibility] = useState({ marriedDate: false, metropolitanAreaDate: true });
+    const [visibility, setVisibility] = useState({ marriedDate: false, metropolitanAreaDate: false, regionMoveInDate: false });
 
     function handleClick(e) {
 
         // 폼 데이터 저장
         sessionStorage.setItem('formData1', JSON.stringify(formData));
+        console.log(formData);
 
         navigate("/condition-2");
     }
@@ -39,6 +40,16 @@ export default function Condition01Content() {
                 [name]: value
             };
         });
+    }
+
+    function changeVisibility({condition, name}) {
+        setVisibility((prev) => {
+            if(condition) {
+                return {...prev, [name]: true};                                                               
+            } else {
+                return {...prev, [name]: false};
+            }
+        })
     }
 
     // value는 상위 질문 옵션값임
@@ -68,17 +79,17 @@ export default function Condition01Content() {
                     name={'birthday'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
 
                 {/* 현재 거주지 */}
-                <MoveInDate onChangedInputValue={onChangedInputValue} />
+                <MoveInDate onChangedInputValue={onChangedInputValue} changeVisibility={changeVisibility} />
 
                 {/* 현재 거주지에 입주한 날 */}
-                <InputNumberItem number={3} question={'현재 거주지에 입주한 날(주민등록표등본에 있는 전입일자)'}
+                <InputNumberItem number={3} question={`${formData.gunGu ?? 'OOO'}에 입주한 날(주민등록표등본에 있는 전입일자)`}
                     name={'moveInDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
 
                 {/* [꼬리질문] 현재 지역(시/도)에 거주하기 시작한 날 */}
                 <MoveInFollwUpQuestion1 onChangedInputValue={onChangedInputValue}
-                    visibility={visibility['regionMoveInDate']} type='date' placeholder={placeholderText.dateType} />
+                    visibility={visibility['regionMoveInDate']} siDo={formData.siDoName} />
 
-                {/* [꼬리질문] 서울, 경기, 인천에에 거주하기 시작한 날 */}
+                {/* [꼬리질문] 서울, 경기, 인천에 거주하기 시작한 날 */}
                 <MoveInFollwUpQuestion2 onChangedInputValue={onChangedInputValue}
                     visibility={visibility['metropolitanAreaDate']} type='date' placeholder={placeholderText.dateType} />
 
@@ -103,7 +114,7 @@ export default function Condition01Content() {
 }
 
 {/* 거주지역 - 현재 사는 지역 */ }
-function MoveInDate({ onChangedInputValue }) {
+function MoveInDate({ onChangedInputValue, changeVisibility }) {
     
     const [sidoSelectedName, setSidoSelectedName] = useState('시/도');
     const [gunguSelectedName, setGunguelectedName] = useState('군/구');
@@ -116,14 +127,30 @@ function MoveInDate({ onChangedInputValue }) {
         setSidoIndex(index);
         setGunguData(sidoData[index].values);
         setSidoSelectedName(sidoData[index].category);
+        
+        onChangedInputValue({name: 'siDo', value: sidoData[index].code});
+        onChangedInputValue({name: 'siDoName', value: sidoData[index].category});
+
         setGunguelectedName('군/구');
+        onChangedInputValue({name: 'gunGu', value: null});
+
+        const sidoCode = sidoData[index].code;
+
+        // 서울, 인천, 경기?
+        const trueCondition = sidoCode === 100 || sidoCode === 400 || sidoCode == 410;
+        changeVisibility({ condition: trueCondition, name: 'metropolitanAreaDate'});
+
+        // 경기/충북/충남/전북/전남/경북/경남/강원
+        const regionMoveinSidoList = [410, 360, 312, 560, 513, 712, 621, 200];
+        const regionMoveinCondition = regionMoveinSidoList.includes(sidoCode);
+        changeVisibility({ condition: regionMoveinCondition, name: 'regionMoveInDate'});
     }
 
     function handleChangedGuGunDropdown({index}) {
-        setGunguelectedName(gunguData[index].value);
-        onChangedInputValue({name: 'siDo', value: sidoData[sidoIndex].code});
-        onChangedInputValue({name: 'gunGu', value: gunguData[index].value});
+        
         // 값 저장
+        setGunguelectedName(gunguData[index].value);
+        onChangedInputValue({name: 'gunGu', value: gunguData[index].value});
     }
 
     const sidoList = () => {
@@ -174,15 +201,15 @@ function MoveInDate({ onChangedInputValue }) {
     );
 }
 
-{/* 거주지역 - 경기에 거주하기 시작한 날 */ }
-function MoveInFollwUpQuestion1({ onChangedInputValue, visibility }) {
+{/* 거주지역 - 특정 지역()에 거주하기 시작한 날 */ }
+function MoveInFollwUpQuestion1({ siDo, onChangedInputValue, visibility }) {
 
     if (visibility === false) {
         return;
     }
 
     return (
-        <InputNumberSubItem number={'3-1'} question={'경기에 거주하기 시작한 날'} depth={3}
+        <InputNumberSubItem number={'3-1'} question={`${siDo}에 거주하기 시작한 날`} depth={3}
             name={'metropolitanAreaDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
     );
 }
