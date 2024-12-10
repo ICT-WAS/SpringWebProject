@@ -262,7 +262,7 @@ function AccountInfoQuestion({ onChangedInputValue, visibility }) {
     return (
         <div>
             <InputNumberSubItem number={'1-1'} question={'가입일자 입력'} depth={3}
-                name={'familyBirth'} onChange={onChangedInputValue} placeholder={placeholderText.dateType} />
+                name={'familyBirth'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
             <InputNumberSubItem number={'1-2'} question={'납입 횟수 입력'} depth={3}
                 name={'familyBirth'} onChange={onChangedInputValue} placeholder={placeholderText.countType} />
             <InputNumberSubItem number={'1-3'} question={'총 납입 금액 입력'} depth={3}

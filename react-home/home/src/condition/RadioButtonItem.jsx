@@ -77,7 +77,7 @@ function StackedRadioButtons({ buttons, direction = 'vertical', flexAuto, onChan
 }
 
 
-export function FamilyRadioButtonSubItem({ index, number, question, buttons, depth = 1, onChangedFamilyValue}) {
+export function FamilyRadioButtonSubItem({ index, number, question, direction, buttons, depth = 1, onChangedFamilyValue}) {
 
     const marginClass = `ms-${depth}`;
 
@@ -85,27 +85,26 @@ export function FamilyRadioButtonSubItem({ index, number, question, buttons, dep
         <>
             <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
                 <p className="card-header-text">{number }.{question}</p>
-                <FamilyStackedRadioButtons index={index} buttons={buttons}
+                <FamilyStackedRadioButtons index={index} buttons={buttons} direction={direction}
                     onChangedFamilyValue={onChangedFamilyValue} />
             </div>
         </>
     );
 }
 
-function FamilyStackedRadioButtons({ index, buttons, onChangedFamilyValue }) {
+function FamilyStackedRadioButtons({ index, buttons, direction='vertical', onChangedFamilyValue }) {
 
     return (
         <>
-            <Stack direction={'vertical'} gap={2} >
-                <FamilyRadioButtons index={index} buttons={buttons}
+            <Stack direction={direction} gap={2} >
+                <FamilyRadioButtons index={index} buttons={buttons} direction={direction}
                      onChangedFamilyValue={onChangedFamilyValue} />
             </Stack>
         </>
     );
 }
 
-function FamilyRadioButtons({ index = 0, buttons, flexAuto = true, onChangedFamilyValue }) {
-    const flexValue = flexAuto ? 1 : 'none';
+function FamilyRadioButtons({ index = 0, buttons, onChangedFamilyValue }) {
 
     function handleRadioChange(e) {
         const name = buttons.name;
@@ -122,7 +121,7 @@ function FamilyRadioButtons({ index = 0, buttons, flexAuto = true, onChangedFami
                 label={button.data}
                 value={index}
                 id={`${buttons.name}-${index}`}
-                style={{ flex: `${flexValue}` }}
+                style={{ flex: 1 }}
                 onChange={handleRadioChange}
             />
         </React.Fragment>

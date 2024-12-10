@@ -114,7 +114,7 @@ export function InputText({ name, onChange, type='normal', placeholder }) {
     );
 }
 
-export function InputNumberLoopSubItemWithFollowQuestions({ number, question, depth = 1, name, onChange, handleFollowUpQuestion, subQuestion, type, placeholder, unit }) {
+export function InputNumberLoopSubItemWithFollowQuestions({ number, question, depth = 1, name, onChange, handleFollowUpQuestion, subQuestion, type, placeholder, unit, onChangedFamilyValue }) {
     const marginClass = `ms-${depth * 1}`;
 
     return (
@@ -122,20 +122,20 @@ export function InputNumberLoopSubItemWithFollowQuestions({ number, question, de
             <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
                 <p className="card-header-text">{number}.&nbsp;{question}</p>
                 <InputTextWithFollowQuestions name={name} onChange={onChange} 
-                    handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} type={type} placeholder={placeholder} unit={unit} />
+                    handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} type={type} placeholder={placeholder} unit={unit} onChangedFamilyValue={onChangedFamilyValue} />
             </div>
         </>
     );
 }
 
-function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, subQuestion, type='normal', placeholder, unit }) {
+function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, subQuestion, type='normal', placeholder, unit, onChangedFamilyValue }) {
 
     const [repeatCount, setRepeatCount] = useState(0);
 
     function handleInputChange(e) {
 
         const name = e.target.getAttribute('name');
-        const value = e.target.value;
+        let value = e.target.value;
 
         if(type === 'date') {
             value = formatDateToCustomFormat(e.target.value.toString());
@@ -171,7 +171,8 @@ function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, 
             <div key={index}>
                 {subQuestion({ 
                     onChangedInputValue: onChange, 
-                    childCount: index + 1
+                    childCount: index + 1,
+                    onChangedFamilyValue: onChangedFamilyValue
                 })}
             </div>
             ))}
