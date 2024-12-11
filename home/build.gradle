@@ -58,6 +58,9 @@ dependencies {
 	//휴대폰 인증
 	implementation 'net.nurigo:sdk:4.3.0'
 
+	//Webflux - 비동기/논블로킹
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 }
 
 tasks.named('test') {

@@ -8,6 +8,8 @@ import { useGlobalContext } from "../Context";
 import { Container, Stack } from "react-bootstrap";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
+import KakaoLogin from "../components/login/KakaoLogin";
+import NaverLogin from "../components/login/NaverLogin";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -109,6 +111,8 @@ const Login = () => {
               >
                 {loading ? "로그인 중..." : "로그인"}
               </button>
+              <KakaoLogin />
+              <NaverLogin />
               {isModal && (
                 <Modal
                   title={loginErrorTitle}
