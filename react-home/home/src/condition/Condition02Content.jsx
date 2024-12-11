@@ -24,23 +24,23 @@ export default function Condition02Content() {
 
     /* 제출용 데이터 */
     const [formData, setFormData] = useState({});
-    const [familyData, setFamilyData] = useState({1 : []});
+    const [familyData, setFamilyData] = useState([{relationship : 1, livingTogether: 1}]);
 
     /* 꼬리질문 가시성 */
     const followUpQuestions = {
         grandparents: [{ value: 'Y', subQuestionId: 'livingWith' }],
         parents: [{ value: 'Y', subQuestionId: 'livingWithParents' }],
-        children: [{ value: 'Y', subQuestionId: 'livingWithChildren' }, { value: 'N', subQuestionId: 'livingWithGrandChildren' }],
-        livingWithGrandChildren: [{ value: 'Y', subQuestionId: 'grandChildren' }],
+        children: [{ value: 'Y', subQuestionId: 'livingWithChildren' }, { value: 'N', subQuestionId: 'grandchildren' }],
+        grandchildren: [{ value: 'Y', subQuestionId: 'grandChildrenCount' }],
         spouse: [{ value: 'N', subQuestionId: 'spouseLivingWith' }],
         isSpouseLivingWithChildren: [{ value: 'Y', subQuestionId: 'spouseLivingWithChildren' }],
-        inLaws: [{ value: 'Y', subQuestionId: 'livingWithinLaws' }],
+        inLaws: [{ value: 'Y', subQuestionId: 'livingWithInLaws' }],
     };
 
     const [visibility, setVisibility] = useState({
-        livingWith: false, livingWithParents: false, livingWithChildren: false, livingWithGrandChildren: false,
-        grandChildren: false,
-        spouseLivingWith: false, spouseLivingWithChildren: false, livingWithinLaws: false
+        livingWith: false, livingWithParents: false, livingWithChildren: false, grandchildren: false,
+        grandChildrenCount: false,
+        spouseLivingWith: false, spouseLivingWithChildren: false, livingWithInLaws: false
     });
 
     useEffect(() => {
@@ -97,7 +97,7 @@ export default function Condition02Content() {
         sessionStorage.setItem('formData2', JSON.stringify(formData));
         sessionStorage.setItem('familyData', JSON.stringify(finalFamilyData));
         
-        navigate("/condition-3");
+        // navigate("/condition-3");
     }
 
     /* formData 업데이트 */
@@ -118,7 +118,7 @@ export default function Condition02Content() {
      * updates 예 : { livingTogether: '2024-12-09', livingTogetherDate: 5 }
      * 
      */
-    function onChangedFamilyValue({ code, index, updates }) {
+    function onChangedFamilyValue({ code, livingTogether, index, updates }) {
         setFamilyData((prevFamilyData) => {
             const existingData = prevFamilyData[code] || []; // 해당 code가 없으면 빈 배열로 초기화
 
@@ -197,10 +197,10 @@ export default function Condition02Content() {
 
                 {/* [꼬리질문] 부모(신청자 본인의 자녀)가 사망하여 양육자가 없는 손자녀와 같이 살고 계신가요? */}
                 <LivingWithGrandChildrenFollwUpQuestion onChangedInputValue={onChangedInputValue} handleFollowUpQuestion={handleFollowUpQuestion}
-                    visibility={visibility['livingWithGrandChildren']} />
+                    visibility={visibility['grandchildren']} />
 
                 <LivingWithGrandChildrenInfoQuestion onChangedFamilyValue={onChangedFamilyValue} handleFollowUpQuestion={handleFollowUpQuestion}
-                     visibility={visibility['grandChildren']} />
+                     visibility={visibility['grandChildrenCount']} />
 
                 {/* 배우자와 같이 살고 계신가요? */}
                 {hasSpouse && <RadioButtonItem number={3} question={'배우자와 같이 살고 계신가요?'}
@@ -213,12 +213,11 @@ export default function Condition02Content() {
                     subQuestionVisibility={visibility['spouseLivingWithChildren']} onChangedFamilyValue={onChangedFamilyValue} />
 
                 {/* 사위 또는 며느리와 같이 살고 계신가요? */}
-                {hasInLaw && <RadioButtonItem number={3} question={'사위 또는 며느리와 같이 살고 계신가요?'}
-                    buttons={livingWithInLawsButtons} direction={'horizontal'} onChange={onChangedInputValue}
-                    handleFollowUpQuestion={handleFollowUpQuestion} />}
+                {hasInLaw && <LivingWithInLaws buttons={livingWithInLawsButtons} onChange={onChangedInputValue}
+                    handleFollowUpQuestion={handleFollowUpQuestion} hasSpouse={hasSpouse}/>}
 
                 {/* [꼬리질문] 몇 명의 사위 또는 며느리와 살고 계신가요? */}
-                <LivingWithInLawsFollwUpQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['livingWithinLaws']} />
+                <LivingWithInLawsFollwUpQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['livingWithInLaws']} />
 
                 {/* 다음으로 */}
                 <Stack direction="horizontal" gap={2}>
@@ -414,7 +413,7 @@ function LivingWithChildrenFollwUpQuestion2({ onChangedFamilyValue, visibility, 
 {/* 자식과 동거 안함 - 부모(신청자 본인의 자녀)가 사망하여 양육자가 없는 손자녀와 같이 살고 계신가요? */ }
 function LivingWithGrandChildrenFollwUpQuestion({ onChangedInputValue, handleFollowUpQuestion, visibility }) {
 
-    const livingWithGrandChildren = { name: 'livingWithGrandChildren', values: [{ value: 'Y', data: '예', hasFollowUpQuestion: true }, { value: 'N', data: '아니오' }] }
+    const grandchildren = { name: 'grandchildren', values: [{ value: 'Y', data: '예', hasFollowUpQuestion: true }, { value: 'N', data: '아니오' }] }
 
     if (!visibility) {
         return;
@@ -423,7 +422,7 @@ function LivingWithGrandChildrenFollwUpQuestion({ onChangedInputValue, handleFol
     return (
         <RadioButtonSubItem number={'3-1'} question={'부모(신청자 본인의 자녀)가 사망하여 양육자가 없는 손자녀와 같이 살고 계신가요?'} depth={3}
 
-            buttons={livingWithGrandChildren} onChange={onChangedInputValue} direction={'horizontal'} 
+            buttons={grandchildren} onChange={onChangedInputValue} direction={'horizontal'} 
             handleFollowUpQuestion={handleFollowUpQuestion} />
     );
 }
@@ -438,7 +437,7 @@ function LivingWithGrandChildrenInfoQuestion({ onChangedFamilyValue, handleFollo
     return (
         <InputNumberSubItem number={'3-1'} question={'몇 명의 손자녀와 살고 계신가요?'} depth={4}
 
-            name={'grandChildren'} onChange={onChangedFamilyValue}
+            name={'grandChildrenCount'} onChange={onChangedFamilyValue}
             handleFollowUpQuestion={handleFollowUpQuestion}
             unit={'명'} maxLength={2} placeholder={placeholderText.peopleCountType} />
     );
@@ -536,6 +535,20 @@ function SpouseLivingWithChildrenFollwUpQuestion2({ onChangedInputValue, visibil
             <FamilyRadioButtonSubItem number={'4-8'} question={'동거 기간을 선택해주세요'} depth={4} onChangedFamilyValue={onChangedFamilyValue}
                 buttons={livingForButtons}  />
         </>
+    );
+}
+{/* 사위 또는 며느리와 동거 - 몇 명의 사위 또는 며느리와 살고 계신가요? */ }
+function LivingWithInLaws({ buttons, onChangedInputValue, handleFollowUpQuestion, hasSpouse }) {
+
+    let question = '사위 또는 며느리와 같이 살고 계신가요?';
+    if(hasSpouse) {
+        question = '본인 또는 배우자가 사위 또는 며느리와 같이 살고 계신가요?';
+    }
+
+    return (
+        <RadioButtonItem number={3} question={question}
+                    buttons={buttons} direction={'horizontal'} onChange={onChangedInputValue}
+                    handleFollowUpQuestion={handleFollowUpQuestion} />
     );
 }
 
