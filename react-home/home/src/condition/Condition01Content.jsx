@@ -12,13 +12,32 @@ export default function Condition01Content() {
 
     const houseHolderButtons = { name: 'householder', values: [{ data: '세대원', value: 'N', }, { data: '세대주', value: 'Y', }] }
     const marriedButtons = { name: 'married', values: [{ data: '미혼', value: 0 }, { data: '기혼', value: 1, hasFollowUpQuestion: true }, { data: '예비신혼부부', value: 2 }, { data: '한부모', value: 3 }] }
+    const accountTypeButtons = {
+        name: 'type', values: [
+            { data: '청약예금', value: 'SAVINGS_ACCOUNT', hasFollowUpQuestion: true },
+            { data: '청약부금', value: 'SAVINGS_PLAN', hasFollowUpQuestion: true },
+            { data: '청약저축', value: 'SAVINGS_DEPOSIT', hasFollowUpQuestion: true },
+            { data: '주택청약종합저축', value: 'COMBINED_SAVINGS', hasFollowUpQuestion: true }]
+    }
+    const spouseHasAccountButtons = { name: 'spouseHasAccount', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
 
     /* 제출용 데이터 */
     const [formData, setFormData] = useState({});
 
     /* 꼬리질문 가시성 */
-    const followUpQuestions = { married: [{value: 1, subQuestionId: 'marriedDate'}], moveInDate: [{value: 1, subQuestionId: 'metropolitanAreaDate'}, {value: 2, subQuestionId: 'regionMoveInDate'}] };
-    const [visibility, setVisibility] = useState({ marriedDate: false, metropolitanAreaDate: false, regionMoveInDate: false });
+    const followUpQuestions = { 
+        married: [{value: 1, subQuestionId: 'marriedDate'}], 
+        moveInDate: [{value: 1, subQuestionId: 'metropolitanAreaDate'}, {value: 2, subQuestionId: 'regionMoveInDate'}],
+        type: [{ value: 'SAVINGS_ACCOUNT', subQuestionId: 'accountInfo' },
+            { value: 'SAVINGS_PLAN', subQuestionId: 'accountInfo' },
+            { value: 'SAVINGS_DEPOSIT', subQuestionId: 'accountInfo' },
+            { value: 'COMBINED_SAVINGS', subQuestionId: 'accountInfo' }],
+        spouseHasAccount: [{ value: 'Y', subQuestionId: 'spouseAccountDate' }], };
+
+    const [visibility, setVisibility] = useState({ 
+        marriedDate: false, metropolitanAreaDate: false, regionMoveInDate: false,
+        accountInfo: false, spouseAccountDate: false, 
+     });
 
     useEffect(() => {
         const keysToRemove = Object.keys(visibility).filter(
@@ -78,24 +97,17 @@ export default function Condition01Content() {
     // value는 상위 질문 옵션값임
     function handleFollowUpQuestion({ name, value, visible }) {
         const matchedItem = followUpQuestions[name];
-        
+
         if (!matchedItem || matchedItem.length < 1) {
             return;
         }
 
         matchedItem.forEach((item) => {
-
             const questionName = item.subQuestionId;
-            handleFollowUpQuestion({name: questionName});
 
-            let subQuestionVisibility = false;
-            if(item.value === value) {
-                subQuestionVisibility = true;
-            }
-        
             setVisibility((prevVisibility) => ({
                 ...prevVisibility,
-                [questionName]: subQuestionVisibility,
+                [questionName]: visible,
             }));
         });
     }
@@ -134,6 +146,28 @@ export default function Condition01Content() {
 
                 {/* [꼬리질문] 혼인신고일 */}
                 <MarriedFollwUpQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['marriedDate']} />
+
+                {/* 소유하신 청약 통장의 종류를 선택해주세요 */}
+                <RadioButtonItem number={1} question={'소유하신 청약 통장의 종류를 선택해주세요'}
+                    buttons={accountTypeButtons} direction={'horizontal'} onChange={onChangedInputValue}
+                    handleFollowUpQuestion={handleFollowUpQuestion} />
+
+                {/* [꼬리질문] 청약 통장 정보 */}
+                <AccountInfoQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['accountInfo']} />
+
+                {/* 배우자도 청약 통장이 있으신가요? */}
+                {(formData['married'] == 1 || formData['married'] == 2 ) && (
+                    <RadioButtonItem
+                        number={2}
+                        question={'배우자도 청약 통장이 있으신가요?'}
+                        buttons={spouseHasAccountButtons}
+                        direction={'horizontal'}
+                        onChange={onChangedInputValue}
+                        handleFollowUpQuestion={handleFollowUpQuestion}
+                    />
+                )}
+                {/* [꼬리질문] 배우자의 청약 통장 정보 */}
+                {(visibility['spouseAccountDate'] && (formData['married'] == 1 || formData['married'] == 2 )) && <SpouseAccountInfoQuestion onChangedInputValue={onChangedInputValue} />}
 
                 {/* 다음으로 */}
                 <Button variant="dark" onClick={handleClick}>다음</Button>
@@ -267,5 +301,35 @@ function MarriedFollwUpQuestion({ onChangedInputValue, visibility }) {
     return (
         <InputNumberSubItem number={'5-1'} question={'혼인신고일'} depth={3}
             name={'marriedDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
+    );
+}
+
+{/* 청약 통장 - 청약 통장 정보 */ }
+function AccountInfoQuestion({ onChangedInputValue, visibility }) {
+
+    if (!visibility) {
+        return;
+    }
+
+    return (
+        <div>
+            <InputNumberSubItem number={'1-1'} question={'가입일자 입력'} depth={3}
+                name={'createdAt'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
+            <InputNumberSubItem number={'1-2'} question={'납입 횟수 입력'} depth={3}
+                name={'paymentCount'} onChange={onChangedInputValue} placeholder={placeholderText.countType} />
+            <InputNumberSubItem number={'1-3'} question={'총 납입 금액 입력'} depth={3}
+                name={'totalAmount'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
+            <InputNumberSubItem number={'1-4'} question={'납입 인정 금액 입력'} depth={3}
+                name={'recognizedAmount'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
+        </div>
+    );
+}
+
+{/* 배우자 청약통장 - 가입일자 */ }
+function SpouseAccountInfoQuestion({ onChangedInputValue }) {
+
+    return (
+        <InputNumberSubItem number={'2-1'} question={'가입일자 입력'} depth={3}
+            name={'spouseAccountDate'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
     );
 }

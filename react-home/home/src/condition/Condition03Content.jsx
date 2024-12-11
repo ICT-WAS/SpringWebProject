@@ -11,21 +11,6 @@ export default function Condition03Content() {
 
     const navigate = useNavigate();
 
-    /*
-    SAVINGS_ACCOUNT("청약예금"),
-    SAVINGS_PLAN("청약부금"),
-    SAVINGS_DEPOSIT("청약저축"),
-    COMBINED_SAVINGS("주택청약종합저축");
-    */
-
-    const accountTypeButtons = {
-        name: 'type', values: [
-            { data: '청약예금', value: 'SAVINGS_ACCOUNT', hasFollowUpQuestion: true },
-            { data: '청약부금', value: 'SAVINGS_PLAN', hasFollowUpQuestion: true },
-            { data: '청약저축', value: 'SAVINGS_DEPOSIT', hasFollowUpQuestion: true },
-            { data: '주택청약종합저축', value: 'COMBINED_SAVINGS', hasFollowUpQuestion: true }]
-    }
-    const spouseHasAccountButtons = { name: 'spouseHasAccount', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
     const totalPropertyValueButtons = { name: 'propertyPrice', values: [{ data: '미보유 혹은 2억 1,150만원 이하', value: 0 }, { data: '2억 1,150만원 초과 3억 3,100만원 이하', value: 1 }, { data: '3억 3,100만원 초과', value: 2 }] }
     const incomeActivityTypeButtons = { name: 'incomeActivity', values: [{ data: '외벌이', value: 0 }, { data: '맞벌이', value: 1, hasFollowUpQuestion: true }] }
     const familyHasHouseButtons = { name: 'isOwner', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
@@ -45,12 +30,6 @@ export default function Condition03Content() {
     
     /* 꼬리질문 가시성 */
     const followUpQuestions = {
-        type: [{ value: 'SAVINGS_ACCOUNT', subQuestionId: 'accountInfo' },
-        { value: 'SAVINGS_PLAN', subQuestionId: 'accountInfo' },
-        { value: 'SAVINGS_DEPOSIT', subQuestionId: 'accountInfo' },
-        { value: 'COMBINED_SAVINGS', subQuestionId: 'accountInfo' }
-        ],
-        spouseHasAccount: [{ value: 'Y', subQuestionId: 'spouseAccountDate' }],
         hasVehicle: [{ value: 'Y', subQuestionId: 'vehicleValue' }],
         incomeActivity: [{ value: 1, subQuestionId: 'spouseIncome' }],
         isOwner: [{ value: 'Y', subQuestionId: 'hasHouseInfo' }],
@@ -58,7 +37,7 @@ export default function Condition03Content() {
         lastWinned: [{ value: 'Y', subQuestionId: 'winningDate' }],
         ineligible: [{ value: 'Y', subQuestionId: 'disqualifiedDate' }]
     };
-    const [visibility, setVisibility] = useState({ accountInfo: false, spouseAccountDate: false, vehicleValue: true, spouseIncome: false, hasHouseInfo: false, soldHouseInfo: false, winningDate: false, disqualifiedDate: false });
+    const [visibility, setVisibility] = useState({ vehicleValue: true, spouseIncome: false, hasHouseInfo: false, soldHouseInfo: false, winningDate: false, disqualifiedDate: false });
 
 
     useEffect(() => {
@@ -157,28 +136,6 @@ export default function Condition03Content() {
         <Form>
             <Stack direction='vertical' gap={5} >
 
-                {/* 소유하신 청약 통장의 종류를 선택해주세요 */}
-                <RadioButtonItem number={1} question={'소유하신 청약 통장의 종류를 선택해주세요'}
-                    buttons={accountTypeButtons} direction={'horizontal'} onChange={onChangedInputValue}
-                    handleFollowUpQuestion={handleFollowUpQuestion} />
-
-                {/* [꼬리질문] 청약 통장 정보 */}
-                <AccountInfoQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['accountInfo']} />
-
-                {/* 배우자도 청약 통장이 있으신가요? */}
-                {hasSpouse === true && (
-                    <RadioButtonItem
-                        number={2}
-                        question={'배우자도 청약 통장이 있으신가요?'}
-                        buttons={spouseHasAccountButtons}
-                        direction={'horizontal'}
-                        onChange={onChangedInputValue}
-                        handleFollowUpQuestion={handleFollowUpQuestion}
-                    />
-                )}
-                {/* [꼬리질문] 배우자의 청약 통장 정보 */}
-                <SpouseAccountInfoQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['spouseAccountDate']} />
-
                 {/* 차량가액을 입력해주세요 */}
                 {/* 미보유 체크시 0원 */}
                 <CheckButtonItem number={3} question={'차량가액을 입력해주세요'}
@@ -268,40 +225,6 @@ export default function Condition03Content() {
             </Stack>
 
         </Form>
-    );
-}
-
-{/* 청약 통장 - 청약 통장 정보 */ }
-function AccountInfoQuestion({ onChangedInputValue, visibility }) {
-
-    if (!visibility) {
-        return;
-    }
-
-    return (
-        <div>
-            <InputNumberSubItem number={'1-1'} question={'가입일자 입력'} depth={3}
-                name={'createdAt'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
-            <InputNumberSubItem number={'1-2'} question={'납입 횟수 입력'} depth={3}
-                name={'paymentCount'} onChange={onChangedInputValue} placeholder={placeholderText.countType} />
-            <InputNumberSubItem number={'1-3'} question={'총 납입 금액 입력'} depth={3}
-                name={'totalAmount'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
-            <InputNumberSubItem number={'1-4'} question={'납입 인정 금액 입력'} depth={3}
-                name={'recognizedAmount'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
-        </div>
-    );
-}
-
-{/* 배우자 청약통장 - 가입일자 */ }
-function SpouseAccountInfoQuestion({ onChangedInputValue, visibility }) {
-
-    if (!visibility) {
-        return;
-    }
-
-    return (
-        <InputNumberSubItem number={'2-1'} question={'가입일자 입력'} depth={3}
-            name={'spouseAccountDate'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
     );
 }
 
