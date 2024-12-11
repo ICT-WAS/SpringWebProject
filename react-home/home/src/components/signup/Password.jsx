@@ -64,7 +64,7 @@ const Password = ({ password, setPassword }) => {
         placeholder="비밀번호를 입력해주세요."
       />
       {error && <span className="error-message">{error}</span>}
-      <div className="form-group" style={{ marginTop: "12px" }}>
+      <div className="form-group" style={{ marginTop: "6px" }}>
         <label htmlFor="password-check">비밀번호 확인</label>
         <input
           type="password"
