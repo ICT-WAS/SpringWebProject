@@ -120,7 +120,7 @@ function FamilyRadioButtons({ index = 0, buttons, onChangedFamilyValue }) {
                 name={`${buttons.code}-${buttons.name}`}
                 label={button.data}
                 value={index}
-                id={`${buttons.name}-${index}`}
+                id={`${buttons.code}-${buttons.name}-${index}`}
                 style={{ flex: 1 }}
                 onChange={handleRadioChange}
             />

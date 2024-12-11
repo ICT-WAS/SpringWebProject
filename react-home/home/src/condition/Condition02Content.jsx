@@ -45,13 +45,15 @@ export default function Condition02Content() {
         grandparents: [{ value: 'Y', subQuestionId: 'livingWith' }],
         parents: [{ value: 'Y', subQuestionId: 'livingWithParents' }],
         children: [{ value: 'Y', subQuestionId: 'livingWithChildren' }, { value: 'N', subQuestionId: 'livingWithGrandChildren' }],
-        spouse: [{ value: 'Y', subQuestionId: 'spouseLivingWith' }],
+        livingWithGrandChildren: [{ value: 'Y', subQuestionId: 'grandChildren' }],
+        spouse: [{ value: 'N', subQuestionId: 'spouseLivingWith' }],
         isSpouseLivingWithChildren: [{ value: 'Y', subQuestionId: 'spouseLivingWithChildren' }],
         inLaws: [{ value: 'Y', subQuestionId: 'livingWithinLaws' }],
     };
 
     const [visibility, setVisibility] = useState({
         livingWith: false, livingWithParents: false, livingWithChildren: false, livingWithGrandChildren: false,
+        grandChildren: false,
         spouseLivingWith: false, spouseLivingWithChildren: false, livingWithinLaws: false
     });
 
@@ -122,7 +124,7 @@ export default function Condition02Content() {
     }
 
     // value는 상위 질문 옵션값임
-    function handleFollowUpQuestion({ name, value, visible }) {
+    function handleFollowUpQuestion({ name, value }) {
         const matchedItem = followUpQuestions[name];
 
         if (!matchedItem || matchedItem.length < 1) {
@@ -130,11 +132,18 @@ export default function Condition02Content() {
         }
 
         matchedItem.forEach((item) => {
-            const questionName = item.subQuestionId;
 
+            const questionName = item.subQuestionId;
+            handleFollowUpQuestion({name: questionName});
+
+            let subQuestionVisibility = false;
+            if(item.value === value) {
+                subQuestionVisibility = true;
+            }
+        
             setVisibility((prevVisibility) => ({
                 ...prevVisibility,
-                [questionName]: visible,
+                [questionName]: subQuestionVisibility,
             }));
         });
     }
@@ -171,6 +180,13 @@ export default function Condition02Content() {
                 {/* [꼬리질문] 몇 명의 자녀와 같이 살고 계신가요? */}
                 <LivingWithChildrenFollwUpQuestion onChangedInputValue={onChangedInputValue}
                     visibility={visibility['livingWithChildren']} onChangedFamilyValue={onChangedFamilyValue} />
+
+                {/* [꼬리질문] 부모(신청자 본인의 자녀)가 사망하여 양육자가 없는 손자녀와 같이 살고 계신가요? */}
+                <LivingWithGrandChildrenFollwUpQuestion onChangedInputValue={onChangedInputValue} handleFollowUpQuestion={handleFollowUpQuestion}
+                    visibility={visibility['livingWithGrandChildren']} />
+
+                <LivingWithGrandChildrenInfoQuestion onChangedFamilyValue={onChangedFamilyValue} handleFollowUpQuestion={handleFollowUpQuestion}
+                     visibility={visibility['grandChildren']} />
 
                 {/* 배우자와 같이 살고 계신가요? */}
                 {hasSpouse && <RadioButtonItem number={3} question={'배우자와 같이 살고 계신가요?'}
@@ -383,28 +399,33 @@ function LivingWithChildrenFollwUpQuestion2({ onChangedFamilyValue, visibility }
 {/* 자식과 동거 안함 - 부모(신청자 본인의 자녀)가 사망하여 양육자가 없는 손자녀와 같이 살고 계신가요? */ }
 function LivingWithGrandChildrenFollwUpQuestion({ onChangedInputValue, handleFollowUpQuestion, visibility }) {
 
+    const livingWithGrandChildren = { name: 'livingWithGrandChildren', values: [{ value: 'Y', data: '예', hasFollowUpQuestion: true }, { value: 'N', data: '아니오' }] }
+
     if (!visibility) {
         return;
     }
 
     return (
-        <InputNumberLoopSubItemWithFollowQuestions number={'3-1'} question={'부모(신청자 본인의 자녀)가 사망하여 양육자가 없는 손자녀와 같이 살고 계신가요?'} depth={3}
+        <RadioButtonSubItem number={'3-1'} question={'부모(신청자 본인의 자녀)가 사망하여 양육자가 없는 손자녀와 같이 살고 계신가요?'} depth={3}
 
-            name={'livingWithGrandChildren'} onChange={onChangedInputValue}
-            handleFollowUpQuestion={handleFollowUpQuestion}
-            subQuestion={LivingWithGrandChildrenInfoQuestion} unit={'명'} maxLength={2} placeholder={placeholderText.peopleCountType} />
+            buttons={livingWithGrandChildren} onChange={onChangedInputValue} direction={'horizontal'} 
+            handleFollowUpQuestion={handleFollowUpQuestion} />
     );
 }
 
 {/* 손자녀와 동거 - 손자녀 정보 */ }
-function LivingWithGrandChildrenInfoQuestion({ onChangedFamilyValue, handleFollowUpQuestion }) {
+function LivingWithGrandChildrenInfoQuestion({ onChangedFamilyValue, handleFollowUpQuestion, visibility }) {
+
+    if (!visibility) {
+        return;
+    }
 
     return (
-        <InputNumberLoopSubItemWithFollowQuestions number={'3-1'} question={'몇 명의 손자녀와 살고 계신가요?'} depth={3}
+        <InputNumberSubItem number={'3-1'} question={'몇 명의 손자녀와 살고 계신가요?'} depth={4}
 
-            name={'livingWithGrandChildren'} onChange={onChangedFamilyValue}
+            name={'grandChildren'} onChange={onChangedFamilyValue}
             handleFollowUpQuestion={handleFollowUpQuestion}
-            subQuestion={LivingWithChildrenInfoQuestion} unit={'명'} maxLength={2} placeholder={placeholderText.peopleCountType} />
+            unit={'명'} maxLength={2} placeholder={placeholderText.peopleCountType} />
     );
 }
 

@@ -21,7 +21,6 @@ export default function Condition01Content() {
     const [visibility, setVisibility] = useState({ marriedDate: false, metropolitanAreaDate: false, regionMoveInDate: false });
 
     function handleClick(e) {
-
         // 폼 데이터 저장
         sessionStorage.setItem('formData1', JSON.stringify(formData));
         console.log(formData);

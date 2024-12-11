@@ -82,7 +82,6 @@ export function InputText({ name, onChange, type='normal', placeholder }) {
 
         const today = new Date();
         const formattedDate = today.getFullYear().toString() + (today.getMonth() + 1).toString() + today.getDate().toString();
-        console.log(formattedDate);
 
         const name = e.target.getAttribute('name');
         let value = null;
@@ -90,6 +89,7 @@ export function InputText({ name, onChange, type='normal', placeholder }) {
         if(type === 'date') {
             value = formatDateToCustomFormat(e.target.value.toString());
             if(value == null) {
+                e.target.value = '';
                 setHasError(true);
             }
         } else {

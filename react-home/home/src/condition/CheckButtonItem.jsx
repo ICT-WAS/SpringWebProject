@@ -1,20 +1,20 @@
 import React, { useState } from "react";
 import { Form, Stack } from "react-bootstrap";
 
-export function CheckButtonItem({ number, question, buttons, direction, depth, flexAuto, onChange, handleFollowUpQuestion, reverseCheck }) {
+export function CheckButtonItem({ number, question, buttons, depth, flexAuto, onChange, handleFollowUpQuestion, reverseCheck }) {
 
     return (
         <>
             <div key={`${number}-${question}`}>
                 <p className="card-header-text"><b className="px-2">{number.toString().padStart(2, '0')}</b>{question}</p>
-                <StackedCheckButtons buttons={buttons} direction={direction} depth={depth} flexAuto={flexAuto} onChange={onChange}
+                <StackedCheckButtons buttons={buttons} depth={depth} flexAuto={flexAuto} onChange={onChange}
                     handleFollowUpQuestion={handleFollowUpQuestion} reverseCheck={reverseCheck} />
             </div>
         </>
     );
 }
 
-export function CheckButtonSubItem({ number, question, buttons, direction, depth = 1, flexAuto, onChange, handleFollowUpQuestion }) {
+export function CheckButtonSubItem({ number, question, buttons, depth = 1, flexAuto, onChange, handleFollowUpQuestion }) {
 
     const marginClass = `ms-${depth}`;
 
@@ -22,7 +22,7 @@ export function CheckButtonSubItem({ number, question, buttons, direction, depth
         <>
             <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6' }} className={marginClass}>
                 <p className="card-header-text">{number}.{question}</p>
-                <StackedCheckButtons buttons={buttons} direction={direction} flexAuto={flexAuto} onChange={onChange}
+                <StackedCheckButtons buttons={buttons} flexAuto={flexAuto} onChange={onChange}
                     handleFollowUpQuestion={handleFollowUpQuestion} />
             </div>
         </>
@@ -30,11 +30,11 @@ export function CheckButtonSubItem({ number, question, buttons, direction, depth
 }
 
 
-function StackedCheckButtons({ buttons, direction = 'vertical', flexAuto, onChange, handleFollowUpQuestion, reverseCheck }) {
+function StackedCheckButtons({ buttons, flexAuto, onChange, handleFollowUpQuestion, reverseCheck }) {
 
     return (
         <>
-            <Stack direction={direction} gap={2} >
+            <Stack direction={'vertical'} gap={2} >
                 <CheckButtons buttons={buttons} flexAuto={flexAuto}
                     onChange={onChange} handleFollowUpQuestion={handleFollowUpQuestion} reverseCheck={reverseCheck} />
             </Stack>
@@ -97,7 +97,7 @@ export function CheckButtonSubItemWithFollowQuestions({ number, question, button
         <>
             <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6' }} className={marginClass}>
                 <p className="card-header-text">{number}.{question}</p>
-                <StackedCheckButtonsWithFollowQuestions buttons={buttons} direction={direction} flexAuto={flexAuto} onChange={onChange}
+                <StackedCheckButtonsWithFollowQuestions buttons={buttons} flexAuto={flexAuto} onChange={onChange}
                     handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} reverseCheck={reverseCheck} onChangedFamilyValue={onChangedFamilyValue} />
             </div>
         </>
@@ -105,11 +105,11 @@ export function CheckButtonSubItemWithFollowQuestions({ number, question, button
 }
 
 
-function StackedCheckButtonsWithFollowQuestions({ buttons, direction = 'vertical', flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue }) {
+function StackedCheckButtonsWithFollowQuestions({ buttons, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue }) {
 
     return (
         <>
-            <Stack direction={direction} gap={2} >
+            <Stack direction={'vertical'} gap={2} >
                 <CheckButtonsWithFollowQuestions buttons={buttons} flexAuto={flexAuto}
                     onChange={onChange} handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} reverseCheck={reverseCheck} onChangedFamilyValue={onChangedFamilyValue} />
             </Stack>
