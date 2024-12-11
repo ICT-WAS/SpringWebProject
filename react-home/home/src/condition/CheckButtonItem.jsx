@@ -89,7 +89,7 @@ function CheckButtons({ buttons, flexAuto = true, onChange, handleFollowUpQuesti
     );
 }
 
-export function CheckButtonSubItemWithFollowQuestions({ number, question, buttons, direction, depth = 1, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue, index }) {
+export function CheckButtonSubItemWithFollowQuestions({ number, question, buttons, depth = 1, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue, index }) {
 
     const marginClass = `ms-${depth}`;
 
@@ -139,6 +139,94 @@ function CheckButtonsWithFollowQuestions({ buttons, flexAuto = true, onChange, h
             }
         
             onChange({ name: name, value: updatedValues });
+            return updatedValues;
+        });
+
+        let visibility = e.target.checked;
+        visibility = reverseCheck ? !visibility : visibility;
+
+        setSubQuestionVisibility((prev) => {
+            const newVisibility = [...prev];
+            newVisibility[idx] = visibility;
+            return newVisibility;
+        });
+
+        if (typeof handleFollowUpQuestion === 'function') {
+            let visible = false;
+            if (buttons.values[idx].hasFollowUpQuestion === true) {
+                visible = true;
+            }
+            handleFollowUpQuestion({ name: name, visible: visible });
+        }
+    }
+
+    return buttons.values.map((button, idx) =>
+        <React.Fragment key={`buttons-${idx}`}>
+            <Form.Check
+                type={'checkbox'}
+                name={`${buttons.name}-${index}`}
+                label={button.data}
+                value={idx}
+                id={`${buttons.name}-${idx}`}
+                style={{ flex: `${flexValue}` }}
+                onChange={handleCheckChange}
+            />
+
+            {subQuestion({ onChangedFamilyValue: onChangedFamilyValue, visibility: subQuestionVisibility[idx], code: button.value, index: index })}
+        </React.Fragment>
+    );
+}
+
+export function FetusCheckButtonSubItemWithFollowQuestions({ number, question, buttons, depth = 1, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue, index }) {
+
+    const marginClass = `ms-${depth}`;
+
+    return (
+        <>
+            <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6' }} className={marginClass}>
+                <p className="card-header-text">{number}.{question}</p>
+                <FetusStackedCheckButtonsWithFollowQuestions buttons={buttons} flexAuto={flexAuto} onChange={onChange}
+                    handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} reverseCheck={reverseCheck} onChangedFamilyValue={onChangedFamilyValue} index={index} />
+            </div>
+        </>
+    );
+}
+
+function FetusStackedCheckButtonsWithFollowQuestions({ buttons, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue, index }) {
+
+    return (
+        <>
+            <Stack direction={'vertical'} gap={2} >
+                <FetusCheckButtonsWithFollowQuestions buttons={buttons} flexAuto={flexAuto}
+                    onChange={onChange} handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} 
+                    reverseCheck={reverseCheck} onChangedFamilyValue={onChangedFamilyValue} index={index} />
+            </Stack>
+        </>
+    );
+}
+
+// 태아 체크
+function FetusCheckButtonsWithFollowQuestions({ buttons, flexAuto = true, handleFollowUpQuestion, subQuestion, reverseCheck = false, onChangedFamilyValue, index = 0 }) {
+    const flexValue = flexAuto ? 1 : 'none';
+
+    const [subQuestionVisibility, setSubQuestionVisibility] = useState(Array(buttons.values.length).fill(reverseCheck));
+    const [checkedValues, setCheckedValues] = useState([]);
+
+    function handleCheckChange(e) {
+        
+        const name = buttons.code;
+        const idx = e.target.value;
+        const value = buttons.values[idx].value;
+
+        setCheckedValues((prevItems) => {
+            let updatedValues;
+            if (e.target.checked) {
+              updatedValues = [...prevItems, value];
+            } else {
+              updatedValues = prevItems.filter((v) => v !== value);
+            }
+        
+            onChangedFamilyValue({ code: name, index: index, updates: {} });
             return updatedValues;
         });
 

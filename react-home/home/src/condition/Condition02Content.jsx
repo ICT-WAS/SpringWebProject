@@ -24,7 +24,7 @@ export default function Condition02Content() {
 
     /* 제출용 데이터 */
     const [formData, setFormData] = useState({});
-    const [familyData, setFamilyData] = useState([{relationship : 1, livingTogether: 1}]);
+    const [familyData, setFamilyData] = useState({1: [{ index: 0, livingTogether: 1 }]}); // 본인 데이터
 
     /* 꼬리질문 가시성 */
     const followUpQuestions = {
@@ -79,23 +79,24 @@ export default function Condition02Content() {
     }
 
     function handleNextButtonClick(e) {
-
-        console.log(formData);
-        console.log(familyData);
-
         let finalFamilyData = familyData;
         let finalHasSpouse = false;
 
         sessionStorage.removeItem('hasSpouse');
 
         if(formData['spouse'] === 'Y' ) {
-            finalFamilyData = {...familyData, [2]: []};
+            finalFamilyData = {...familyData, [2]: [{index: 0, livingTogether: 1}]};
             finalHasSpouse = true;
+        } else if(formData['spouse'] === 'N' ) {
+            finalFamilyData = {...familyData, [2]: [{index: 0, livingTogether: 2}]};
         }
 
         sessionStorage.setItem('hasSpouse', finalHasSpouse);
         sessionStorage.setItem('formData2', JSON.stringify(formData));
         sessionStorage.setItem('familyData', JSON.stringify(finalFamilyData));
+
+        console.log(formData);
+        console.log(finalFamilyData);
         
         // navigate("/condition-3");
     }
@@ -115,10 +116,10 @@ export default function Condition02Content() {
     }
 
     /**
-     * updates 예 : { livingTogether: '2024-12-09', livingTogetherDate: 5 }
+     * updates 예 : { livingTogether: 1, livingTogetherDate: 2 }
      * 
      */
-    function onChangedFamilyValue({ code, livingTogether, index, updates }) {
+    function onChangedFamilyValue({ code, index, updates }) {
         setFamilyData((prevFamilyData) => {
             const existingData = prevFamilyData[code] || []; // 해당 code가 없으면 빈 배열로 초기화
 
@@ -500,7 +501,7 @@ function SpouseLivingWithChildrenFollwUpQuestion({ onChangedInputValue, handleFo
         <InputNumberLoopSubItemWithFollowQuestions number={'4-4'} question={'몇 명의 자녀와 살고 계신가요?'} depth={4}
             name={'spouseLivingWithChildren'} onChange={onChangedInputValue}
             handleFollowUpQuestion={handleFollowUpQuestion} onChangedFamilyValue={onChangedFamilyValue}
-            subQuestion={SpouseLivingWithChildrenInfoQuestion} unit={'명'} maxLength={2} placeholder={placeholderText.peopleCountType} />
+            subQuestion={SpouseLivingWithChildrenInfoQuestion} unit={'명'} placeholder={placeholderText.peopleCountType} />
     );
 }
 
@@ -517,8 +518,9 @@ function SpouseLivingWithChildrenInfoQuestion({ onChangedInputValue, handleFollo
 }
 
 {/* 배우자가 자식과 동거 - 자녀 생년월일과 혼인여부, 동거기간을 입력해주세요 */ }
-function SpouseLivingWithChildrenFollwUpQuestion2({ onChangedInputValue, visibility, onChangedFamilyValue }) {
+function SpouseLivingWithChildrenFollwUpQuestion2({ onChangedFamilyValue, visibility, index }) {
 
+    const code = FamilyMember.CHILD;
     const isMarriedButtons = { name: 'isMarried', values: [{ data: '미혼', value: 'N' }, { data: '기혼', value: 'Y' }] };
     const livingForButtons = { name: 'livingFor', values: [{ data: '1년 미만', value: 0 }, { data: '1년 이상 3년 미만', value: 1 }, { data: '3년 이상', value: 2 }] };
 
@@ -528,11 +530,11 @@ function SpouseLivingWithChildrenFollwUpQuestion2({ onChangedInputValue, visibil
 
     return (
         <>
-            <FamilyInputNumberSubItem number={'4-6'} question={'생년월일 입력'} depth={4} onChangedFamilyValue={onChangedFamilyValue}
+            <FamilyInputNumberSubItem code={code}index={index} number={'4-6'} question={'생년월일 입력'} depth={4} onChangedFamilyValue={onChangedFamilyValue}
                 name={'birthday'} type={'date'} placeholder={placeholderText.dateType} />
-            <FamilyRadioButtonSubItem number={'4-7'} question={'자녀 혼인 여부'} depth={4} direction={'horizontal'}
+            <FamilyRadioButtonSubItem index={index} number={'4-7'} question={'자녀 혼인 여부'} depth={4} direction={'horizontal'}
                 buttons={isMarriedButtons}  onChangedFamilyValue={onChangedFamilyValue} />
-            <FamilyRadioButtonSubItem number={'4-8'} question={'동거 기간을 선택해주세요'} depth={4} onChangedFamilyValue={onChangedFamilyValue}
+            <FamilyRadioButtonSubItem index={index} number={'4-8'} question={'동거 기간을 선택해주세요'} depth={4} onChangedFamilyValue={onChangedFamilyValue}
                 buttons={livingForButtons}  />
         </>
     );
