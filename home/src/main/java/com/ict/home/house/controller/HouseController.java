@@ -1,7 +1,6 @@
 package com.ict.home.house.controller;
 
 import com.ict.home.house.dto.HouseInfo;
-import com.ict.home.house.model.House;
 import com.ict.home.house.service.HouseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 

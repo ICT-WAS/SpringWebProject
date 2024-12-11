@@ -3,6 +3,8 @@ package com.ict.home.house.service;
 import com.ict.home.house.dto.HouseInfo;
 import com.ict.home.house.model.House;
 import com.ict.home.house.repository.HouseRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class HouseServiceImpl implements HouseService{
+
+    @PersistenceContext
+    private EntityManager em;
 
     @Autowired
     private HouseRepository houseRepository;
