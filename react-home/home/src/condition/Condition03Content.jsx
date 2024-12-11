@@ -26,44 +26,23 @@ export default function Condition03Content() {
             { data: '주택청약종합저축', value: 'COMBINED_SAVINGS', hasFollowUpQuestion: true }]
     }
     const spouseHasAccountButtons = { name: 'spouseHasAccount', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
-    const totalPropertyValueButtons = { name: 'totalPropertyValue', values: [{ data: '미보유 혹은 2억 1,150만원 이하', value: 0 }, { data: '2억 1,150만원 초과 3억 3,100만원 이하', value: 1 }, { data: '3억 3,100만원 초과', value: 2 }] }
-    const incomeActivityTypeButtons = { name: 'incomeActivityType', values: [{ data: '외벌이', value: 0 }, { data: '맞벌이', value: 1, hasFollowUpQuestion: true }] }
-    const familyHasHouseButtons = { name: 'familyHasHouse', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
-    const soldHouseHistoryButtons = { name: 'soldHouseHistory', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
-    const winningHistoryButtons = { name: 'winningHistory', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
-    const wasDisqualifiedButtons = { name: 'wasDisqualified', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
+    const totalPropertyValueButtons = { name: 'propertyPrice', values: [{ data: '미보유 혹은 2억 1,150만원 이하', value: 0 }, { data: '2억 1,150만원 초과 3억 3,100만원 이하', value: 1 }, { data: '3억 3,100만원 초과', value: 2 }] }
+    const incomeActivityTypeButtons = { name: 'incomeActivity', values: [{ data: '외벌이', value: 0 }, { data: '맞벌이', value: 1, hasFollowUpQuestion: true }] }
+    const familyHasHouseButtons = { name: 'isOwner', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
+    const soldHouseHistoryButtons = { name: 'soldHouse', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
+    const winningHistoryButtons = { name: 'lastWinned', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
+    const wasDisqualifiedButtons = { name: 'ineligible', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
 
     /* 제출용 데이터 */
     const [hasSpouse, setHasSpouse] = useState(false);
-    const [prevFormData, setPrevFormData] = useState({});
+    const [formData1, setFormData1] = useState({});
+    const [formData2, setFormData2] = useState({});
     const [formData, setFormData] = useState({});
     const [familyData, setFamilyData] = useState({});
 
     const [family, setFamily] = useState([]);
 
-    useEffect(() => {
-        /* 이전 폼 데이터 읽어오기 */
-        const sessionFormData1 = sessionStorage.getItem('formData1');
-        const sessionFormData = sessionStorage.getItem('formData2');
-        const sessionFamilyData = sessionStorage.getItem('familyData');
-        let storedFormData = {};
-        let storedFamilyData = {};
-
-        try {
-            storedFormData = JSON.parse(sessionFormData);
-            storedFamilyData = JSON.parse(sessionFamilyData);
-
-            // 상태 업데이트
-            setHasSpouse(storedFormData.spouse === 'Y');
-            setPrevFormData(storedFormData);
-            setFamilyData(storedFamilyData);
-
-            const familyKeys = Object.keys(storedFamilyData).map(key => Number(key));
-            setFamily(familyKeys);
-        } catch (error) { }
-    }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행
-
-
+    
     /* 꼬리질문 가시성 */
     const followUpQuestions = {
         type: [{ value: 'SAVINGS_ACCOUNT', subQuestionId: 'accountInfo' },
@@ -73,27 +52,67 @@ export default function Condition03Content() {
         ],
         spouseHasAccount: [{ value: 'Y', subQuestionId: 'spouseAccountDate' }],
         hasVehicle: [{ value: 'Y', subQuestionId: 'vehicleValue' }],
-        incomeActivityType: [{ value: 1, subQuestionId: 'spouseIncome' }],
-        familyHasHouse: [{ value: 'Y', subQuestionId: 'hasHouseInfo' }],
-        soldHouseHistory: [{ value: 'Y', subQuestionId: 'soldHouseInfo' }],
-        winningHistory: [{ value: 'Y', subQuestionId: 'winningDate' }],
-        wasDisqualified: [{ value: 'Y', subQuestionId: 'disqualifiedDate' }]
+        incomeActivity: [{ value: 1, subQuestionId: 'spouseIncome' }],
+        isOwner: [{ value: 'Y', subQuestionId: 'hasHouseInfo' }],
+        soldHouse: [{ value: 'Y', subQuestionId: 'soldHouseInfo' }],
+        lastWinned: [{ value: 'Y', subQuestionId: 'winningDate' }],
+        ineligible: [{ value: 'Y', subQuestionId: 'disqualifiedDate' }]
     };
     const [visibility, setVisibility] = useState({ accountInfo: false, spouseAccountDate: false, vehicleValue: true, spouseIncome: false, hasHouseInfo: false, soldHouseInfo: false, winningDate: false, disqualifiedDate: false });
 
 
-    function handlePrevButtonClick(e) {
+    useEffect(() => {
+        /* 이전 폼 데이터 읽어오기 */
+        const sessionFormData1 = sessionStorage.getItem('formData1');
+        const sessionFormData = sessionStorage.getItem('formData2');
+        const sessionFamilyData = sessionStorage.getItem('familyData');
+        let storedFormData1 = {};
+        let storedFormData2 = {};
+        let storedFamilyData = {};
 
-        console.log(formData);
+        try {
+            storedFormData1 = JSON.parse(sessionFormData1);
+            storedFormData2 = JSON.parse(sessionFormData);
+            storedFamilyData = JSON.parse(sessionFamilyData);
+
+            // 상태 업데이트
+            setHasSpouse(storedFormData2.spouse === 'Y');
+            setFormData1(storedFormData1);
+            setFormData2(storedFormData2);
+            setFamilyData(storedFamilyData);
+
+            const familyKeys = Object.keys(storedFamilyData).map(key => Number(key));
+            setFamily(familyKeys);
+        } catch (error) { }
+    }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행
+
+    useEffect(() => {
+        const keysToRemove = Object.keys(visibility).filter(
+            (key) => visibility[key] === false
+        );
+
+        if (keysToRemove.length > 0) {
+            setFormData((prev) => {
+                const updatedFormData = { ...prev };
+                keysToRemove.forEach((key) => {
+                    delete updatedFormData[key]; // false인 키를 삭제
+                });
+                return updatedFormData;
+            });
+        }
+    }, [visibility]);
+
+
+    function handlePrevButtonClick(e) {
 
         navigate("/condition-2");
     }
 
     function handleNextButtonClick(e) {
 
+        console.log(formData1);
+        console.log(formData2);
         console.log(formData);
-
-        console.log(hasSpouse);
         console.log(familyData);
         console.log(family);
         // 제출
@@ -176,20 +195,20 @@ export default function Condition03Content() {
 
                 {/* 세대구성원 전원의 총 자산을 입력해주세요 */}
                 <InputNumberItem number={5} question={'세대구성원 전원의 총 자산을 입력해주세요'}
-                    name={'moveInDate'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
+                    name={'totalAsset'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
 
                 {/* 본인의 총 자산을 입력해주세요 */}
                 <InputNumberItem number={6} question={'본인의 총 자산을 입력해주세요'}
-                    name={'moveInDate'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
+                    name={'myAsset'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
 
                 {/* 배우자의 총 자산을 입력해주세요 */}
                 {hasSpouse === true && (<InputNumberItem number={7} question={'배우자의 총 자산을 입력해주세요'}
-                    name={'moveInDate'} onChange={onChangedInputValue}
+                    name={'spouseAsset'} onChange={onChangedInputValue}
                     placeholder={placeholderText.largeMoneyUnitType} />)}
 
                 {/* 세대구성원 중 만 19세 이상 세대원 전원의 전년도 월 평균소득을 모두 합산한 금액 */}
                 <InputNumberItem number={8} question={'세대구성원 중 만 19세 이상 세대원 전원의 전년도 월 평균소득을 모두 합산한 금액'}
-                    name={'moveInDate'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
+                    name={'familyAverageMonthlyIncome'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
 
                 {/* 본인의 전년도 월 평균소득을 입력해주세요 */}
                 <InputNumberItem number={9} question={'본인의 전년도 월 평균소득을 입력해주세요'}
@@ -205,7 +224,7 @@ export default function Condition03Content() {
 
                 {/* 소득세 납부 기간 */}
                 <InputNumberItem number={11} question={'소득세 납부 기간'}
-                    name={'moveInDate'} onChange={onChangedInputValue} placeholder={placeholderText.yearCountType} />
+                    name={'incomeTaxPaymentPeriod'} onChange={onChangedInputValue} placeholder={placeholderText.yearCountType} />
 
                 {/* 신청자 및 세대구성원이 주택 혹은 분양권을 소유하고 있나요? */}
                 <RadioButtonItem number={12} question={'신청자 및 세대구성원이 주택 혹은 분양권을 소유하고 있나요?'}
@@ -262,13 +281,13 @@ function AccountInfoQuestion({ onChangedInputValue, visibility }) {
     return (
         <div>
             <InputNumberSubItem number={'1-1'} question={'가입일자 입력'} depth={3}
-                name={'familyBirth'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
+                name={'createdAt'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
             <InputNumberSubItem number={'1-2'} question={'납입 횟수 입력'} depth={3}
-                name={'familyBirth'} onChange={onChangedInputValue} placeholder={placeholderText.countType} />
+                name={'paymentCount'} onChange={onChangedInputValue} placeholder={placeholderText.countType} />
             <InputNumberSubItem number={'1-3'} question={'총 납입 금액 입력'} depth={3}
-                name={'familyBirth'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
+                name={'totalAmount'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
             <InputNumberSubItem number={'1-4'} question={'납입 인정 금액 입력'} depth={3}
-                name={'familyBirth'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
+                name={'recognizedAmount'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
         </div>
     );
 }
@@ -282,7 +301,7 @@ function SpouseAccountInfoQuestion({ onChangedInputValue, visibility }) {
 
     return (
         <InputNumberSubItem number={'2-1'} question={'가입일자 입력'} depth={3}
-            name={'spouseAccountDate'} onChange={onChangedInputValue} placeholder={placeholderText.dateType} />
+            name={'spouseAccountDate'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
     );
 }
 
@@ -294,7 +313,7 @@ function VehicleValueQuestion({ onChangedInputValue, visibility }) {
 
     return (
         <InputNumberSubItem number={'3-1'} question={'차량가액을 입력해주세요'} depth={3}
-            name={'vehicleValue'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
+            name={'carPrice'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
     );
 }
 
@@ -306,7 +325,7 @@ function SpouseIncomeQuestion({ onChangedInputValue, visibility }) {
 
     return (
         <InputNumberSubItem number={'10-1'} question={'배우자의 월평균소득을 입력해주세요'} depth={3}
-            name={'spouseIncome'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
+            name={'spouseAverageMonthlyIncome'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
     );
 }
 
@@ -341,7 +360,7 @@ function HasHouseCountQuestion({ onChangedInputValue, visibility }) {
 
     return (
         <InputNumberSubItem number={'12-2'} question={'소유 주택/분양권 수'} depth={4}
-            name={'hasHouseCount'} onChange={onChangedInputValue} placeholder={placeholderText.houseCountType} />
+            name={'houseCount'} onChange={onChangedInputValue} placeholder={placeholderText.houseCountType} />
     );
 }
 
@@ -376,7 +395,7 @@ function SoldHouseDateQuestion({ onChangedInputValue, visibility }) {
 
     return (
         <InputNumberSubItem number={'13-2'} question={'주택 처분한 날짜'} depth={4}
-            name={'soldHouseDate'} onChange={onChangedInputValue} placeholder={placeholderText.dateType} />
+            name={'houseSoldDate'} onChange={onChangedInputValue} placeholder={placeholderText.dateType} />
     );
 }
 
@@ -388,7 +407,7 @@ function WinningDateQuestion({ onChangedInputValue, visibility }) {
 
     return (
         <InputNumberSubItem number={'14-1'} question={'가장 최근에 당첨된 날짜를 입력해주세요'} depth={3}
-            name={'winningDate'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
+            name={'lastWinned'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
     );
 }
 
@@ -400,6 +419,6 @@ function DisqualifiedDate({ onChangedInputValue, visibility }) {
 
     return (
         <InputNumberSubItem number={'15-1'} question={'부적격자 판정된 날짜가 언제인가요?'} depth={3}
-            name={'disqualifiedDate'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
+            name={'ineligible'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
     );
 }

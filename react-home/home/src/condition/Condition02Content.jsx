@@ -22,20 +22,6 @@ export default function Condition02Content() {
     const [hasMarried, setHasMarried] = useState(false);
     const [hasInLaw, setHasInLaw] = useState(false);
 
-    useEffect(() => {
-        /* 이전 폼 데이터 읽어오기 */
-        const sessionData = sessionStorage.getItem('formData1');
-        let userData = null;
-        try {
-            userData = JSON.parse(sessionData);
-            setHasSpouse(userData.married === 1 || userData.married === 2);
-            setHasMarried(userData.married > 0);
-            setHasInLaw(userData.married === 1 || userData.married === 3);
-
-        } catch (error) { }
-    }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행
-
-
     /* 제출용 데이터 */
     const [formData, setFormData] = useState({});
     const [familyData, setFamilyData] = useState({1 : []});
@@ -57,6 +43,34 @@ export default function Condition02Content() {
         spouseLivingWith: false, spouseLivingWithChildren: false, livingWithinLaws: false
     });
 
+    useEffect(() => {
+        /* 이전 폼 데이터 읽어오기 */
+        const sessionData = sessionStorage.getItem('formData1');
+        let userData = null;
+        try {
+            userData = JSON.parse(sessionData);
+            setHasSpouse(userData.married === 1 || userData.married === 2);
+            setHasMarried(userData.married > 0);
+            setHasInLaw(userData.married === 1 || userData.married === 3);
+
+        } catch (error) { }
+    }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행
+
+    useEffect(() => {
+        const keysToRemove = Object.keys(visibility).filter(
+            (key) => visibility[key] === false
+        );
+
+        if (keysToRemove.length > 0) {
+            setFormData((prev) => {
+                const updatedFormData = { ...prev };
+                keysToRemove.forEach((key) => {
+                    delete updatedFormData[key]; // false인 키를 삭제
+                });
+                return updatedFormData;
+            });
+        }
+    }, [visibility]);
 
     function handlePrevButtonClick(e) {
 
@@ -339,7 +353,7 @@ function LivingWithParentsFollwUpQuestion2({ onChangedFamilyValue, visibility, c
     return (
         <>
             <FamilyInputNumberSubItem code={code} number={'2-2'} question={'생년월일 입력'} depth={4}
-                name={'familyBirth'} type={'date'} onChangedFamilyValue={onChangedFamilyValue} placeholder={placeholderText.dateType} />
+                name={'birthday'} type={'date'} onChangedFamilyValue={onChangedFamilyValue} placeholder={placeholderText.dateType} />
             <FamilyRadioButtonSubItem number={'2-3'} question={'동거 기간을 선택해주세요'} depth={4}
                 buttons={livingForButtons} onChangedFamilyValue={onChangedFamilyValue} />
         </>
@@ -363,11 +377,11 @@ function LivingWithChildrenFollwUpQuestion({ onChangedInputValue, onChangedFamil
 }
 
 {/* 자식과 동거 - 자녀 정보 */ }
-function LivingWithChildrenInfoQuestion({ onChangedInputValue, onChangedFamilyValue, handleFollowUpQuestion, childCount }) {
+function LivingWithChildrenInfoQuestion({ onChangedInputValue, onChangedFamilyValue, handleFollowUpQuestion, index }) {
 
     return (
-        <CheckButtonSubItemWithFollowQuestions number={'3-2'} question={`자녀${childCount} `} depth={4}
-            buttons={{ name: `isFetus${childCount}`, values: [{ data: '태아', value: 'Y', hasFollowUpQuestion: true }] }}
+        <CheckButtonSubItemWithFollowQuestions number={'3-2'} question={`자녀${index+1} `} depth={4} index={index}
+            buttons={{ code: FamilyMember.UNBORN_CHILD, name: 'isFetus', values: [{ data: '태아', value: 'Y', hasFollowUpQuestion: true }] }}
             onChange={onChangedInputValue} handleFollowUpQuestion={handleFollowUpQuestion}
             onChangedFamilyValue={onChangedFamilyValue}
             subQuestion={LivingWithChildrenFollwUpQuestion2} reverseCheck={true} />
@@ -375,10 +389,11 @@ function LivingWithChildrenInfoQuestion({ onChangedInputValue, onChangedFamilyVa
 }
 
 {/* 자식과 동거 - 자녀 생년월일과 혼인여부, 동거기간을 입력해주세요 */ }
-function LivingWithChildrenFollwUpQuestion2({ onChangedFamilyValue, visibility }) {
+function LivingWithChildrenFollwUpQuestion2({ onChangedFamilyValue, visibility, index }) {
 
-    const isMarriedButtons = { name: 'children-isMarried', values: [{ data: '미혼', value: 'N' }, { data: '기혼', value: 'Y' }] };
-    const livingForButtons = { name: 'livingTogetherDate', values: [{ data: '1년 미만', value: 0 }, { data: '1년 이상 3년 미만', value: 1 }, { data: '3년 이상', value: 2 }] };
+    const code = FamilyMember.CHILD;
+    const isMarriedButtons = { code: code, name: 'isMarried', values: [{ data: '미혼', value: 'N' }, { data: '기혼', value: 'Y' }] };
+    const livingForButtons = { code: code, name: 'livingTogetherDate', values: [{ data: '1년 미만', value: 0 }, { data: '1년 이상 3년 미만', value: 1 }, { data: '3년 이상', value: 2 }] };
 
     if (!visibility) {
         return;
@@ -386,11 +401,11 @@ function LivingWithChildrenFollwUpQuestion2({ onChangedFamilyValue, visibility }
 
     return (
         <>
-            <FamilyInputNumberSubItem number={'3-3'} question={'생년월일 입력'} depth={4}
-                name={'childBirth'} onChangedFamilyValue={onChangedFamilyValue} type={'date'} placeholder={placeholderText.dateType} />
-            <FamilyRadioButtonSubItem number={'3-4'} question={'자녀 혼인 여부'} depth={4} direction={'horizontal'}
+            <FamilyInputNumberSubItem code={code} index={index} number={'3-3'} question={'생년월일 입력'} depth={4}
+                name={'birthday'} onChangedFamilyValue={onChangedFamilyValue} type={'date'} placeholder={placeholderText.dateType} />
+            <FamilyRadioButtonSubItem index={index} number={'3-4'} question={'자녀 혼인 여부'} depth={4} direction={'horizontal'}
                 buttons={isMarriedButtons} onChangedFamilyValue={onChangedFamilyValue} />
-            <FamilyRadioButtonSubItem number={'3-5'} question={'동거 기간을 선택해주세요'} depth={4}
+            <FamilyRadioButtonSubItem index={index} number={'3-5'} question={'동거 기간을 선택해주세요'} depth={4}
                 buttons={livingForButtons} onChangedFamilyValue={onChangedFamilyValue} />
         </>
     );
@@ -491,11 +506,11 @@ function SpouseLivingWithChildrenFollwUpQuestion({ onChangedInputValue, handleFo
 }
 
 {/* 배우자가 자식과 동거 - 자녀 정보 */ }
-function SpouseLivingWithChildrenInfoQuestion({ onChangedInputValue, handleFollowUpQuestion, childCount, onChangedFamilyValue }) {
+function SpouseLivingWithChildrenInfoQuestion({ onChangedInputValue, handleFollowUpQuestion, index, onChangedFamilyValue }) {
 
     return (
-        <CheckButtonSubItemWithFollowQuestions number={'4-5'} question={`자녀${childCount} `} depth={4}
-            buttons={{ name: `isFetus${childCount}`, values: [{ data: '태아', value: 'Y', hasFollowUpQuestion: true }] }}
+        <CheckButtonSubItemWithFollowQuestions number={'4-5'} question={`자녀${index+1} `} depth={4}
+            buttons={{ code: FamilyMember.UNBORN_CHILD, name: `isFetus${index+1}`, values: [{ data: '태아', value: 'Y', hasFollowUpQuestion: true }] }}
             onChange={onChangedInputValue} handleFollowUpQuestion={handleFollowUpQuestion}
             onChangedFamilyValue={onChangedFamilyValue}
             subQuestion={SpouseLivingWithChildrenFollwUpQuestion2} reverseCheck={true} />
@@ -505,7 +520,7 @@ function SpouseLivingWithChildrenInfoQuestion({ onChangedInputValue, handleFollo
 {/* 배우자가 자식과 동거 - 자녀 생년월일과 혼인여부, 동거기간을 입력해주세요 */ }
 function SpouseLivingWithChildrenFollwUpQuestion2({ onChangedInputValue, visibility, onChangedFamilyValue }) {
 
-    const isMarriedButtons = { name: 'children-isMarried', values: [{ data: '미혼', value: 'N' }, { data: '기혼', value: 'Y' }] };
+    const isMarriedButtons = { name: 'isMarried', values: [{ data: '미혼', value: 'N' }, { data: '기혼', value: 'Y' }] };
     const livingForButtons = { name: 'livingFor', values: [{ data: '1년 미만', value: 0 }, { data: '1년 이상 3년 미만', value: 1 }, { data: '3년 이상', value: 2 }] };
 
     if (!visibility) {
@@ -515,7 +530,7 @@ function SpouseLivingWithChildrenFollwUpQuestion2({ onChangedInputValue, visibil
     return (
         <>
             <FamilyInputNumberSubItem number={'4-6'} question={'생년월일 입력'} depth={4} onChangedFamilyValue={onChangedFamilyValue}
-                name={'childBirth'} type={'date'} placeholder={placeholderText.dateType} />
+                name={'birthday'} type={'date'} placeholder={placeholderText.dateType} />
             <FamilyRadioButtonSubItem number={'4-7'} question={'자녀 혼인 여부'} depth={4} direction={'horizontal'}
                 buttons={isMarriedButtons}  onChangedFamilyValue={onChangedFamilyValue} />
             <FamilyRadioButtonSubItem number={'4-8'} question={'동거 기간을 선택해주세요'} depth={4} onChangedFamilyValue={onChangedFamilyValue}

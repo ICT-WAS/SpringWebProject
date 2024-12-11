@@ -26,20 +26,20 @@ export function InputNumberSubItem({ number, question, depth = 1, name, onChange
     );
 }
 
-export function FamilyInputNumberSubItem({ code, number, question, depth = 1, name, onChangedFamilyValue, type, placeholder }) {
+export function FamilyInputNumberSubItem({ code, number, question, depth = 1, name, onChangedFamilyValue, type, placeholder, index }) {
     const marginClass = `ms-${depth * 1}`;
 
     return (
         <>
             <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
                 <p className="card-header-text">{number}.&nbsp;{question}</p>
-                <FamilyInputText code={code} name={name} onChangedFamilyValue={onChangedFamilyValue} type={type} placeholder={placeholder} />
+                <FamilyInputText code={code} name={name} onChangedFamilyValue={onChangedFamilyValue} type={type} placeholder={placeholder} index={index} />
             </div>
         </>
     );
 }
 
-function FamilyInputText({ code, index = 0, name, onChangedFamilyValue, type='normal', placeholder }) {
+function FamilyInputText({ code, name, onChangedFamilyValue, type='normal', placeholder, index = 0 }) {
 
     const [hasError, setHasError] = useState(false);
 
@@ -144,7 +144,6 @@ function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, 
             value = Number(e.target.value);
         }
 
-        onChange({name: name, value: value});
         setRepeatCount(e.target.value);
 
         if (typeof handleFollowUpQuestion === 'function') {
@@ -171,7 +170,7 @@ function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, 
             <div key={index}>
                 {subQuestion({ 
                     onChangedInputValue: onChange, 
-                    childCount: index + 1,
+                    index: index,
                     onChangedFamilyValue: onChangedFamilyValue
                 })}
             </div>
@@ -191,7 +190,7 @@ function formatDateToCustomFormat(dateString) {
     const month = dateString.substring(4, 6); // MM
     const day = dateString.substring(6, 8); // dd
 
-    const formattedValue = `${year}-${day}-${month}`;
+    const formattedValue = `${year}-${month}-${day}`;
 
     return formattedValue;
 }

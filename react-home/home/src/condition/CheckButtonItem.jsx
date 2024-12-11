@@ -89,7 +89,7 @@ function CheckButtons({ buttons, flexAuto = true, onChange, handleFollowUpQuesti
     );
 }
 
-export function CheckButtonSubItemWithFollowQuestions({ number, question, buttons, direction, depth = 1, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue }) {
+export function CheckButtonSubItemWithFollowQuestions({ number, question, buttons, direction, depth = 1, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue, index }) {
 
     const marginClass = `ms-${depth}`;
 
@@ -98,26 +98,27 @@ export function CheckButtonSubItemWithFollowQuestions({ number, question, button
             <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6' }} className={marginClass}>
                 <p className="card-header-text">{number}.{question}</p>
                 <StackedCheckButtonsWithFollowQuestions buttons={buttons} flexAuto={flexAuto} onChange={onChange}
-                    handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} reverseCheck={reverseCheck} onChangedFamilyValue={onChangedFamilyValue} />
+                    handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} reverseCheck={reverseCheck} onChangedFamilyValue={onChangedFamilyValue} index={index} />
             </div>
         </>
     );
 }
 
 
-function StackedCheckButtonsWithFollowQuestions({ buttons, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue }) {
+function StackedCheckButtonsWithFollowQuestions({ buttons, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue, index }) {
 
     return (
         <>
             <Stack direction={'vertical'} gap={2} >
                 <CheckButtonsWithFollowQuestions buttons={buttons} flexAuto={flexAuto}
-                    onChange={onChange} handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} reverseCheck={reverseCheck} onChangedFamilyValue={onChangedFamilyValue} />
+                    onChange={onChange} handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} 
+                    reverseCheck={reverseCheck} onChangedFamilyValue={onChangedFamilyValue} index={index} />
             </Stack>
         </>
     );
 }
 
-function CheckButtonsWithFollowQuestions({ buttons, flexAuto = true, onChange, handleFollowUpQuestion, subQuestion, reverseCheck = false, onChangedFamilyValue }) {
+function CheckButtonsWithFollowQuestions({ buttons, flexAuto = true, onChange, handleFollowUpQuestion, subQuestion, reverseCheck = false, onChangedFamilyValue, index = 0 }) {
     const flexValue = flexAuto ? 1 : 'none';
 
     const [subQuestionVisibility, setSubQuestionVisibility] = useState(Array(buttons.values.length).fill(reverseCheck));
@@ -125,9 +126,9 @@ function CheckButtonsWithFollowQuestions({ buttons, flexAuto = true, onChange, h
 
     function handleCheckChange(e) {
         
-        const name = e.target.getAttribute('name');
-        const index = e.target.value;
-        const value = buttons.values[index].value;
+        const name = buttons.code;
+        const idx = e.target.value;
+        const value = buttons.values[idx].value;
 
         setCheckedValues((prevItems) => {
             let updatedValues;
@@ -146,32 +147,32 @@ function CheckButtonsWithFollowQuestions({ buttons, flexAuto = true, onChange, h
 
         setSubQuestionVisibility((prev) => {
             const newVisibility = [...prev];
-            newVisibility[index] = visibility;
+            newVisibility[idx] = visibility;
             return newVisibility;
         });
 
         if (typeof handleFollowUpQuestion === 'function') {
             let visible = false;
-            if (buttons.values[index].hasFollowUpQuestion === true) {
+            if (buttons.values[idx].hasFollowUpQuestion === true) {
                 visible = true;
             }
             handleFollowUpQuestion({ name: name, visible: visible });
         }
     }
 
-    return buttons.values.map((button, index) =>
-        <React.Fragment key={`buttons-${index}`}>
+    return buttons.values.map((button, idx) =>
+        <React.Fragment key={`buttons-${idx}`}>
             <Form.Check
                 type={'checkbox'}
-                name={buttons.name}
+                name={`${buttons.name}-${index}`}
                 label={button.data}
-                value={index}
-                id={`${buttons.name}-${index}`}
+                value={idx}
+                id={`${buttons.name}-${idx}`}
                 style={{ flex: `${flexValue}` }}
                 onChange={handleCheckChange}
             />
 
-            {subQuestion({ onChangedFamilyValue: onChangedFamilyValue, visibility: subQuestionVisibility[index], code: button.value })}
+            {subQuestion({ onChangedFamilyValue: onChangedFamilyValue, visibility: subQuestionVisibility[idx], code: button.value, index: index })}
         </React.Fragment>
     );
 }

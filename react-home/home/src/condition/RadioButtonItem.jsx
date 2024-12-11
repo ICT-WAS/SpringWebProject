@@ -113,14 +113,14 @@ function FamilyRadioButtons({ index = 0, buttons, onChangedFamilyValue }) {
         onChangedFamilyValue({ code: buttons.code, index: index, updates: { [name] : value } });
     }
 
-    return buttons.values.map((button, index) =>
-        <React.Fragment key={`buttons-${index}`}>
+    return buttons.values.map((button, idx) =>
+        <React.Fragment key={`buttons-${idx}`}>
             <Form.Check
                 type={'radio'}
-                name={`${buttons.code}-${buttons.name}`}
+                name={`${buttons.code}-${buttons.name}-${index}`}
                 label={button.data}
-                value={index}
-                id={`${buttons.code}-${buttons.name}-${index}`}
+                value={idx}
+                id={`${buttons.code}-${buttons.name}-${index}-${idx}`}
                 style={{ flex: 1 }}
                 onChange={handleRadioChange}
             />

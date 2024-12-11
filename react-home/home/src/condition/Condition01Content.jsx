@@ -20,6 +20,22 @@ export default function Condition01Content() {
     const followUpQuestions = { married: [{value: 1, subQuestionId: 'marriedDate'}], moveInDate: [{value: 1, subQuestionId: 'metropolitanAreaDate'}, {value: 2, subQuestionId: 'regionMoveInDate'}] };
     const [visibility, setVisibility] = useState({ marriedDate: false, metropolitanAreaDate: false, regionMoveInDate: false });
 
+    useEffect(() => {
+        const keysToRemove = Object.keys(visibility).filter(
+            (key) => visibility[key] === false
+        );
+
+        if (keysToRemove.length > 0) {
+            setFormData((prev) => {
+                const updatedFormData = { ...prev };
+                keysToRemove.forEach((key) => {
+                    delete updatedFormData[key]; // false인 키를 삭제
+                });
+                return updatedFormData;
+            });
+        }
+    }, [visibility]);
+
     function handleClick(e) {
         // 폼 데이터 저장
         sessionStorage.setItem('formData1', JSON.stringify(formData));
@@ -48,6 +64,14 @@ export default function Condition01Content() {
             } else {
                 return {...prev, [name]: false};
             }
+        });
+        setFormData((prev) => {
+            if(condition) {
+                return prev;                                                               
+            } else {
+                const {[name]: _, ...rest} = prev;
+                return rest;
+            }
         })
     }
 
@@ -60,13 +84,20 @@ export default function Condition01Content() {
         }
 
         matchedItem.forEach((item) => {
-            const questionName = item.subQuestionId;
 
+            const questionName = item.subQuestionId;
+            handleFollowUpQuestion({name: questionName});
+
+            let subQuestionVisibility = false;
+            if(item.value === value) {
+                subQuestionVisibility = true;
+            }
+        
             setVisibility((prevVisibility) => ({
                 ...prevVisibility,
-                [questionName]: visible,
-              }));
-          });
+                [questionName]: subQuestionVisibility,
+            }));
+        });
     }
 
     return (
@@ -82,7 +113,7 @@ export default function Condition01Content() {
 
                 {/* 현재 거주지에 입주한 날 */}
                 <InputNumberItem number={3} question={`${formData.gunGu ?? 'OOO'}에 입주한 날(주민등록표등본에 있는 전입일자)`}
-                    name={'moveInDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
+                    name={'transferDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
 
                 {/* [꼬리질문] 현재 지역(시/도)에 거주하기 시작한 날 */}
                 <MoveInFollwUpQuestion1 onChangedInputValue={onChangedInputValue}
@@ -209,7 +240,7 @@ function MoveInFollwUpQuestion1({ siDo, onChangedInputValue, visibility }) {
 
     return (
         <InputNumberSubItem number={'3-1'} question={`${siDo}에 거주하기 시작한 날`} depth={3}
-            name={'metropolitanAreaDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
+            name={'regionMoveInDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
     );
 }
 
@@ -229,12 +260,12 @@ function MoveInFollwUpQuestion2({ onChangedInputValue, visibility }) {
 {/* 결혼 여부 - 혼인신고일 */ }
 function MarriedFollwUpQuestion({ onChangedInputValue, visibility }) {
 
-    if (visibility === false) {
+    if (!visibility) {
         return;
     }
 
     return (
         <InputNumberSubItem number={'5-1'} question={'혼인신고일'} depth={3}
-            name={'marriageDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
+            name={'marriedDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
     );
 }
