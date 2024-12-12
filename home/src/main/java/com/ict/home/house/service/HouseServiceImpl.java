@@ -69,7 +69,7 @@ public class HouseServiceImpl implements HouseService{
             list.add(houseInfo);
         }
 
-        if (regions==null && !regions.isEmpty()){
+        if (regions!=null && !regions.isEmpty()){
             return list;
         }
 
