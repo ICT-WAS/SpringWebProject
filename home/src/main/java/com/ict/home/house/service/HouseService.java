@@ -6,7 +6,12 @@ import java.util.List;
 
 public interface HouseService {
 
-    List<HouseInfo> getHouseInfoList();
-
-    List<HouseInfo> filterByRegions(List<HouseInfo> houseInfoList, List<String> regions);
+    List<HouseInfo> getHouseInfoListByFilter(List<String> regions,
+                                             List<String> houseTypes,
+                                             List<String> area,
+                                             List<Integer> prices,
+                                             List<String> supplies,
+                                             List<String> statuses,
+                                             Long userCondition,
+                                             String orderBy);
 }

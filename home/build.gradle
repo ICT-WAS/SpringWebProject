@@ -53,7 +53,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework:spring-context'
 	implementation 'org.springframework:spring-context-support'
-	implementation 'com.sun.mail:jakarta.mail'
+	// implementation 'com.sun.mail:jakarta.mail'
 
 	//휴대폰 인증
 	implementation 'net.nurigo:sdk:4.3.0'
@@ -71,9 +71,12 @@ dependencies {
 sourceSets {
 	main {
 		java {
-			srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
+			srcDirs = ["$projectDir/src/main/java", "$buildDir/generated/sources/annotationProcessor/java/main"]
 		}
 	}
+}
+compileJava {
+	options.annotationProcessorPath = configurations.annotationProcessor
 }
 
 tasks.named('test') {

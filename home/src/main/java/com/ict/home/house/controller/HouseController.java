@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HouseController {
 
-    private final HouseService houseService;
+    private final HouseService hs;
 
     @GetMapping("")
     @Operation(summary = "공고 목록 조회", description = "공고를 조회합니다.")
@@ -38,37 +38,12 @@ public class HouseController {
                                           @RequestParam(required = false) List<String> statuses,
                                           @RequestParam(required = false) Long userCondition,
                                           @RequestParam(required = false) String orderBy) {
-        List<HouseInfo> houseInfoList = houseService.getHouseInfoList();
+        List<HouseInfo> houseInfoListByFilter = hs.getHouseInfoListByFilter(regions, houseTypes, area, prices, supplies, statuses, userCondition, orderBy);
 
-        if(regions!=null){
-            houseInfoList = houseService.filterByRegions(houseInfoList, regions);
-        }
-
-        if (houseTypes != null) {
-
-        }
-
-        if (area != null) {
-
-        }
-
-        if (prices != null) {
-
-        }
-
-        if (supplies != null) {
-
-        }
-
-        if (statuses != null) {
-
-        }
-
-        List<HouseInfo> finalHouseInfoList = houseInfoList;
         return ResponseEntity.ok(new HashMap<String, Object>(){{
-            put("totalCount", finalHouseInfoList.size());
-            put("houseInfoList", finalHouseInfoList);
-                                 }});
+            put("totalCount", houseInfoListByFilter.size());
+            put("houseInfoList", houseInfoListByFilter);
+        }});
     }
 
 

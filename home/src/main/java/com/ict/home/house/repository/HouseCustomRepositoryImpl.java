@@ -4,6 +4,7 @@ import com.ict.home.house.model.House;
 import com.ict.home.house.model.QDetail;
 import com.ict.home.house.model.QDetail04;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -182,14 +183,19 @@ public class HouseCustomRepositoryImpl implements HouseCustomRepository{
             builder.and(statusBuilder);
         }
 
-
-
-        return jpaQueryFactory.select(house)
+        JPAQuery<House> query = jpaQueryFactory.select(house)
                 .from(house)
                 .leftJoin(detail01).on(house.houseId.eq(detail01.house.houseId))  // house와 detail01 테이블을 id 값으로 조인
                 .leftJoin(detail).on(house.houseId.eq(detail.house.houseId)) // house와 detail 테이블을 id 값으로 조인
                 .leftJoin(detail04).on(house.houseId.eq(detail04.house.houseId)) // house와 detail04 테이블을 id 값으로 조인
-                .where(builder)
-                .fetch();
+                .where(builder);
+
+        if ("최신순".equals(orderBy)) {
+            query.orderBy(house.rcritPblancDe.desc()); // rcritPblancDe 기준으로 내림차순 정렬
+        }
+
+        List<House> houseList = query.fetch();
+
+        return houseList;
     }
 }

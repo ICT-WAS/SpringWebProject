@@ -1,11 +1,12 @@
 package com.ict.home;
 
+import com.ict.home.house.dto.HouseInfo;
 import com.ict.home.house.model.Detail;
 import com.ict.home.house.model.Detail01;
 import com.ict.home.house.model.Detail04;
 import com.ict.home.house.model.House;
 import com.ict.home.house.repository.HouseCustomRepositoryImpl;
-import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.ict.home.house.service.HouseService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
@@ -55,20 +56,40 @@ public class test {
     @Autowired
     private HouseCustomRepositoryImpl hr;
 
+    @Autowired
+    private HouseService hs;
+
     @Test
     public void test02(){
-        List<String> list = new ArrayList<>();
-        list.add("무순위");
-        list.add("국민주택");
+        List<String> regions = new ArrayList<>();
+        regions.add("인천광역시 전체");
 
-        List<String> list2 = new ArrayList<>();
+        List<String> houseTypes = new ArrayList<>();
+        houseTypes.add("민영주택");
 
-        list2.add("20평 미만");
-        list2.add("30평대");
+        List<String> area = new ArrayList<>();
 
-        List<House> filteredHouseList = hr.findFilteredHouseList(list, list, list2, null, null, null, null, null);
+        area.add("20평 미만");
+        area.add("20평대");
+        area.add("30평대");
 
-        filteredHouseList.forEach(System.out::println);
-        System.out.println(filteredHouseList.size());
+        List<String> statuses = new ArrayList<>();
+        statuses.add("접수마감");
+
+        List<Integer> prices = new ArrayList<>();
+
+        List<String> supplies = new ArrayList<>();
+
+        Long userCondition = 1L;
+
+        List<House> filteredHouseList = hr.findFilteredHouseList(regions, houseTypes, area, prices, supplies, statuses, userCondition, "최신순");
+
+        List<HouseInfo> houseInfoListByFilter = hs.getHouseInfoListByFilter(regions, houseTypes, area, prices, supplies, statuses, userCondition, "최신순");
+
+        houseInfoListByFilter.forEach(System.out::println);
+        System.out.println(houseInfoListByFilter.size());
+
+//        filteredHouseList.forEach(System.out::println);
+//        System.out.println(filteredHouseList.size());
     }
 }
