@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class HouseServiceImpl implements HouseService{
+public class HouseServiceImpl implements HouseService {
 
     @PersistenceContext
     private final EntityManager em;
@@ -42,7 +42,7 @@ public class HouseServiceImpl implements HouseService{
                                                     List<String> supplies,
                                                     List<String> statuses,
                                                     Long userId,
-                                                    String orderBy){
+                                                    String orderBy) {
 
         List<Account> accounts = ar.findByUser_Id(userId);
         Condition01 condition01 = c01r.findByUser_Id(userId);
@@ -69,7 +69,7 @@ public class HouseServiceImpl implements HouseService{
             list.add(houseInfo);
         }
 
-        if (regions!=null && !regions.isEmpty()){
+        if (regions == null || regions.isEmpty()) {
             return list;
         }
 
@@ -80,11 +80,11 @@ public class HouseServiceImpl implements HouseService{
             String gunGu = region.split(" ")[1];
 
             List<HouseInfo> filteredList;
-            if (region.indexOf("전체")>=0){
+            if (region.indexOf("전체") >= 0) {
                 filteredList = list.stream()
                         .filter(houseInfo -> siDo.equals(houseInfo.getRegion1()))
                         .collect(Collectors.toList());
-            }else{
+            } else {
                 filteredList = list.stream()
                         .filter(houseInfo -> siDo.equals(houseInfo.getRegion1()) && gunGu.equals(houseInfo.getRegion2()))
                         .collect(Collectors.toList());
@@ -100,7 +100,7 @@ public class HouseServiceImpl implements HouseService{
         return houseInfoList;
     }
 
-    private HouseInfo makeHouseInfo(House house){
+    private HouseInfo makeHouseInfo(House house) {
         HouseInfo houseInfo = new HouseInfo();
         houseInfo.setHouseId(house.getHouseId());
         houseInfo.setHouseManageNo(house.getHouseManageNo());
