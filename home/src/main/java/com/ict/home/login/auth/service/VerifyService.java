@@ -35,8 +35,8 @@ public class VerifyService {
         //인증 코드 생성
         String verificationCode = createVerificationCode();
 
-        //인증 코드 만료시간 설정(3분)
-        LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(3);
+        //인증 코드 만료시간 설정(10분)
+        LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(10);
 
         Verification verification = new Verification();
 

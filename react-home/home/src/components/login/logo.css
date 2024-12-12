@@ -1,0 +1,47 @@
+.signup_btn {
+  position: relative;
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 0;
+  border-radius: 4px;
+  text-align: center;
+  letter-spacing: -0.08px;
+  font-weight: 520;
+  color: #ffffff;
+  text-decoration: none; /* 밑줄 제거 */
+}
+
+.yellow_bg {
+  background-color: #fee500;
+}
+
+.green_bg {
+  background-color: #03c75a;
+}
+
+.sns_1::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  width: 24px;
+  height: 24px;
+  background-image: url("../../images/login/naver-icon.png");
+  background-repeat: no-repeat;
+}
+
+.sns_2 {
+  color: #161516;
+}
+
+.sns_2::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  width: 24px;
+  height: 24px;
+  background-image: url("../../images/login/kakao-icon.png");
+  background-repeat: no-repeat;
+}

@@ -28,7 +28,7 @@ public class Detail01 {
 
     @Schema(description = "주택상세구분코드 (01: 민영, 03: 국민)")
     @Column(name = "HOUSE_DTL_SECD")
-    private Integer houseDtlSecd; // (01: 민영, 03: 국민)
+    private String houseDtlSecd; // (01: 민영, 03: 국민)
 
     @Schema(description = "주택상세구분코드명")
     @Column(name = "HOUSE_DTL_SECD_NM")

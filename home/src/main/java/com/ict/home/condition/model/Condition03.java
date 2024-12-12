@@ -78,18 +78,6 @@ public class Condition03 {
     @Column(name = "income_tax_payment_period", nullable = false)
     private Integer incomeTaxPaymentPeriod;
 
-    @NotNull
-    @Schema(description = "세대구성원 혹은 본인의 주택 혹은 분양권 소유 여부 (N: x / Y: o)")
-    @Column(name = "is_owner", nullable = false)
-    @Convert(converter = YesNoConverter.class)
-    private Boolean isOwner;
-
-    @NotNull
-    @Schema(description = "세대구성원 혹은 본인의 주택 처분 여부 (N: x / Y: o)")
-    @Column(name = "is_sold_house", nullable = false)
-    @Convert(converter = YesNoConverter.class)
-    private Boolean isSoldHouse;
-
     @Schema(description = "세대구성원 혹은 본인의 과거 주택청약 당첨 여부 (가장 최근에 당첨된 날짜 / 없으면 null)")
     @Column(name = "last_winned", nullable = true)
     private LocalDate lastWinned;

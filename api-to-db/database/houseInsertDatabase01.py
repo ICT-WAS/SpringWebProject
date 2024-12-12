@@ -110,6 +110,8 @@ columns_to_keep = ['PBLANC_NO',
 df = df[columns_to_keep]
 
 # df에서 DATE 타입은 날짜 형식으로 변환
+df['HOUSE_DTL_SECD'] = df['HOUSE_DTL_SECD'].replace(1, '01')
+df['HOUSE_DTL_SECD'] = df['HOUSE_DTL_SECD'].replace(3, '03')
 df['RCEPT_BGNDE'] = pd.to_datetime(df['RCEPT_BGNDE'])
 df['RCEPT_ENDDE'] = pd.to_datetime(df['RCEPT_ENDDE'])
 df['SPSPLY_RCEPT_BGNDE'] = pd.to_datetime(df['SPSPLY_RCEPT_BGNDE'])

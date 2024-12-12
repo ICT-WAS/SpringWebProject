@@ -20,7 +20,7 @@
 
   width: 100%;
   min-width: 320px;
-  max-width: 510px;
+  max-width: 375px;
   min-height: auto;
 
   background: #ffffff;
@@ -41,7 +41,7 @@
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  gap: 16px; /* Adjust gap between form groups */
+  gap: 10px; /* Adjust gap between form groups */
 }
 
 .form-container-signin h2 {
@@ -61,6 +61,7 @@
 .form-group label {
   font-weight: bold;
   color: #333;
+  font-size: 14px;
 }
 
 .form-group input {
@@ -117,6 +118,7 @@
   font-weight: bold;
   color: #333;
   margin-bottom: 8px;
+  font-size: 14px;
 }
 
 .form-group-phone .input-group {
