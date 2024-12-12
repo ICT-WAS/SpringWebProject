@@ -12,6 +12,6 @@ public interface HouseService {
                                              List<Integer> prices,
                                              List<String> supplies,
                                              List<String> statuses,
-                                             Long userCondition,
+                                             Long userId,
                                              String orderBy);
 }

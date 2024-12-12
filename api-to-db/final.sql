@@ -240,13 +240,9 @@ CREATE TABLE `condition03` (
 	`income_activity`	INTEGER	NULL	COMMENT '0 : 외벌이 / 1 : 맞벌이',
 	`spouse_average_monthly_income`	INTEGER	NULL	COMMENT '단위:만원',
 	`income_tax_payment_period`	INTEGER	NOT NULL	COMMENT '단위:년',
-	`is_owner`	CHAR(1)	NOT NULL	comment 'Y or N',
-	`is_sold_house`	CHAR(1)	NOT NULL	COMMENT 'Y or N',
 	`last_winned`	DATE	NULL	COMMENT '가장 최근에 당첨된 날짜 / 없으면 null',
 	`ineligible`	DATE	NULL	COMMENT '부적격자 판정된 날짜 / 없으면 null',
 	PRIMARY KEY (`condition03_id`),
 	FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
-	CONSTRAINT `chk_property_price` CHECK (`property_price` IN (0, 1, 2)),
-	CONSTRAINT `chk_is_owner` CHECK (`is_owner` IN ('Y', 'N')),
-	CONSTRAINT `chk_sold_house` CHECK (`is_sold_house` IN ('Y', 'N'))
+	CONSTRAINT `chk_property_price` CHECK (`property_price` IN (0, 1, 2))
 );

@@ -1,5 +1,9 @@
 package com.ict.home.house.repository;
 
+import com.ict.home.condition.model.Account;
+import com.ict.home.condition.model.Condition01;
+import com.ict.home.condition.model.Condition03;
+import com.ict.home.condition.model.Family;
 import com.ict.home.house.model.House;
 
 import java.util.List;
@@ -12,6 +16,9 @@ public interface HouseCustomRepository {
                                       List<Integer> prices,
                                       List<String> supplies,
                                       List<String> statuses,
-                                      Long userCondition,
+                                      List<Account> accounts,
+                                      Condition01 condition01,
+                                      Condition03 condition03,
+                                      List<Family> families,
                                       String orderBy);
 }

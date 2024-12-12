@@ -36,9 +36,9 @@ public class HouseController {
                                           @RequestParam(required = false) List<Integer> prices,
                                           @RequestParam(required = false) List<String> supplies,
                                           @RequestParam(required = false) List<String> statuses,
-                                          @RequestParam(required = false) Long userCondition,
+                                          @RequestParam(required = false) Long userId,
                                           @RequestParam(required = false) String orderBy) {
-        List<HouseInfo> houseInfoListByFilter = hs.getHouseInfoListByFilter(regions, houseTypes, area, prices, supplies, statuses, userCondition, orderBy);
+        List<HouseInfo> houseInfoListByFilter = hs.getHouseInfoListByFilter(regions, houseTypes, area, prices, supplies, statuses, userId, orderBy);
 
         return ResponseEntity.ok(new HashMap<String, Object>(){{
             put("totalCount", houseInfoListByFilter.size());

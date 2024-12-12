@@ -1,5 +1,10 @@
 package com.ict.home.house.repository;
 
+import com.ict.home.condition.model.Account;
+import com.ict.home.condition.model.Condition01;
+import com.ict.home.condition.model.Condition03;
+import com.ict.home.condition.model.Family;
+import com.ict.home.condition.repository.AccountRepository;
 import com.ict.home.house.model.House;
 import com.ict.home.house.model.QDetail;
 import com.ict.home.house.model.QDetail04;
@@ -31,10 +36,15 @@ public class HouseCustomRepositoryImpl implements HouseCustomRepository{
                                              List<Integer> prices,
                                              List<String> supplies,
                                              List<String> statuses,
-                                             Long userCondition,
+                                             List<Account> accounts,
+                                             Condition01 condition01,
+                                             Condition03 condition03,
+                                             List<Family> families,
                                              String orderBy) {
         // 쿼리 생성
         BooleanBuilder builder = new BooleanBuilder();
+
+        // accounts/condition01/condition03/families 필터링 추가 예정
 
         // houseTypes 조건 추가 (국민주택, 민영주택, 무순위)
         if (houseTypes != null && !houseTypes.isEmpty()) {

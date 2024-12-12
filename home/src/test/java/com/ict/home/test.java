@@ -82,12 +82,12 @@ public class test {
 
         Long userCondition = 1L;
 
-        List<House> filteredHouseList = hr.findFilteredHouseList(regions, houseTypes, area, prices, supplies, statuses, userCondition, "최신순");
+//        List<House> filteredHouseList = hr.findFilteredHouseList(regions, houseTypes, area, prices, supplies, statuses, userCondition, "최신순");
 
-        List<HouseInfo> houseInfoListByFilter = hs.getHouseInfoListByFilter(regions, houseTypes, area, prices, supplies, statuses, userCondition, "최신순");
+//        List<HouseInfo> houseInfoListByFilter = hs.getHouseInfoListByFilter(regions, houseTypes, area, prices, supplies, statuses, userCondition, "최신순");
 
-        houseInfoListByFilter.forEach(System.out::println);
-        System.out.println(houseInfoListByFilter.size());
+//        houseInfoListByFilter.forEach(System.out::println);
+//        System.out.println(houseInfoListByFilter.size());
 
 //        filteredHouseList.forEach(System.out::println);
 //        System.out.println(filteredHouseList.size());

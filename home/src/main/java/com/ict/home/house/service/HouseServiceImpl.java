@@ -1,10 +1,16 @@
 package com.ict.home.house.service;
 
+import com.ict.home.condition.model.*;
+import com.ict.home.condition.repository.AccountRepository;
+import com.ict.home.condition.repository.Condition01Repository;
+import com.ict.home.condition.repository.Condition03Repository;
+import com.ict.home.condition.repository.FamilyRepository;
 import com.ict.home.house.dto.HouseInfo;
 import com.ict.home.house.model.House;
 import com.ict.home.house.repository.HouseCustomRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +19,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class HouseServiceImpl implements HouseService{
 
     @PersistenceContext
-    private EntityManager em;
+    private final EntityManager em;
 
-    @Autowired
-    private HouseCustomRepository hr;
+    private final HouseCustomRepository hr;
+
+    private final AccountRepository ar;
+
+    private final Condition01Repository c01r;
+
+    private final Condition03Repository c03r;
+
+    private final FamilyRepository fr;
 
     public List<HouseInfo> getHouseInfoListByFilter(List<String> regions,
                                                     List<String> houseTypes,
@@ -27,9 +41,16 @@ public class HouseServiceImpl implements HouseService{
                                                     List<Integer> prices,
                                                     List<String> supplies,
                                                     List<String> statuses,
-                                                    Long userCondition,
+                                                    Long userId,
                                                     String orderBy){
-        List<House> filteredHouseList = hr.findFilteredHouseList(regions, houseTypes, area, prices, supplies, statuses, userCondition, orderBy);
+
+        List<Account> accounts = ar.findByUser_Id(userId);
+        Condition01 condition01 = c01r.findByUser_Id(userId);
+        Condition03 condition03 = c03r.findByUser_Id(userId);
+        List<Family> families = fr.findByUser_Id(userId);
+
+        List<House> filteredHouseList = hr.findFilteredHouseList(regions, houseTypes, area, prices, supplies, statuses,
+                accounts, condition01, condition03, families, orderBy);
 
         List<HouseInfo> filteredHouseInfos = getHouseInfoListByRegionsFilter(filteredHouseList, regions);
 
@@ -46,6 +67,10 @@ public class HouseServiceImpl implements HouseService{
         for (House house : filteredHouseList) {
             HouseInfo houseInfo = makeHouseInfo(house);
             list.add(houseInfo);
+        }
+
+        if (regions==null && !regions.isEmpty()){
+            return list;
         }
 
         List<HouseInfo> houseInfoList = new ArrayList<>();
