@@ -22,7 +22,7 @@ def getAPTDetail():
         if os.path.exists(save_file_name):
             if PBLANC_NO in finished_PBLANC_NO.array:
                 print(str(PBLANC_NO) + '는 이미 존재하는 공고번호 입니다. 탐색을 중단합니다.')
-            break
+                break
 
         getAPTDetail = '/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancMdl'
         page = str(_page)
