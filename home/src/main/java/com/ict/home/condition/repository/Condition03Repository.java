@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface Condition03Repository extends JpaRepository<Condition03, Long> {
     Condition03 findByUser_Id(Long Id);
+
+    void deleteByUser_Id(Long Id);
 }

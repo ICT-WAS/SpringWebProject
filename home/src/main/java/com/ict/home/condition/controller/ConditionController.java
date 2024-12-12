@@ -7,16 +7,17 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/condition")
+@AllArgsConstructor
 public class ConditionController {
 
-    @Autowired
-    private ConditionService cs;
+    private final ConditionService cs;
 
     @GetMapping("/{userId}")
     @Operation(summary = "조건 조회", description = "조건을 조회합니다.")
@@ -57,7 +58,11 @@ public class ConditionController {
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
     })
-    public ResponseEntity<?> addCondition() {
+    public ResponseEntity<?> addCondition(
+            @PathVariable Long userId,           // userId를 경로 변수로 받기
+            @RequestBody Object conditionRequest // JSON 데이터를 매개변수로 받기
+    ) {
+
 
         return ResponseEntity.ok("등록 성공");
     }
@@ -92,9 +97,9 @@ public class ConditionController {
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
     })
-    public ResponseEntity<?> deleteCondition() {
-
-        return ResponseEntity.ok("삭제 성공");
+    public ResponseEntity<?> deleteCondition(@PathVariable Long userId) {
+        ResponseEntity<String> response = cs.deleteConditions(userId);
+        return response;
     }
 
 }

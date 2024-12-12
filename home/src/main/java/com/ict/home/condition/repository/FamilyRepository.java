@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface FamilyRepository extends JpaRepository<Family, Long> {
     List<Family> findByUser_Id(Long Id);
+
+    void deleteByUser_Id(Long Id);
 }

@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> findByUser_Id(Long Id);
+
+    void deleteByUser_Id(Long Id);
 }

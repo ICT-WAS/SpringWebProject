@@ -1,8 +1,7 @@
 package com.ict.home.condition.serivce;
 
-import org.springframework.stereotype.Service;
+import org.springframework.http.ResponseEntity;
 
-@Service
 public interface ConditionService {
-
+    ResponseEntity<String> deleteConditions(Long userId);
 }
