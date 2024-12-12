@@ -28,7 +28,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-	
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
@@ -48,6 +48,19 @@ dependencies {
 
 	// openAPI
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+
+	//email 인증
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework:spring-context'
+	implementation 'org.springframework:spring-context-support'
+	implementation 'com.sun.mail:jakarta.mail'
+
+	//휴대폰 인증
+	implementation 'net.nurigo:sdk:4.3.0'
+
+	//Webflux - 비동기/논블로킹
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 
 	// QueryDSL
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
