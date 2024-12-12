@@ -63,8 +63,8 @@ const Password = ({ password, setPassword }) => {
         onChange={handleChange}
         placeholder="비밀번호를 입력해주세요."
       />
-      {error && <span style={{ color: "red" }}>{error}</span>}
-      <div className="form-group" style={{ marginTop: "12px" }}>
+      {error && <span className="error-message">{error}</span>}
+      <div className="form-group" style={{ marginTop: "6px" }}>
         <label htmlFor="password-check">비밀번호 확인</label>
         <input
           type="password"
@@ -75,7 +75,7 @@ const Password = ({ password, setPassword }) => {
           onChange={handleChangeCheck}
           placeholder="비밀번호를 확인해주세요."
         />
-        {checkError && <span style={{ color: "red" }}>{checkError}</span>}
+        {checkError && <span className="error-message">{checkError}</span>}
       </div>
     </div>
   );

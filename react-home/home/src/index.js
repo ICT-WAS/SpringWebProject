@@ -19,6 +19,8 @@ import Conditions from "./condition/Conditions";
 import UserTest from "./components/user/UserTest";
 import PrivateRoute from "./components/routes/PrivateRoute";
 import LoginRoute from "./components/routes/LoginRoute";
+import KakaoRedirection from "./components/login/KakaoRedirection";
+import NaverRedirection from "./components/login/NaverRedirection";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -40,6 +42,10 @@ root.render(
         <Route path="/condition-1" element={<Condition01 />} />
         <Route path="/condition-2" element={<Condition02 />} />
         <Route path="/condition-3" element={<Condition03 />} />
+
+        {/* 소셜 로그인 리다이렉트 경로 */}
+        <Route exact path="/kakao/callback" element={<KakaoRedirection />} />
+        <Route exact path="/naver/callback" element={<NaverRedirection />} />
 
         {/* 로그인한 사용자는 접근할 수 없음 - LoginRoute 컴포넌트로 감싸면 보호 설정 됨 */}
         {/* 로그인한 사용자가 login 페이지 접근 시 메인 페이지("/")로 리다이렉트 */}
