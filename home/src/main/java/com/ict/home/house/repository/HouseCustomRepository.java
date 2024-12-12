@@ -11,7 +11,7 @@ public interface HouseCustomRepository {
                                       List<String> area,
                                       List<Integer> prices,
                                       List<String> supplies,
-                                      List<String> status,
+                                      List<String> statuses,
                                       Long userCondition,
                                       String orderBy);
 }

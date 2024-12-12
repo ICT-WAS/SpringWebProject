@@ -35,7 +35,7 @@ public class HouseController {
                                           @RequestParam(required = false) List<String> area,
                                           @RequestParam(required = false) List<Integer> prices,
                                           @RequestParam(required = false) List<String> supplies,
-                                          @RequestParam(required = false) List<String> status,
+                                          @RequestParam(required = false) List<String> statuses,
                                           @RequestParam(required = false) Long userCondition,
                                           @RequestParam(required = false) String orderBy) {
         List<HouseInfo> houseInfoList = houseService.getHouseInfoList();
@@ -60,7 +60,7 @@ public class HouseController {
 
         }
 
-        if (status != null) {
+        if (statuses != null) {
 
         }
 
