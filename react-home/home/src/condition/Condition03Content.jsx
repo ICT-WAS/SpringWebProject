@@ -13,8 +13,6 @@ export default function Condition03Content() {
 
     const totalPropertyValueButtons = { name: 'propertyPrice', values: [{ data: '미보유 혹은 2억 1,150만원 이하', value: 0 }, { data: '2억 1,150만원 초과 3억 3,100만원 이하', value: 1 }, { data: '3억 3,100만원 초과', value: 2 }] }
     const incomeActivityTypeButtons = { name: 'incomeActivity', values: [{ data: '외벌이', value: 0 }, { data: '맞벌이', value: 1, hasFollowUpQuestion: true }] }
-    const familyHasHouseButtons = { name: 'isOwner', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
-    const soldHouseHistoryButtons = { name: 'soldHouse', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
     const winningHistoryButtons = { name: 'lastWinned', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
     const wasDisqualifiedButtons = { name: 'ineligible', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
 
@@ -32,8 +30,6 @@ export default function Condition03Content() {
     const followUpQuestions = {
         hasVehicle: [{ value: 'Y', subQuestionId: 'vehicleValue' }],
         incomeActivity: [{ value: 1, subQuestionId: 'spouseIncome' }],
-        isOwner: [{ value: 'Y', subQuestionId: 'hasHouseInfo' }],
-        soldHouse: [{ value: 'Y', subQuestionId: 'soldHouseInfo' }],
         lastWinned: [{ value: 'Y', subQuestionId: 'winningDate' }],
         ineligible: [{ value: 'Y', subQuestionId: 'disqualifiedDate' }]
     };
@@ -182,24 +178,6 @@ export default function Condition03Content() {
                 {/* 소득세 납부 기간 */}
                 <InputNumberItem number={11} question={'소득세 납부 기간'}
                     name={'incomeTaxPaymentPeriod'} onChange={onChangedInputValue} placeholder={placeholderText.yearCountType} />
-
-                {/* 신청자 및 세대구성원이 주택 혹은 분양권을 소유하고 있나요? */}
-                <RadioButtonItem number={12} question={'신청자 및 세대구성원이 주택 혹은 분양권을 소유하고 있나요?'}
-                    buttons={familyHasHouseButtons} direction={'horizontal'} onChange={onChangedInputValue}
-                    handleFollowUpQuestion={handleFollowUpQuestion} />
-
-                {/* [꼬리질문] 주택 처분 세대원, 날짜 */}
-                <HasHouseQuestion onChangedInputValue={onChangedInputValue} family={family}
-                    handleFollowUpQuestion={handleFollowUpQuestion} visibility={visibility['hasHouseInfo']} />
-
-                {/* 과거 신청자 및 세대구성원이 주택을 처분한 적 있나요? */}
-                <RadioButtonItem number={13} question={'과거 신청자 및 세대구성원이 주택을 처분한 적 있나요?'}
-                    buttons={soldHouseHistoryButtons} direction={'horizontal'} onChange={onChangedInputValue}
-                    handleFollowUpQuestion={handleFollowUpQuestion} />
-
-                {/* [꼬리질문] 주택 처분 세대원, 날짜 */}
-                <SoldHouseQuestion onChangedInputValue={onChangedInputValue} family={family}
-                    handleFollowUpQuestion={handleFollowUpQuestion} visibility={visibility['soldHouseInfo']} />
 
                 {/* 신청자 및 세대구성원이 과거 주택 청약에 당첨된 적 있나요? */}
                 <RadioButtonItem number={14} question={'신청자 및 세대구성원이 과거 주택 청약에 당첨된 적 있나요?'}

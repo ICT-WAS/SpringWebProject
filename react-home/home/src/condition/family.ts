@@ -9,26 +9,25 @@ export enum FamilyMember {
     GREAT_GRANDFATHER = 8, // 증조할아버지
     CHILD = 9,           // 자녀
     UNBORN_CHILD = 10,   // 자녀(태아)
-    SON_IN_LAW_OR_DAUGHTER_IN_LAW = 11, // 사위 또는 며느리
-    SPOUSE_MOTHER = 12,  // 배우자의 어머니
-    SPOUSE_FATHER = 13,  // 배우자의 아버지
-    SPOUSE_GRANDMOTHER = 14, // 배우자의 할머니
-    SPOUSE_GRANDFATHER = 15, // 배우자의 할아버지
-    SPOUSE_GREAT_GRANDMOTHER = 16, // 배우자의 증조할머니
-    SPOUSE_GREAT_GRANDFATHER = 17, // 배우자의 증조할아버지
-    GRANDCHILD_NO_GUARDIAN = 18 // 부모(신청자 본인의 자녀)가 사망하여 양육자가 없는 손자녀
+    GRANDCHILD_NO_GUARDIAN = 11, // 부모(신청자 본인의 자녀)가 사망하여 양육자가 없는 손자녀
+    SON_IN_LAW_OR_DAUGHTER_IN_LAW = 12, // 사위 또는 며느리
+    SPOUSE_MOTHER = 13,  // 배우자의 어머니
+    SPOUSE_FATHER = 14,  // 배우자의 아버지
+    SPOUSE_GRANDMOTHER = 15, // 배우자의 할머니
+    SPOUSE_GRANDFATHER = 16, // 배우자의 할아버지
+    SPOUSE_GREAT_GRANDMOTHER = 17, // 배우자의 증조할머니
+    SPOUSE_GREAT_GRANDFATHER = 18, // 배우자의 증조할아버지
 }
 
+// 
 export function getEnumKeyFromValue(enumObj: any, value: number): string | undefined {
     const entry = Object.entries(enumObj).find(([key, val]) => val === value);
     return entry ? entry[0] : undefined;
 }
 
+// 숫자로 한글이름 찾기
 export function getFamilyMemberName(value: number): string | undefined {
-    // FamilyMember에서 숫자 값에 해당하는 키를 가져오기
     const key = getEnumKeyFromValue(FamilyMember, value);
-    
-    // 해당 키로 familyMemberNames에서 이름을 반환
     return key ? familyMemberNames[FamilyMember[key as keyof typeof FamilyMember]] : undefined;
 }
 

@@ -1,76 +1,58 @@
-import { Button, Dropdown, Form, Stack } from "react-bootstrap";
+import { Button, Container, Dropdown, Form, Row, Stack, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { FamilyInputNumberSubItem, InputNumberItem, InputNumberLoopSubItemWithFollowQuestions, InputNumberSubItem } from "./InputNumberItem";
+import { FamilyInputNumberSubItem, formatDateToCustomFormat, InputNumberItem, InputNumberLoopSubItemWithFollowQuestions, InputNumberSubItem } from "./InputNumberItem";
 import { FamilyRadioButtonSubItem, RadioButtonItem, RadioButtonSubItem } from "./RadioButtonItem";
 import { CheckButtonSubItem, CheckButtonSubItemWithFollowQuestions } from "./CheckButtonItem";
 import { placeholderText } from "./placeholderText";
-import { FamilyMember, familyMemberNames } from "./family.ts";
+import { familyList, FamilyMember, familyMemberNames, getEnumKeyFromValue } from "./family.ts";
 
 export default function Condition02Content() {
 
     const navigate = useNavigate();
-
-    const livingWithGreatGrandParentsButtons = { name: 'grandparents', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
-    const livingWithParentsButtons = { name: 'parents', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
-    const livingWithChildrenButtons = { name: 'children', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N', hasFollowUpQuestion: true }] }
-    const livingWithSpouseButtons = { name: 'spouse', values: [{ data: '예', value: 'Y' }, { data: '아니오', value: 'N', hasFollowUpQuestion: true }] }
-    const spouseLivingWithChildrenButtons = { name: 'isSpouseLivingWithChildren', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
-    const livingWithInLawsButtons = { name: 'inLaws', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
-
-    const [hasSpouse, setHasSpouse] = useState(false);
-    const [hasMarried, setHasMarried] = useState(false);
-    const [hasInLaw, setHasInLaw] = useState(false);
+    const [married, setMarried] = useState(0);
 
     /* 제출용 데이터 */
     const [formData, setFormData] = useState({});
-    const [familyData, setFamilyData] = useState({1: [{ index: 0, livingTogether: 1 }]}); // 본인 데이터
 
-    /* 꼬리질문 가시성 */
-    const followUpQuestions = {
-        grandparents: [{ value: 'Y', subQuestionId: 'livingWith' }],
-        parents: [{ value: 'Y', subQuestionId: 'livingWithParents' }],
-        children: [{ value: 'Y', subQuestionId: 'livingWithChildren' }, { value: 'N', subQuestionId: 'grandchildren' }],
-        grandchildren: [{ value: 'Y', subQuestionId: 'grandChildrenCount' }],
-        spouse: [{ value: 'N', subQuestionId: 'spouseLivingWith' }],
-        isSpouseLivingWithChildren: [{ value: 'Y', subQuestionId: 'spouseLivingWithChildren' }],
-        inLaws: [{ value: 'Y', subQuestionId: 'livingWithInLaws' }],
-    };
-
-    const [visibility, setVisibility] = useState({
-        livingWith: false, livingWithParents: false, livingWithChildren: false, grandchildren: false,
-        grandChildrenCount: false,
-        spouseLivingWith: false, spouseLivingWithChildren: false, livingWithInLaws: false
-    });
+    const [myData, setMyData] = useState([{ relationship: 1, livingTogether: 1 }]);
+    const [spouseData, setSpouseData] = useState([]);
+    const [familyData, setFamilyData] = useState([]);
+    const [spouseFamilyData, setSpouseFamilyData] = useState([]);
+    const [hasSeperateHouseSpouse, setHasSeperateHouseSpouse] = useState(false);
+    const [userBirth, setUserBirth] = useState(null);
 
     useEffect(() => {
         /* 이전 폼 데이터 읽어오기 */
+        
         const sessionData = sessionStorage.getItem('formData1');
+        if (!sessionData) return;
+
         let userData = null;
         try {
             userData = JSON.parse(sessionData);
-            setHasSpouse(userData.married === 1 || userData.married === 2);
-            setHasMarried(userData.married > 0);
-            setHasInLaw(userData.married === 1 || userData.married === 3);
-
         } catch (error) { }
-    }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행
 
-    useEffect(() => {
-        const keysToRemove = Object.keys(visibility).filter(
-            (key) => visibility[key] === false
-        );
+        const nextHasSeperateSpouse = userData.spouse === 'N';
+        const prevMarried = Number(userData.married);
+        setMarried(prevMarried);
+        setHasSeperateHouseSpouse(nextHasSeperateSpouse);
+        setUserBirth(userData.birthday);
 
-        if (keysToRemove.length > 0) {
-            setFormData((prev) => {
-                const updatedFormData = { ...prev };
-                keysToRemove.forEach((key) => {
-                    delete updatedFormData[key]; // false인 키를 삭제
-                });
-                return updatedFormData;
-            });
+        setMyData([{ relationship: 1, livingTogether: 1 }]);
+
+        if (prevMarried === 0) {
+            return;
         }
-    }, [visibility]);
+
+        if (nextHasSeperateSpouse) {
+            setSpouseData([{ relationship: 2, livingTogether: 2 }])
+        } else {
+            // 배우자 추가
+            setSpouseData({ relationship: 2, livingTogether: 1 });
+        }
+
+    }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행
 
     function handlePrevButtonClick(e) {
 
@@ -79,146 +61,57 @@ export default function Condition02Content() {
     }
 
     function handleNextButtonClick(e) {
-        let finalFamilyData = familyData;
-        let finalHasSpouse = false;
+
+        let finalFamilyData = [ ...familyData, ...myData];
+        if(spouseData.length > 0) {
+            finalFamilyData = [...finalFamilyData, ...spouseData];
+        }
+        
+        const finalHasSpouse = (hasSeperateHouseSpouse === false) && (married === 1 || married === 2);
 
         sessionStorage.removeItem('hasSpouse');
 
-        if(formData['spouse'] === 'Y' ) {
-            finalFamilyData = {...familyData, [2]: [{index: 0, livingTogether: 1}]};
-            finalHasSpouse = true;
-        } else if(formData['spouse'] === 'N' ) {
-            finalFamilyData = {...familyData, [2]: [{index: 0, livingTogether: 2}]};
-        }
-
         sessionStorage.setItem('hasSpouse', finalHasSpouse);
-        sessionStorage.setItem('formData2', JSON.stringify(formData));
         sessionStorage.setItem('familyData', JSON.stringify(finalFamilyData));
 
-        console.log(formData);
         console.log(finalFamilyData);
-        
+
         // navigate("/condition-3");
     }
 
-    /* formData 업데이트 */
-    function onChangedInputValue({ name, value }) {
-        const questionName = followUpQuestions[name];
+    // 세대구성원 추가/수정
+    function handleFamilyRowChange({ index, familyRow }) {
 
-        setFormData(prevFormData => {
-            const { [questionName]: _, ...filteredData } = prevFormData;
+        const updatedFamilyData = familyData.length > index
+            ? familyData.map((item, idx) =>
+                idx === index ? { ...familyRow } : item // 해당 index에서만 교체
+            )
+            : [...familyData, familyRow]; // 인덱스가 없으면 새로운 항목 추가
 
-            return {
-                ...filteredData,
-                [name]: value
-            };
-        });
+        setFamilyData(updatedFamilyData);
     }
 
-    /**
-     * updates 예 : { livingTogether: 1, livingTogetherDate: 2 }
-     * 
-     */
-    function onChangedFamilyValue({ code, index, updates }) {
-        setFamilyData((prevFamilyData) => {
-            const existingData = prevFamilyData[code] || []; // 해당 code가 없으면 빈 배열로 초기화
+    // 배우자 세대구성원 추가/수정
+    function handleSpouseFamilyRowChange({ index, familyRow }) {
 
-            const updatedData = existingData.some((item) => item.index === index)
-                ? existingData.map((item) =>
-                    item.index === index
-                        ? { ...item, ...updates } // 조건에 맞는 항목 업데이트
-                        : item
-                )
-                : [...existingData, { index, ...updates }]; // 조건에 맞는 항목이 없으면 새 항목 추가
+        const updatedFamilyData = spouseFamilyData.length > index
+            ? spouseFamilyData.map((item, idx) =>
+                idx === index ? { ...familyRow } : item // 해당 index에서만 교체
+            )
+            : [...spouseFamilyData, familyRow]; // 인덱스가 없으면 새로운 항목 추가
 
-            return {
-                ...prevFamilyData,
-                [code]: updatedData,
-            };
-        });
-    }
-
-    // value는 상위 질문 옵션값임
-    function handleFollowUpQuestion({ name, value }) {
-        const matchedItem = followUpQuestions[name];
-
-        if (!matchedItem || matchedItem.length < 1) {
-            return;
-        }
-
-        matchedItem.forEach((item) => {
-
-            const questionName = item.subQuestionId;
-            handleFollowUpQuestion({name: questionName});
-
-            let subQuestionVisibility = false;
-            if(item.value === value) {
-                subQuestionVisibility = true;
-            }
-        
-            setVisibility((prevVisibility) => ({
-                ...prevVisibility,
-                [questionName]: subQuestionVisibility,
-            }));
-        });
+        setSpouseFamilyData(updatedFamilyData);
     }
 
     return (
         <Form>
             <Stack direction='vertical' gap={5} >
 
-                {/* 본인' 또는 배우자'의 증, 조부모와 같이 살고 계신가요? */}
-                <GrandParents hasSpouse={hasSpouse}
-                    buttons={livingWithGreatGrandParentsButtons} onChange={onChangedInputValue}
-                    handleFollowUpQuestion={handleFollowUpQuestion} />
+                {/* 본인 세대의 세대원 */}
+                <FamilyForm married={married} handleChange={handleFamilyRowChange} userBirth={userBirth} hasSeperateHouseSpouse={hasSeperateHouseSpouse} />
 
-                {/* [꼬리질문] 같이 살고 있는 사람을 선택해주세요 */}
-                <LivingWithGrandParentsFollwUpQuestion onChangedInputValue={onChangedInputValue}
-                    hasSpouse={hasSpouse} visibility={visibility['livingWith']}
-                    handleFollowUpQuestion={handleFollowUpQuestion} onChangedFamilyValue={onChangedFamilyValue} />
-
-                {/* 본인' 또는 배우자'의 부모님과 같이 살고 계신가요? */}
-                <Parents hasSpouse={hasSpouse}
-                    buttons={livingWithParentsButtons} direction={'horizontal'} onChange={onChangedInputValue}
-                    handleFollowUpQuestion={handleFollowUpQuestion} />
-
-                {/* [꼬리질문] 같이 살고 있는 사람을 선택해주세요 */}
-                <LivingWithParentsFollwUpQuestion onChangedInputValue={onChangedInputValue}
-                    hasSpouse={hasSpouse} visibility={visibility['livingWithParents']}
-                    handleFollowUpQuestion={handleFollowUpQuestion} onChangedFamilyValue={onChangedFamilyValue} />
-
-                {/* 자녀와 같이 살고 계신가요? */}
-                {hasMarried && <RadioButtonItem number={3} question={'자녀와 같이 살고 계신가요?'}
-                    buttons={livingWithChildrenButtons} direction={'horizontal'} onChange={onChangedInputValue}
-                    handleFollowUpQuestion={handleFollowUpQuestion} />}
-
-                {/* [꼬리질문] 몇 명의 자녀와 같이 살고 계신가요? */}
-                <LivingWithChildrenFollwUpQuestion onChangedInputValue={onChangedInputValue}
-                    visibility={visibility['livingWithChildren']} onChangedFamilyValue={onChangedFamilyValue} />
-
-                {/* [꼬리질문] 부모(신청자 본인의 자녀)가 사망하여 양육자가 없는 손자녀와 같이 살고 계신가요? */}
-                <LivingWithGrandChildrenFollwUpQuestion onChangedInputValue={onChangedInputValue} handleFollowUpQuestion={handleFollowUpQuestion}
-                    visibility={visibility['grandchildren']} />
-
-                <LivingWithGrandChildrenInfoQuestion onChangedFamilyValue={onChangedFamilyValue} handleFollowUpQuestion={handleFollowUpQuestion}
-                     visibility={visibility['grandChildrenCount']} />
-
-                {/* 배우자와 같이 살고 계신가요? */}
-                {hasSpouse && <RadioButtonItem number={3} question={'배우자와 같이 살고 계신가요?'}
-                    buttons={livingWithSpouseButtons} direction={'horizontal'} onChange={onChangedInputValue}
-                    handleFollowUpQuestion={handleFollowUpQuestion} />}
-
-                {/* [꼬리질문] 배우자 거주 정보 */}
-                <SpouseLivingWithFollwUpQuestion onChangedInputValue={onChangedInputValue} handleFollowUpQuestion={handleFollowUpQuestion}
-                    visibility={visibility['spouseLivingWith']} buttons={spouseLivingWithChildrenButtons} 
-                    subQuestionVisibility={visibility['spouseLivingWithChildren']} onChangedFamilyValue={onChangedFamilyValue} />
-
-                {/* 사위 또는 며느리와 같이 살고 계신가요? */}
-                {hasInLaw && <LivingWithInLaws buttons={livingWithInLawsButtons} onChange={onChangedInputValue}
-                    handleFollowUpQuestion={handleFollowUpQuestion} hasSpouse={hasSpouse}/>}
-
-                {/* [꼬리질문] 몇 명의 사위 또는 며느리와 살고 계신가요? */}
-                <LivingWithInLawsFollwUpQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['livingWithInLaws']} />
+                {/* 배우자 세대의 세대원 */}
+                {hasSeperateHouseSpouse && <SpouseFamilyForm index={0} married={married} handleChange={handleSpouseFamilyRowChange} />}
 
                 {/* 다음으로 */}
                 <Stack direction="horizontal" gap={2}>
@@ -231,339 +124,386 @@ export default function Condition02Content() {
     );
 }
 
-{/* 본인' 또는 배우자'의 증, 조부모와 같이 살고 계신가요? */ }
-function GrandParents({ hasSpouse, buttons, onChange, handleFollowUpQuestion }) {
-    let question = '본인의 증, 조부모와 같이 살고 계신가요?';
+{/* 본인과의 관계 드롭다운 */ }
+function FamilyRelationshipDropdown({ married, handleChange }) {
 
-    if (hasSpouse) {
-        question = '본인 또는 배우자의 증, 조부모와 같이 살고 계신가요?';
+    const [slectedItem, setSlectedItem] = useState('선택');     // 한글
+    const [slectedValue, setSlectedValue] = useState(0);   // 숫자값
+
+    // 미혼 3~8
+    const notMarriedFamilyList = Object.keys(FamilyMember).filter(key =>
+        (typeof FamilyMember[key] !== 'number') && key > 2 && key < 8
+    );
+
+    // 기혼
+    const marriedFamilyList = Object.keys(FamilyMember).filter(key =>
+        (typeof FamilyMember[key] !== 'number') && key > 2
+    );
+
+    // 예비신혼 9, 10, 11, 12 제외
+    const engagedFamilyList = Object.keys(FamilyMember).filter(key =>
+        (typeof FamilyMember[key] !== 'number') && (key > 2 && key < 9) || key > 12
+    );
+
+    // 한부모 13~ 제외
+    const singleParentFamilyList = Object.keys(FamilyMember).filter(key =>
+        (typeof FamilyMember[key] !== 'number') && key > 2 && key < 13
+    );
+
+    const familyOptinList = [notMarriedFamilyList, marriedFamilyList, engagedFamilyList, singleParentFamilyList];
+    let familyList = familyOptinList[married];
+
+    const relationshipList = () => {
+        return familyList.map((relationship) => (
+            <Dropdown.Item key={relationship}
+                onClick={() => handleChangedDropdown(relationship)}>
+                {familyMemberNames[relationship]}
+            </Dropdown.Item>
+        ));
+    }
+
+    function handleChangedDropdown(relationship) {
+        setSlectedItem(familyMemberNames[relationship]);
+        setSlectedValue(relationship);
+
+        handleChange({ key: 'relationship', value: Number(relationship) });
+
     }
 
     return (
-        <RadioButtonItem number={1} question={question}
-            buttons={buttons} direction={'horizontal'} onChange={onChange}
-            handleFollowUpQuestion={handleFollowUpQuestion} />
+        <Dropdown style={{ flex: 1 }}>
+            <Dropdown.Toggle variant="warning" className='dropdown-transparent flex-fill' >
+                {slectedItem}
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+                {relationshipList()}
+            </Dropdown.Menu>
+        </Dropdown>
     );
+
 }
 
-{/* 증,조부모 동거 - 같이 살고 있는 사람을 선택해주세요 */ }
-function LivingWithGrandParentsFollwUpQuestion({ onChangedInputValue, hasSpouse, handleFollowUpQuestion, visibility, onChangedFamilyValue }) {
+{/* 동거기간 드롭다운 */ }
+function LivingTogetherDateDropdown({ handleChange }) {
 
-    let livingWithGrandParentsButtons = {
-        name: 'grandParentsLivingWith', values: [
-            { value: FamilyMember.GREAT_GRANDFATHER, data: familyMemberNames[FamilyMember.GREAT_GRANDFATHER], hasFollowUpQuestion: true },
-            { value: FamilyMember.GREAT_GRANDMOTHER, data: familyMemberNames[FamilyMember.GREAT_GRANDMOTHER], hasFollowUpQuestion: true },
-            { value: FamilyMember.GRANDFATHER, data: familyMemberNames[FamilyMember.GRANDFATHER], hasFollowUpQuestion: true },
-            { value: FamilyMember.GRANDMOTHER, data: familyMemberNames[FamilyMember.GRANDMOTHER], hasFollowUpQuestion: true },
+    const [slectedItem, setSlectedItem] = useState('선택');     // 한글
 
-        ]
-    };
+    const livingTogetherData = [
+        { data: '1년 미만', value: 0 },
+        { data: '1년 이상 3년 미만', value: 1 },
+        { data: '3년 이상', value: 2 }];
 
-    if (hasSpouse) {
-        livingWithGrandParentsButtons.values.push(
-            { value: FamilyMember.SPOUSE_GREAT_GRANDFATHER, data: familyMemberNames[FamilyMember.SPOUSE_GREAT_GRANDFATHER], hasFollowUpQuestion: true },
-            { value: FamilyMember.SPOUSE_GREAT_GRANDMOTHER, data: familyMemberNames[FamilyMember.SPOUSE_GREAT_GRANDMOTHER], hasFollowUpQuestion: true },
-            { value: FamilyMember.GRANDFATHER, data: familyMemberNames[FamilyMember.SPOUSE_GRANDFATHER], hasFollowUpQuestion: true },
-            { value: FamilyMember.GRANDMOTHER, data: familyMemberNames[FamilyMember.SPOUSE_GRANDMOTHER], hasFollowUpQuestion: true },
-        );
+    const livingTogetherDataList = () => {
+        return livingTogetherData.map((livingTogether) => (
+            <Dropdown.Item key={livingTogether}
+                data-value={livingTogether.value}
+                data-name={livingTogether.data}
+                onClick={(e) => handleChangedDropdown(e)}>
+                {livingTogether.data}
+            </Dropdown.Item>
+        ));
     }
 
-    if (!visibility) {
-        return;
+    function handleChangedDropdown(e) {
+        const value = e.target.getAttribute('data-value');
+        const name = e.target.getAttribute('data-name');
+        setSlectedItem(name);
+
+        handleChange({ key: 'livingTogetherDate', value: Number(value) });
     }
 
     return (
-        <CheckButtonSubItemWithFollowQuestions number={'1-1'} question={'같이 살고 있는 사람을 선택해주세요'} depth={3}
-            buttons={livingWithGrandParentsButtons} onChange={onChangedInputValue}
-            handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={LivingWithGrandParentsFollwUpQuestion2}
-            onChangedFamilyValue={onChangedFamilyValue} />
+        <Dropdown style={{ flex: 1 }}>
+            <Dropdown.Toggle variant="warning" className='dropdown-transparent flex-fill' >
+                {slectedItem}
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+                {livingTogetherDataList()}
+            </Dropdown.Menu>
+        </Dropdown>
     );
+
 }
 
-{/* 증,조부모 동거 - 동거기간을 선택해주세요 */ }
-function LivingWithGrandParentsFollwUpQuestion2({ onChangedFamilyValue, visibility, code }) {
+{/* 본인 세대의 세대원 */ }
+function FamilyForm({ married, handleChange, userBirth, hasSeperateHouseSpouse }) {
 
-    const livingForButtons = { code: code, name: 'livingTogetherDate', values: [{ data: '1년 미만', value: 0 }, { data: '1년 이상 3년 미만', value: 1 }, { data: '3년 이상', value: 2 }] };
+    const [loopCount, setLoopCount] = useState(0);
+    const hasSpouse = !hasSeperateHouseSpouse && (married == 1 || married == 2);
 
-    if (!visibility) {
-        return;
-    }
-
-    return (
-        <FamilyRadioButtonSubItem number={'1-2'} question={'동거 기간을 선택해주세요'} depth={4}
-            buttons={livingForButtons} onChangedFamilyValue={onChangedFamilyValue} />
-    );
-}
-
-
-{/* 본인' 또는 배우자'의 부모님과 같이 살고 계신가요? */ }
-function Parents({ hasSpouse, buttons, onChange, handleFollowUpQuestion }) {
-
-    let question = '본인의 부모님과 같이 살고 계신가요?';
-    if (hasSpouse) {
-        question = '본인 또는 배우자의 부모님과 같이 살고 계신가요?';
-    }
-
-    return (
-        <RadioButtonItem number={2} question={question}
-            buttons={buttons} direction={'horizontal'} onChange={onChange}
-            handleFollowUpQuestion={handleFollowUpQuestion} />
-    );
-}
-
-{/* 부모와 동거 - 같이 살고 있는 사람을 선택해주세요 */ }
-function LivingWithParentsFollwUpQuestion({ onChangedInputValue, hasSpouse, handleFollowUpQuestion, visibility, onChangedFamilyValue }) {
-
-    let livingWithGrandParentsButtons = {
-        name: 'parentslivingWith', values: [
-            { value: FamilyMember.FATHER, data: familyMemberNames[FamilyMember.FATHER], hasFollowUpQuestion: true },
-            { value: FamilyMember.MOTHER, data: familyMemberNames[FamilyMember.MOTHER], hasFollowUpQuestion: true },
-
-        ]
-    };
-
-    if (hasSpouse) {
-        livingWithGrandParentsButtons.values.push(
-            { value: FamilyMember.SPOUSE_FATHER, data: familyMemberNames[FamilyMember.SPOUSE_FATHER], hasFollowUpQuestion: true },
-            { value: FamilyMember.SPOUSE_MOTHER, data: familyMemberNames[FamilyMember.SPOUSE_MOTHER], hasFollowUpQuestion: true },
-        );
-    }
-
-    if (!visibility) {
-        return;
-    }
-
-    return (
-        <CheckButtonSubItemWithFollowQuestions number={'2-1'} question={'같이 살고 있는 사람을 선택해주세요'} depth={3}
-            buttons={livingWithGrandParentsButtons} onChange={onChangedInputValue}
-            handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={LivingWithParentsFollwUpQuestion2} 
-            onChangedFamilyValue={onChangedFamilyValue} />
-    );
-}
-
-{/* 부모와 동거 - 생년월일과 동거기간을 선택해주세요 */ }
-function LivingWithParentsFollwUpQuestion2({ onChangedFamilyValue, visibility, code }) {
-
-    const livingForButtons = { code: code, name: 'livingTogetherDate', values: [{ data: '1년 미만', value: 0 }, { data: '1년 이상 3년 미만', value: 1 }, { data: '3년 이상', value: 2 }] };
-
-    if (!visibility) {
-        return;
+    function handleButtonClick() {
+        setLoopCount(prev => prev + 1);
     }
 
     return (
         <>
-            <FamilyInputNumberSubItem code={code} number={'2-2'} question={'생년월일 입력'} depth={4}
-                name={'birthday'} type={'date'} onChangedFamilyValue={onChangedFamilyValue} placeholder={placeholderText.dateType} />
-            <FamilyRadioButtonSubItem number={'2-3'} question={'동거 기간을 선택해주세요'} depth={4}
-                buttons={livingForButtons} onChangedFamilyValue={onChangedFamilyValue} />
+            본인 세대의 세대구성원
+            <Table>
+                <thead>
+                    <FamilyFormHead />
+                </thead>
+                <tbody>
+                    <SelfFormRow married={married} userBirth={userBirth} />
+                    {hasSpouse && <SpouseFormRow />}
+                    {Array.from({ length: loopCount }, (_, index) => (
+                        <>
+                            <FamilyFormRow index={index} livingTogether={1} married={married} handleChange={handleChange} />
+                        </>
+                    ))}
+
+                </tbody>
+            </Table>
+            <Button variant="light" onClick={handleButtonClick}>동거인 추가</Button>
         </>
     );
 }
 
-{/* 자식과 동거 - 몇 명의 자녀와 살고 계신가요? */ }
-function LivingWithChildrenFollwUpQuestion({ onChangedInputValue, onChangedFamilyValue, handleFollowUpQuestion, visibility }) {
+{/* 배우자 세대의 세대원 */ }
+function SpouseFamilyForm({ married, handleChange }) {
 
-    if (!visibility) {
-        return;
-    }
+    const [loopCount, setLoopCount] = useState(0);
 
-    return (
-        <InputNumberLoopSubItemWithFollowQuestions number={'3-1'} question={'몇 명의 자녀와 살고 계신가요?'} depth={3}
-
-            name={'livingWithChildren'} onChange={onChangedInputValue}
-            handleFollowUpQuestion={handleFollowUpQuestion} onChangedFamilyValue={onChangedFamilyValue}
-            subQuestion={LivingWithChildrenInfoQuestion} unit={'명'} placeholder={placeholderText.peopleCountType} />
-    );
-}
-
-{/* 자식과 동거 - 자녀 정보 */ }
-function LivingWithChildrenInfoQuestion({ onChangedInputValue, onChangedFamilyValue, handleFollowUpQuestion, index }) {
-
-    return (
-        <CheckButtonSubItemWithFollowQuestions number={'3-2'} question={`자녀${index+1} `} depth={4} index={index}
-            buttons={{ code: FamilyMember.UNBORN_CHILD, name: 'isFetus', values: [{ data: '태아', value: 'Y', hasFollowUpQuestion: true }] }}
-            onChange={onChangedInputValue} handleFollowUpQuestion={handleFollowUpQuestion}
-            onChangedFamilyValue={onChangedFamilyValue}
-            subQuestion={LivingWithChildrenFollwUpQuestion2} reverseCheck={true} />
-    );
-}
-
-{/* 자식과 동거 - 자녀 생년월일과 혼인여부, 동거기간을 입력해주세요 */ }
-function LivingWithChildrenFollwUpQuestion2({ onChangedFamilyValue, visibility, index }) {
-
-    const code = FamilyMember.CHILD;
-    const isMarriedButtons = { code: code, name: 'isMarried', values: [{ data: '미혼', value: 'N' }, { data: '기혼', value: 'Y' }] };
-    const livingForButtons = { code: code, name: 'livingTogetherDate', values: [{ data: '1년 미만', value: 0 }, { data: '1년 이상 3년 미만', value: 1 }, { data: '3년 이상', value: 2 }] };
-
-    if (!visibility) {
-        return;
+    function handleButtonClick() {
+        setLoopCount(prev => prev + 1);
     }
 
     return (
         <>
-            <FamilyInputNumberSubItem code={code} index={index} number={'3-3'} question={'생년월일 입력'} depth={4}
-                name={'birthday'} onChangedFamilyValue={onChangedFamilyValue} type={'date'} placeholder={placeholderText.dateType} />
-            <FamilyRadioButtonSubItem index={index} number={'3-4'} question={'자녀 혼인 여부'} depth={4} direction={'horizontal'}
-                buttons={isMarriedButtons} onChangedFamilyValue={onChangedFamilyValue} />
-            <FamilyRadioButtonSubItem index={index} number={'3-5'} question={'동거 기간을 선택해주세요'} depth={4}
-                buttons={livingForButtons} onChangedFamilyValue={onChangedFamilyValue} />
+            배우자 세대의 세대구성원
+            <Table>
+                <thead>
+                    <FamilyFormHead />
+                </thead>
+                <tbody>
+                    < SpouseFormRow />
+                    {Array.from({ length: loopCount }, (_, index) => (
+                        <>
+                            <FamilyFormRow index={index} livingTogether={2} married={married} handleChange={handleChange} />
+                        </>
+                    ))}
+
+                </tbody>
+            </Table>
+            <Button variant="light" onClick={handleButtonClick}>동거인 추가</Button>
         </>
     );
 }
 
-{/* 자식과 동거 안함 - 부모(신청자 본인의 자녀)가 사망하여 양육자가 없는 손자녀와 같이 살고 계신가요? */ }
-function LivingWithGrandChildrenFollwUpQuestion({ onChangedInputValue, handleFollowUpQuestion, visibility }) {
-
-    const grandchildren = { name: 'grandchildren', values: [{ value: 'Y', data: '예', hasFollowUpQuestion: true }, { value: 'N', data: '아니오' }] }
-
-    if (!visibility) {
-        return;
-    }
-
+function FamilyFormHead() {
     return (
-        <RadioButtonSubItem number={'3-1'} question={'부모(신청자 본인의 자녀)가 사망하여 양육자가 없는 손자녀와 같이 살고 계신가요?'} depth={3}
-
-            buttons={grandchildren} onChange={onChangedInputValue} direction={'horizontal'} 
-            handleFollowUpQuestion={handleFollowUpQuestion} />
+        <tr>
+            <th>관계</th>
+            <th>동거기간</th>
+            <th>생년월일</th>
+            <th>혼인여부</th>
+            <th>주택/분양권 소유 수</th>
+            <th>주택 처분 날짜</th>
+        </tr>
     );
 }
 
-{/* 손자녀와 동거 - 손자녀 정보 */ }
-function LivingWithGrandChildrenInfoQuestion({ onChangedFamilyValue, handleFollowUpQuestion, visibility }) {
+function FamilyFormRow({ livingTogether, index, married, handleChange }) {
 
-    if (!visibility) {
-        return;
+    const [familyRowData, setFamilyRowData] = useState({ livingTogether: livingTogether });
+
+    function handleChangeFormValue({ key, value }) {
+
+        const nextFamilyRowData = {
+            ...familyRowData,
+            [key]: value
+        };
+
+        setFamilyRowData(nextFamilyRowData);
+        handleChange({ index: index, familyRow: nextFamilyRowData });
     }
 
-    return (
-        <InputNumberSubItem number={'3-1'} question={'몇 명의 손자녀와 살고 계신가요?'} depth={4}
+    // 폼 Input 타입 관리
+    function handleInputChanged(e) {
+        const name = e.target.getAttribute('data-name');
+        const value = e.target.value;
 
-            name={'grandChildrenCount'} onChange={onChangedFamilyValue}
-            handleFollowUpQuestion={handleFollowUpQuestion}
-            unit={'명'} maxLength={2} placeholder={placeholderText.peopleCountType} />
-    );
-}
+        handleChangeFormValue({ key: name, value: value });
+    }
 
-{/* 배우자 동거인 정보 */ }
-function SpouseLivingWithFollwUpQuestion({ onChangedInputValue, handleFollowUpQuestion, visibility, buttons, subQuestionVisibility, onChangedFamilyValue }) {
-
-    const spouseHouseHolderButtons = { name: 'spouseIsHouseholder', values: [{ value: 'Y', data: '예' }, { value: 'N', data: '아니오' }] }
-    const spouseLivingWithButtons = {
-        name: 'spouselivingWith', values: [
-            { value: FamilyMember.GREAT_GRANDFATHER, data: '본인의 증조할아버지', hasFollowUpQuestion: true },
-            { value: FamilyMember.GREAT_GRANDMOTHER, data: '본인의 증조할머니', hasFollowUpQuestion: true },
-            { value: FamilyMember.GRANDFATHER, data: '본인의 할아버지', hasFollowUpQuestion: true },
-            { value: FamilyMember.GRANDMOTHER, data: '본인의 할머니', hasFollowUpQuestion: true },
-            { value: FamilyMember.SPOUSE_GREAT_GRANDFATHER, data: '배우자의 증조할아버지', hasFollowUpQuestion: true },
-            { value: FamilyMember.SPOUSE_GREAT_GRANDMOTHER, data: '배우자의 증조할머니', hasFollowUpQuestion: true },
-            { value: FamilyMember.SPOUSE_GRANDFATHER, data: '배우자의 할아버지', hasFollowUpQuestion: true },
-            { value: FamilyMember.SPOUSE_GRANDMOTHER, data: '배우자의 할머니', hasFollowUpQuestion: true },
-            { value: FamilyMember.FATHER, data: '본인의 아버지', hasFollowUpQuestion: true },
-            { value: FamilyMember.MOTHER, data: '본인의 어머니', hasFollowUpQuestion: true },
-            { value: FamilyMember.SPOUSE_FATHER, data: '배우자의 아버지', hasFollowUpQuestion: true },
-            { value: FamilyMember.SPOUSE_MOTHER, data: '배우자의 어머니', hasFollowUpQuestion: true },
-        ]
-    };
-
-
-    if (!visibility) {
-        return;
+    // 폼 Input date 타입 관리
+    function handleDateInputChanged(e) {
+        const name = e.target.getAttribute('data-name');
+        const value = formatDateToCustomFormat(e.target.value);
+        
+        handleChangeFormValue({ key: name, value: value });
     }
 
     return (
         <>
-            <RadioButtonSubItem number={'4-1'} question={'배우자가 분리세대의 세대주인가요?'} depth={3} direction={'horizontal'}
-                buttons={spouseHouseHolderButtons} onChange={onChangedInputValue} />
+            <tr key={index}>
 
-            <CheckButtonSubItemWithFollowQuestions number={'4-2'} question={'배우자와 같이 살고 있는 사람을 선택해주세요'} depth={3}
-                buttons={spouseLivingWithButtons} onChange={onChangedInputValue} onChangedFamilyValue={onChangedFamilyValue}
-                handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={LivingWithGrandParentsFollwUpQuestion2} />
+                {/* 관계 */}
+                <td>
+                    <FamilyRelationshipDropdown index={index} married={married} handleChange={handleChangeFormValue} />
+                </td>
 
-            <RadioButtonSubItem number={'4-3'} question={'배우자가 자녀(태아 포함)와 함께 살고 계신가요?'}
-                buttons={buttons} direction={'horizontal'} onChange={onChangedInputValue} depth={3}
-                handleFollowUpQuestion={handleFollowUpQuestion} />
+                {/* 동거기간 */}
+                <td>
+                    <LivingTogetherDateDropdown handleChange={handleChangeFormValue} />
+                </td>
 
-            <SpouseLivingWithChildrenFollwUpQuestion onChangedInputValue={onChangedInputValue} handleFollowUpQuestion={handleFollowUpQuestion}
-                visibility={subQuestionVisibility} onChangedFamilyValue={onChangedFamilyValue} />
+                {/* 생년월일 */}
+                <td>
+                    <Form.Control
+                        type="number"
+                        placeholder={placeholderText.dateType}
+                        name={`birth-${index}`}
+                        data-name={'birthday'}
+                        required
+                        onBlur={handleDateInputChanged}
+                    />
+                </td>
 
+                {/* 혼인 여부 */}
+                <td>
+                    <Form.Check
+                        type={'checkbox'}
+                        name={`married-${index}`}
+                        label={'기혼'}
+                        data-name={'isMarried'}
+                        id={`married-${index}`}
+                        style={{ flex: 1 }}
+                    />
+                </td>
+
+                {/* 주택/분양권 소유 수 */}
+                <td>
+                    <Form.Control
+                        type="number"
+                        placeholder={placeholderText.houseCountType}
+                        name={`house-${index}`}
+                        data-name={'houseCount'}
+                        onBlur={handleInputChanged}
+                        required
+                    />
+                </td>
+
+                {/* 주택 처분 날짜 */}
+                <td>
+                    <Form.Control
+                        type="number"
+                        placeholder={placeholderText.dateType}
+                        name={`houseSold-${index}`}
+                        data-name={'houseSoldDate'}
+                        onBlur={handleDateInputChanged}
+                        required
+                    />
+                </td>
+
+            </tr>
         </>
     );
 }
 
-{/* 배우자가 자식과 동거 - 몇 명의 자녀와 살고 계신가요? */ }
-function SpouseLivingWithChildrenFollwUpQuestion({ onChangedInputValue, handleFollowUpQuestion, visibility, onChangedFamilyValue }) {
-
-    if (!visibility) {
-        return;
-    }
-
-    return (
-        <InputNumberLoopSubItemWithFollowQuestions number={'4-4'} question={'몇 명의 자녀와 살고 계신가요?'} depth={4}
-            name={'spouseLivingWithChildren'} onChange={onChangedInputValue}
-            handleFollowUpQuestion={handleFollowUpQuestion} onChangedFamilyValue={onChangedFamilyValue}
-            subQuestion={SpouseLivingWithChildrenInfoQuestion} unit={'명'} placeholder={placeholderText.peopleCountType} />
-    );
-}
-
-{/* 배우자가 자식과 동거 - 자녀 정보 */ }
-function SpouseLivingWithChildrenInfoQuestion({ onChangedInputValue, handleFollowUpQuestion, index, onChangedFamilyValue }) {
-
-    return (
-        <CheckButtonSubItemWithFollowQuestions number={'4-5'} question={`자녀${index+1} `} depth={4}
-            buttons={{ code: FamilyMember.UNBORN_CHILD, name: `isFetus${index+1}`, values: [{ data: '태아', value: 'Y', hasFollowUpQuestion: true }] }}
-            onChange={onChangedInputValue} handleFollowUpQuestion={handleFollowUpQuestion}
-            onChangedFamilyValue={onChangedFamilyValue}
-            subQuestion={SpouseLivingWithChildrenFollwUpQuestion2} reverseCheck={true} />
-    );
-}
-
-{/* 배우자가 자식과 동거 - 자녀 생년월일과 혼인여부, 동거기간을 입력해주세요 */ }
-function SpouseLivingWithChildrenFollwUpQuestion2({ onChangedFamilyValue, visibility, index }) {
-
-    const code = FamilyMember.CHILD;
-    const isMarriedButtons = { name: 'isMarried', values: [{ data: '미혼', value: 'N' }, { data: '기혼', value: 'Y' }] };
-    const livingForButtons = { name: 'livingFor', values: [{ data: '1년 미만', value: 0 }, { data: '1년 이상 3년 미만', value: 1 }, { data: '3년 이상', value: 2 }] };
-
-    if (!visibility) {
-        return;
-    }
-
+function SelfFormRow({ married, userBirth }) {
     return (
         <>
-            <FamilyInputNumberSubItem code={code}index={index} number={'4-6'} question={'생년월일 입력'} depth={4} onChangedFamilyValue={onChangedFamilyValue}
-                name={'birthday'} type={'date'} placeholder={placeholderText.dateType} />
-            <FamilyRadioButtonSubItem index={index} number={'4-7'} question={'자녀 혼인 여부'} depth={4} direction={'horizontal'}
-                buttons={isMarriedButtons}  onChangedFamilyValue={onChangedFamilyValue} />
-            <FamilyRadioButtonSubItem index={index} number={'4-8'} question={'동거 기간을 선택해주세요'} depth={4} onChangedFamilyValue={onChangedFamilyValue}
-                buttons={livingForButtons}  />
+            <tr>
+
+                {/* 관계 */}
+                <td>본인</td>
+
+                {/* 동거기간 */}
+                <td>
+
+                </td>
+
+                {/* 생년월일 */}
+                <td>
+                    <Form.Control
+                        type="number"
+                        placeholder={userBirth}
+                        disabled
+                        readOnly
+                    />
+                </td>
+
+                {/* 혼인 여부 */}
+                <td>
+                    {married === 0 ? "미혼" : "기혼"}
+                </td>
+
+                {/* 주택/분양권 소유 수 */}
+                <td>
+                    <Form.Control
+                        type="number"
+                        placeholder={placeholderText.houseCountType}
+                        name={`house`}
+                        required
+                    />
+                </td>
+
+                {/* 주택 처분 날짜 */}
+                <td>
+                    <Form.Control
+                        type="number"
+                        placeholder={placeholderText.dateType}
+                        name={`houseSold`}
+                        required
+                    />
+                </td>
+
+            </tr>
         </>
     );
 }
-{/* 사위 또는 며느리와 동거 - 몇 명의 사위 또는 며느리와 살고 계신가요? */ }
-function LivingWithInLaws({ buttons, onChangedInputValue, handleFollowUpQuestion, hasSpouse }) {
 
-    let question = '사위 또는 며느리와 같이 살고 계신가요?';
-    if(hasSpouse) {
-        question = '본인 또는 배우자가 사위 또는 며느리와 같이 살고 계신가요?';
-    }
-
-    return (
-        <RadioButtonItem number={3} question={question}
-                    buttons={buttons} direction={'horizontal'} onChange={onChangedInputValue}
-                    handleFollowUpQuestion={handleFollowUpQuestion} />
-    );
-}
-
-{/* 사위 또는 며느리와 동거 - 몇 명의 사위 또는 며느리와 살고 계신가요? */ }
-function LivingWithInLawsFollwUpQuestion({ onChangedInputValue, visibility }) {
-    if (!visibility) {
-        return;
-    }
-
+function SpouseFormRow({ index }) {
     return (
         <>
-            <InputNumberSubItem number={'5-1'} question={'몇 명의 사위 또는 며느리와 살고 계신가요?'} depth={3}
-                name={'inLawsCount'} onChange={onChangedInputValue} unit={'명'} placeholder={placeholderText.peopleCountType} />
+            <tr>
+
+                {/* 관계 */}
+                <td>배우자</td>
+
+                {/* 동거기간 */}
+                <td>
+
+                </td>
+
+                {/* 생년월일 */}
+                <td>
+                    <Form.Control
+                        type="number"
+                        placeholder={placeholderText.dateType}
+                        name={`birth-${index}`}
+                        required
+                    />
+                </td>
+
+                {/* 혼인 여부 */}
+                <td>
+                    기혼
+                </td>
+
+                {/* 주택/분양권 소유 수 */}
+                <td>
+                    <Form.Control
+                        type="number"
+                        placeholder={placeholderText.houseCountType}
+                        name={`house-${index}`}
+                        required
+                    />
+                </td>
+
+                {/* 주택 처분 날짜 */}
+                <td>
+                    <Form.Control
+                        type="number"
+                        placeholder={placeholderText.dateType}
+                        name={`houseSold-${index}`}
+                        required
+                    />
+                </td>
+
+            </tr>
         </>
     );
 }

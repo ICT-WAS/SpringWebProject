@@ -352,7 +352,7 @@ export const conditions = {
             {category: '접수상태', values: [
                 {value: '접수전'},
                 {value: '접수중'},
-                {value: '계약중'},
+                {value: '접수마감'},
             ]},
         ]
     }

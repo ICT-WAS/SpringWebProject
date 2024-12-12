@@ -267,6 +267,7 @@ function WishRegion({ onClickedFilter }) {
 }
 
 /* 주택정보 */
+// TODO : 공급금액 minPrice, maxPrice 넘기기
 function HomeInfo({ onClickedFilter }) {
 
   const categoryName = conditions.homeInfo.category;

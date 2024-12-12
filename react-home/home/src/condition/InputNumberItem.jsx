@@ -180,7 +180,7 @@ function InputTextWithFollowQuestions({ name, onChange, handleFollowUpQuestion, 
 }
 
 {/* yyyy-MM-dd 의 형식으로 반환 */}
-function formatDateToCustomFormat(dateString) {
+export function formatDateToCustomFormat(dateString) {
 
     if (!/^\d{8}$/.test(dateString)) {
         return null;

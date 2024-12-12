@@ -1,5 +1,5 @@
 export const placeholderText = {
-    dateType : '8자리 숫자, 예 : 19991210',
+    dateType : '19991210',
     peopleCountType : '단위: 명',
     yearCountType : '햇수, 단위: 년',
     countType : '단위: 회',

@@ -20,11 +20,14 @@ export default function Condition01Content() {
             { data: '주택청약종합저축', value: 'COMBINED_SAVINGS', hasFollowUpQuestion: true }]
     }
     const spouseHasAccountButtons = { name: 'spouseHasAccount', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
+    const livingWithSpouseButtons = { name: 'spouse', values: [{ data: '예', value: 'Y' }, { data: '아니오', value: 'N'}] }
 
     /* 제출용 데이터 */
     const [formData, setFormData] = useState({});
 
     /* 꼬리질문 가시성 */
+
+    const [hasSpouse, setHasSpouse] = useState(false);
     const followUpQuestions = { 
         married: [{value: 1, subQuestionId: 'marriedDate'}], 
         moveInDate: [{value: 1, subQuestionId: 'metropolitanAreaDate'}, {value: 2, subQuestionId: 'regionMoveInDate'}],
@@ -54,6 +57,10 @@ export default function Condition01Content() {
             });
         }
     }, [visibility]);
+
+    useEffect(() => {
+        setHasSpouse(formData['married'] == 1 || formData['married'] == 2 );
+    }, [formData]);
 
     function handleClick(e) {
         // 폼 데이터 저장
@@ -147,8 +154,13 @@ export default function Condition01Content() {
                 {/* [꼬리질문] 혼인신고일 */}
                 <MarriedFollwUpQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['marriedDate']} />
 
+                {/* [꼬리질문] 배우자 동거 여부 */}
+                {hasSpouse && <RadioButtonSubItem number={5} question={'배우자와 같이 살고 계신가요?'} depth={3}
+                    buttons={livingWithSpouseButtons} direction={'horizontal'} onChange={onChangedInputValue}
+                    handleFollowUpQuestion={handleFollowUpQuestion} />}
+                
                 {/* 소유하신 청약 통장의 종류를 선택해주세요 */}
-                <RadioButtonItem number={1} question={'소유하신 청약 통장의 종류를 선택해주세요'}
+                <RadioButtonItem number={6} question={'소유하신 청약 통장의 종류를 선택해주세요'}
                     buttons={accountTypeButtons} direction={'horizontal'} onChange={onChangedInputValue}
                     handleFollowUpQuestion={handleFollowUpQuestion} />
 
@@ -156,10 +168,10 @@ export default function Condition01Content() {
                 <AccountInfoQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['accountInfo']} />
 
                 {/* 배우자도 청약 통장이 있으신가요? */}
-                {(formData['married'] == 1 || formData['married'] == 2 ) && (
-                    <RadioButtonItem
+                {hasSpouse && (
+                    <RadioButtonSubItem
                         number={2}
-                        question={'배우자도 청약 통장이 있으신가요?'}
+                        question={'배우자도 청약 통장이 있으신가요?'} depth={3}
                         buttons={spouseHasAccountButtons}
                         direction={'horizontal'}
                         onChange={onChangedInputValue}
@@ -167,7 +179,7 @@ export default function Condition01Content() {
                     />
                 )}
                 {/* [꼬리질문] 배우자의 청약 통장 정보 */}
-                {(visibility['spouseAccountDate'] && (formData['married'] == 1 || formData['married'] == 2 )) && <SpouseAccountInfoQuestion onChangedInputValue={onChangedInputValue} />}
+                {(visibility['spouseAccountDate'] && hasSpouse) && <SpouseAccountInfoQuestion onChangedInputValue={onChangedInputValue} />}
 
                 {/* 다음으로 */}
                 <Button variant="dark" onClick={handleClick}>다음</Button>
