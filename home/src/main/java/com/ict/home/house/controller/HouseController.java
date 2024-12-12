@@ -37,12 +37,18 @@ public class HouseController {
                                           @RequestParam(required = false) List<String> supplies,
                                           @RequestParam(required = false) List<String> statuses,
                                           @RequestParam(required = false) Long userId,
-                                          @RequestParam(required = false) String orderBy) {
+                                          @RequestParam(required = false) String orderBy,
+                                          @RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size) {
         List<HouseInfo> houseInfoListByFilter = hs.getHouseInfoListByFilter(regions, houseTypes, area, prices, supplies, statuses, userId, orderBy);
+
+        int fromIndex = page * size;
+        int toIndex = Math.min(fromIndex + size, houseInfoListByFilter.size());
+        List<HouseInfo> paginatedList = houseInfoListByFilter.subList(fromIndex, toIndex);
 
         return ResponseEntity.ok(new HashMap<String, Object>(){{
             put("totalCount", houseInfoListByFilter.size());
-            put("houseInfoList", houseInfoListByFilter);
+            put("houseInfoList", paginatedList);
         }});
     }
 
