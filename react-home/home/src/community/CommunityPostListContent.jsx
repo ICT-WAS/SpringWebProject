@@ -3,7 +3,6 @@ import CommunityCard from "./CommunityCard";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import PostingButton from "./PostingButton";
-import PrivateRoute from "../components/routes/PrivateRoute";
 
 export default function CommunityPostListContent() {
     const [posts, setPosts] = useState([]); // 게시글 목록 상태

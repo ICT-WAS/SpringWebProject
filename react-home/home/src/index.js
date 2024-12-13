@@ -22,6 +22,7 @@ import LoginRoute from "./components/routes/LoginRoute";
 import KakaoRedirection from "./components/login/KakaoRedirection";
 import NaverRedirection from "./components/login/NaverRedirection";
 import CommunityPostList from "./community/CommunityPostList";
+import CommunityPosting from "./community/CommunityPosting";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -46,6 +47,7 @@ root.render(
         
         {/* 커뮤니티 */}
         <Route exact path="/community" element={<CommunityPostList/>} />
+        <Route exact path="/community/posting" element={<CommunityPosting/>} />
 
         {/* 소셜 로그인 리다이렉트 경로 */}
         <Route exact path="/kakao/callback" element={<KakaoRedirection />} />
