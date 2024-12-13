@@ -206,3 +206,17 @@ table tr:hover {
   font-size: 14px;
   color: red;
 }
+
+
+
+/* 조건페이지 nav link css */
+.condition-nav {
+  color: gray !important;
+}
+
+.condition-nav:hover {
+  color: black !important;
+}
+
+.nav-link.active  {
+  color: black !important;
