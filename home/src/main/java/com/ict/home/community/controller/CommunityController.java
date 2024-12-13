@@ -1,8 +1,8 @@
 package com.ict.home.community.controller;
 
+import com.ict.home.community.dto.PostingDto;
 import com.ict.home.community.model.Post;
 import com.ict.home.community.service.CommunityService;
-import com.ict.home.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,49 +41,27 @@ public class CommunityController {
             @RequestParam(name = "page", defaultValue = "1") int page,  // 페이지 번호 (기본값 1)
             @RequestParam(name = "size", defaultValue = "10") int size  // 페이지 크기 (기본값 10)
     ) {
-        // 게시글 예시 데이터 생성
-        List<Post> allPosts = new ArrayList<>();
-        User user = new User();
-        user.setId(3L);
-        user.setEmail("park01sb@naver.com");
-        user.setUsername("박상빈");
-
-        for (long i = 1; i <= 30; i++) {
-            Post post = new Post();
-            post.setUser(user);
-            post.setPostId(i);
-            post.setTitle("게시글 " + i + " 제목");
-            post.setSubject("게시글 " + i + " 내용");
-            post.setCreatedAt(LocalDateTime.now());
-            post.setUpdatedAt(LocalDateTime.now().plusDays(30));
-            allPosts.add(post);
-        }
-
-        if (true) {
-            Post post = new Post();
-            post.setUser(user);
-            post.setPostId(50L);
-            post.setTitle("안녕하세요 안녕하세요 안녕하세요 안녕하세요안녕하세요 안녕하세요안녕하세요 안녕하세요안녕하세요 안녕하세요안녕하세요 안녕하세요안녕하세요 안녕하세요안녕하세요 안녕하세요안녕하세요 안녕하세요안녕하세요 안녕하세요");
-            post.setSubject("안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오");
-            post.setCreatedAt(LocalDateTime.now());
-            post.setUpdatedAt(LocalDateTime.now().plusDays(30));
-            allPosts.add(post);
-        }
+        List<Post> postList = cs.getPostList();
 
         // 키워드 검색이 있을 경우 필터링
-        List<Post> filteredPosts = allPosts;
+        List<Post> filteredPosts = postList;
+
         if (keyword != null && !keyword.trim().isEmpty()) {
-            filteredPosts = allPosts.stream()
+            filteredPosts = postList.stream()
                     .filter(post -> post.getTitle().contains(keyword) || post.getSubject().contains(keyword))
                     .collect(Collectors.toList());
         }
 
-        if (filteredPosts.size() == 0) {
+        if (filteredPosts.size() == 0 && filteredPosts == null) {
             Map<String, Object> response = new HashMap<>();
             response.put("totalCount", 0);
             response.put("content", new ArrayList<>());
             return ResponseEntity.ok(response);
         }
+
+        filteredPosts = filteredPosts.stream()
+                .sorted((post1, post2) -> post2.getCreatedAt().compareTo(post1.getCreatedAt())) // 내림차순 정렬
+                .collect(Collectors.toList());
 
         // 페이지네이션 처리
         int totalCount = filteredPosts.size();
@@ -107,24 +84,22 @@ public class CommunityController {
     @PostMapping("")
     @Operation(summary = "게시글 등록", description = "새로운 게시글을 등록합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글 등록 성공",
-                    content = @Content(schema = @Schema(implementation = Post.class))),
+            @ApiResponse(responseCode = "200", description = "게시글 등록 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
     })
-    public ResponseEntity<?> addPost(
-            @Parameter(name = "userId", description = "게시글 작성자의 고유 ID") Long userId,
-            @Parameter(name = "title", description = "게시글 제목") String title,
-            @Parameter(name = "subject", description = "게시글 본문 내용") String subject) {
+    public ResponseEntity<?> addPost(@RequestBody PostingDto postingDto) {
+        Long userId = postingDto.getUserId();
+        String title = postingDto.getTitle();
+        String subject = postingDto.getSubject();
 
-        Post post = new Post();
-        User user = new User();
-        user.setId(userId);
-        post.setUser(user);
-        post.setTitle(title);
-        post.setSubject(subject);
-        return ResponseEntity.ok(post);
+        Long postId = cs.create(userId, title, subject);
+
+        Map<String, Long> response = new HashMap<>();
+        response.put("postId", postId);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{postId}")

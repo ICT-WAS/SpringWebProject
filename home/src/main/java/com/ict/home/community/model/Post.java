@@ -27,7 +27,7 @@ public class Post {
 
     @Schema(description = "회원 고유 pk")
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 
     @Schema(description = "카테고리")
@@ -42,6 +42,7 @@ public class Post {
     @NotNull
     @Schema(description = "내용")
     @Column(name = "subject", nullable = false)
+    @Lob
     private String subject;
 
     @NotNull
