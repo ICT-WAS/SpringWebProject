@@ -200,3 +200,9 @@ table tr:hover {
   color: #495057; /* 호버 시 색상 변경 */
   background-color: #e9ecef; /* 호버 시 배경색 변경 */
 }
+
+.inputTypeError {
+  font-weight: 400;
+  font-size: 14px;
+  color: red;
+}
