@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { InputNumberItem, InputNumberSubItem } from "./InputNumberItem";
 import { RadioButtonItem, RadioButtonSubItem } from "./RadioButtonItem";
-import { conditions } from '../apply_announcement/conditions';
+import { conditionInfo } from '../apply_announcement/conditionInfo.js';
 import { placeholderText } from "./placeholderText";
 
 export default function Condition01Content() {
@@ -214,7 +214,7 @@ function MoveInDate({ onChangedInputValue, changeVisibility }) {
     const [sidoSelectedName, setSidoSelectedName] = useState('시/도');
     const [gunguSelectedName, setGunguelectedName] = useState('군/구');
 
-    const sidoData = conditions.wishRegion.subcategories;
+    const sidoData = conditionInfo.wishRegion.subcategories;
     const [sidoIndex, setSidoIndex] = useState(0);
     const [gunguData, setGunguData] = useState([{value: '군/구'}]);
 
