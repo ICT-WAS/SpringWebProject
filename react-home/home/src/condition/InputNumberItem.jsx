@@ -76,7 +76,7 @@ function FamilyInputText({ code, name, onChangedFamilyValue, type='normal', plac
 
 export function InputText({ name, onChange, type='normal', placeholder }) {
 
-    const [hasError, setHasError] = useState(false);
+    const [error, setError] = useState(null);
 
     function handleInputChange(e) {
 
@@ -86,17 +86,25 @@ export function InputText({ name, onChange, type='normal', placeholder }) {
         const name = e.target.getAttribute('name');
         let value = null;
 
+        let nextError = "값을 입력해주세요.";
+        setError();
+        if(e.target.value !== null || e.target.value.length !== 0) {
+            nextError = null;
+        } 
+
         if(type === 'date') {
             value = formatDateToCustomFormat(e.target.value.toString());
-            if(value == null) {
+            if(value === null) {
                 e.target.value = '';
-                setHasError(true);
+                nextError = "올바르지 않은 형식입니다.";
+            } else {
             }
         } else {
             e.target.value = Math.max(0, e.target.value);
             value = Number(e.target.value);
         }
 
+        setError(nextError);
         onChange({name: name, value: value});
     }
 
@@ -109,7 +117,7 @@ export function InputText({ name, onChange, type='normal', placeholder }) {
                     onBlur={handleInputChange}
                     required
                 />
-            {hasError && <p className="inputTypeError">올바르지 않은 형식입니다.</p>}
+            <p className="inputTypeError">{error}</p>
         </>
     );
 }

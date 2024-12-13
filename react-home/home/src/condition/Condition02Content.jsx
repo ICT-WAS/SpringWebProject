@@ -13,7 +13,7 @@ export default function Condition02Content() {
     const [married, setMarried] = useState(0);
 
     /* 제출용 데이터 */
-    const [formData, setFormData] = useState({});
+    const [formData1, setFormData1] = useState({});
 
     const [myData, setMyData] = useState([{ relationship: 1, livingTogether: 1 }]);
     const [spouseData, setSpouseData] = useState([]);
@@ -31,6 +31,7 @@ export default function Condition02Content() {
         let userData = null;
         try {
             userData = JSON.parse(sessionData);
+            setFormData1(userData);
         } catch (error) { }
 
         const nextHasSeperateSpouse = userData.spouse === 'N';
@@ -67,16 +68,15 @@ export default function Condition02Content() {
             finalFamilyData = [...finalFamilyData, ...spouseData];
         }
         
-        const finalHasSpouse = (hasSeperateHouseSpouse === false) && (married === 1 || married === 2);
+        const finalHasSpouse = (married === 1 || married === 2);
 
         sessionStorage.removeItem('hasSpouse');
 
         sessionStorage.setItem('hasSpouse', finalHasSpouse);
         sessionStorage.setItem('familyData', JSON.stringify(finalFamilyData));
+        sessionStorage.setItem('formData1', JSON.stringify(formData1));
 
-        console.log(finalFamilyData);
-
-        // navigate("/condition-3");
+        navigate("/condition-3");
     }
 
     // 세대구성원 추가/수정
