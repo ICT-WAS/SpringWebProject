@@ -4,21 +4,19 @@ import com.ict.home.exception.BaseException;
 import com.ict.home.exception.BaseResponse;
 import com.ict.home.login.auth.dto.PostSignupAuthReq;
 import com.ict.home.login.auth.dto.PostVerifyAuthReq;
-import com.ict.home.login.auth.entity.Verification;
-import com.ict.home.login.auth.VerifyEnum.VerificationType;
+import com.ict.home.login.auth.model.Verification;
+import com.ict.home.login.auth.enums.VerificationType;
 import com.ict.home.login.auth.repository.VerificationRepository;
 import com.ict.home.login.auth.service.VerifyService;
-import com.ict.home.user.UserRepository;
-import com.ict.home.user.UserService;
+import com.ict.home.user.repository.UserRepository;
+import com.ict.home.user.service.UserService;
 import jakarta.mail.MessagingException;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
 import static com.ict.home.exception.BaseResponseStatus.CODE_EXPIRED;
-import static com.ict.home.exception.BaseResponseStatus.INVALID_EMAIL_CODE;
 
 @RestController
 @RequestMapping("/auth")

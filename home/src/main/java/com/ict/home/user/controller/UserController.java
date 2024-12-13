@@ -1,4 +1,4 @@
-package com.ict.home.user;
+package com.ict.home.user.controller;
 
 import com.ict.home.exception.BaseException;
 import com.ict.home.exception.BaseResponse;
@@ -7,11 +7,11 @@ import com.ict.home.user.dto.PostLoginRes;
 
 import com.ict.home.user.dto.PostUserReq;
 import com.ict.home.user.dto.PostUserRes;
+import com.ict.home.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -46,7 +46,7 @@ public class UserController {
         try{
             return new BaseResponse<>(userService.localLogin(postLoginReq, response));
         } catch(BaseException exception) {
-            return new BaseResponse<>((exception.getStatus()));
+            return new BaseResponse<>(exception.getStatus());
         }
     }
 
@@ -58,7 +58,7 @@ public class UserController {
         try{
             return new BaseResponse<>(userService.logout(request, response));
         } catch (BaseException exception){
-            return new BaseResponse<>((exception.getStatus()));
+            return new BaseResponse<>(exception.getStatus());
         }
     }
 

@@ -1,8 +1,8 @@
 package com.ict.home.login.auth.service;
 
 import com.ict.home.exception.BaseException;
-import com.ict.home.login.auth.VerifyEnum.VerificationType;
-import com.ict.home.login.auth.entity.Verification;
+import com.ict.home.login.auth.enums.VerificationType;
+import com.ict.home.login.auth.model.Verification;
 import com.ict.home.login.auth.repository.VerificationRepository;
 import com.ict.home.util.SmsCertificationUtil;
 import jakarta.mail.MessagingException;

@@ -1,9 +1,8 @@
 package com.ict.home.login.auth.repository;
 
-import com.ict.home.login.auth.entity.Verification;
+import com.ict.home.login.auth.model.Verification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 public interface VerificationRepository extends JpaRepository<Verification, Long> {

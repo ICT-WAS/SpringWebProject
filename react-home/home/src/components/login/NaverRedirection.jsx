@@ -4,7 +4,8 @@ import { useGlobalContext } from "../../Context";
 import { useEffect } from "react";
 
 const NaverRedirection = () => {
-  const code = new URL(document.location.toString()).searchParams.get("code"); //url 뒤의 코드 파라미터만 저장
+  const code = new URL(document.location.toString()).searchParams.get("code");
+  const state = new URL(document.location.toString()).searchParams.get("state"); //url 뒤의 코드 파라미터만 저장
   const navigate = useNavigate();
 
   //로그인 상태를 관리하는 전역 변수
@@ -15,8 +16,11 @@ const NaverRedirection = () => {
       try {
         const response = await axios.post(
           "http://localhost:8989/oauth/naver/callback",
-          code,
+          { code: code, state: state },
           {
+            headers: {
+              "Content-Type": "application/json", // 명시적으로 Content-Type 설정
+            },
             withCredentials: true, //쿠키 포함 요청
           }
         );
@@ -24,10 +28,10 @@ const NaverRedirection = () => {
         if (response.data.isSuccess) {
           const { accessToken } = response.data.result;
           localStorage.setItem("accessToken", accessToken);
-          // setIsLogin(true);
+          setIsLogin(true);
 
           //로그인 성공 시 리다이렉트 - 로그인 성공해도 해당 페이지에 머물러야 할 수 있음, 차후 조건 처리 필요함!
-          // navigate("/");
+          navigate("/");
         } else {
           // setLoginErrorTitle("로그인 실패");
           // setLoginError(response.data.message);

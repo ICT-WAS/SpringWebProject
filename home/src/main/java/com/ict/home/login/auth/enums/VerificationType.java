@@ -1,4 +1,4 @@
-package com.ict.home.login.auth.VerifyEnum;
+package com.ict.home.login.auth.enums;
 
 public enum VerificationType {
     EMAIL,

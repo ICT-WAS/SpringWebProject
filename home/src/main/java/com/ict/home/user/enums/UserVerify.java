@@ -1,4 +1,4 @@
-package com.ict.home.user;
+package com.ict.home.user.enums;
 
 import lombok.Getter;
 

@@ -1,17 +1,19 @@
-package com.ict.home.user;
+package com.ict.home.user.service;
 
 import com.ict.home.exception.BaseException;
-import com.ict.home.login.auth.entity.Verification;
+import com.ict.home.login.auth.model.Verification;
 import com.ict.home.login.auth.repository.VerificationRepository;
 import com.ict.home.login.jwt.JwtProvider;
 import com.ict.home.login.jwt.Secret;
 import com.ict.home.login.jwt.Token;
 import com.ict.home.login.jwt.TokenRepository;
+import com.ict.home.user.repository.UserRepository;
 import com.ict.home.user.dto.PostLoginReq;
 import com.ict.home.user.dto.PostLoginRes;
 
 import com.ict.home.user.dto.PostUserReq;
 import com.ict.home.user.dto.PostUserRes;
+import com.ict.home.user.User;
 import com.ict.home.util.AES128;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -61,10 +63,13 @@ public class UserService {
         }
 
         //인증 테이블(Verification) 상태 확인 - 이메일 혹은 휴대전화 인증정보가 있는지 확인
-        Verification verification = checkVerification(postUserReq.getEmail(), postUserReq.getPhoneNumber(), postUserReq.getVerificationCode());
-        //인증 정보에서 인증 완료가 아닐 시 에러
-        if (!verification.isVerified()) {
-            throw new BaseException(VERIFICATION_FAILED);
+        if (postUserReq.getVerificationCode() != null) {
+            Verification verification = checkVerification(postUserReq.getEmail(), postUserReq.getPhoneNumber(), postUserReq.getVerificationCode());
+
+            //인증 정보에서 인증 완료가 아닐 시 에러
+            if (!verification.isVerified()) {
+                throw new BaseException(VERIFICATION_FAILED);
+            }
         }
 
         //사용자 정보 생성
@@ -121,7 +126,7 @@ public class UserService {
                 //리프레시  토큰이 있는 경우
                 Token token = tokenRepository.findByUserId(user.getId());
                 //리프레시 토큰의 만료 확인 후 반환 or 발급
-                refreshToken = CheckRefreshTokenExpire(token, user);  //현재 유저의 리프레시 토큰
+                refreshToken = checkRefreshTokenExpire(token, user);  //현재 유저의 리프레시 토큰
             }else {
                 //리프레시 토큰이 없는 경우 - 리프레시 토큰 발급 후 디비 저장
                 refreshToken = createAndSaveRefreshToken(user);
@@ -136,6 +141,8 @@ public class UserService {
 
             response.addCookie(refreshTokenCookie);
 
+            user.setLastLogin(LocalDateTime.now());
+            userRepository.save(user);
             //유저 정보와 액세스토큰을 담은 객체를 클라이언트에 반환
             return new PostLoginRes(user, accessToken);
         } else {
@@ -144,7 +151,7 @@ public class UserService {
     }
 
     //리프레시 토큰의 만료 확인 후 사용자 정보에 맞는 유저 반환
-    private String CheckRefreshTokenExpire(Token token, User user) {
+    public String checkRefreshTokenExpire(Token token, User user) {
         //1. 만료 되었을 시
         if (token.isExpired()) {
             //1-1. 기존 리프레시 토큰 삭제
@@ -173,7 +180,7 @@ public class UserService {
         }
 
         //리프레시 토큰의 만료 확인 후 사용자 정보에 맞는 리프레시 토큰 반환
-        String refreshToken = CheckRefreshTokenExpire(token, user);
+        String refreshToken = checkRefreshTokenExpire(token, user);
 
         String accessToken = null;
         if (refreshToken != null) {
@@ -183,7 +190,7 @@ public class UserService {
     }
 
     //리프레시 토큰 발급 및 저장
-    private String createAndSaveRefreshToken(User user) {
+    public String createAndSaveRefreshToken(User user) {
         String refreshToken = jwtProvider.createRefreshToken(user);
         
         Token token = Token.builder()
