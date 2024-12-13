@@ -52,7 +52,7 @@ public class CommunityController {
                     .collect(Collectors.toList());
         }
 
-        if (filteredPosts.size() == 0 && filteredPosts == null) {
+        if (filteredPosts.isEmpty() || filteredPosts == null) {
             Map<String, Object> response = new HashMap<>();
             response.put("totalCount", 0);
             response.put("content", new ArrayList<>());

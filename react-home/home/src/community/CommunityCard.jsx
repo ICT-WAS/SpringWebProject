@@ -6,7 +6,14 @@ export default function CommunityCard({post}) {
     const truncatedContent = post.subject.length > 60 ? post.subject.slice(0, 60) + "..." : post.subject;
 
     // 작성일 포맷 변환 (ISO 8601 -> yyyy-MM-dd HH:mm 형식)
-    const formattedDate = new Date(post.createdAt).toISOString().slice(0, 16).replace("T", " ");
+    // 작성일 포맷 변환 (ISO 8601 -> yyyy-MM-dd HH:mm 형식)
+    const formattedDate = new Date(post.createdAt)
+                            .toLocaleString("ko-KR", { hour12: false })
+                            .replace(",", "")
+                            .replace("T", "")
+                            .replaceAll(". ", "-")
+                            .slice(0, 17);
+    const modifiedDate = formattedDate.slice(0, formattedDate.lastIndexOf("-")) + " " + formattedDate.slice(formattedDate.lastIndexOf("-") + 1);
 
     return (
         <>
@@ -19,7 +26,7 @@ export default function CommunityCard({post}) {
                         </a>
                     </p>
                     <p className="card-body-text" style={{ fontSize: '0.85rem', color: '#6c757d', width: '200px'  }}>
-                        글쓴이: {post.user.username}
+                        {post.user.username}
                     </p>
                 </div>
 
@@ -29,7 +36,7 @@ export default function CommunityCard({post}) {
                         {truncatedContent}
                     </p>
                     <p className="card-body-text" style={{ fontSize: '0.85rem', color: '#6c757d', width: '200px' }}>
-                        작성일시: {formattedDate}
+                        {modifiedDate}
                     </p>
                 </div>
             </Card>
