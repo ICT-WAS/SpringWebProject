@@ -132,7 +132,7 @@ CREATE TABLE `comment` (
 	`comment_id`	BIGINT	NOT NULL	AUTO_INCREMENT,
 	`user_id`	BIGINT	NOT NULL,
 	`post_id`	BIGINT	NOT NULL,
-	`depth`	INTEGER	NOT NULL	DEFAULT 1 CHECK (depth IN (1, 2))	COMMENT 'default 1 / 대댓글 : 2',
+	`depth`	INTEGER	NOT NULL	DEFAULT 1 CHECK (depth IN (1, 2)),
 	`comment_id2`	BIGINT	NULL,
 	`comments`	TEXT	NOT NULL,
 	`created_at`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP,

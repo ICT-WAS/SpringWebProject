@@ -1,6 +1,7 @@
 package com.ict.home.community.controller;
 
 import com.ict.home.community.model.Post;
+import com.ict.home.community.service.CommunityService;
 import com.ict.home.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -8,12 +9,24 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/community")
+@RequiredArgsConstructor
 public class CommunityController {
+
+    private final CommunityService cs;
 
     @GetMapping("")
     @Operation(summary = "게시글 목록", description = "게시글을 조회합니다.")
@@ -25,9 +38,70 @@ public class CommunityController {
             @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
     })
     public ResponseEntity<?> getPostList(
-            @Parameter(name = "keyword", description = "조회할 키워드") String keyword) {
+            @RequestParam(name = "keyword", required = false) String keyword,  // 검색어 파라미터
+            @RequestParam(name = "page", defaultValue = "1") int page,  // 페이지 번호 (기본값 1)
+            @RequestParam(name = "size", defaultValue = "10") int size  // 페이지 크기 (기본값 10)
+    ) {
+        // 게시글 예시 데이터 생성
+        List<Post> allPosts = new ArrayList<>();
+        User user = new User();
+        user.setId(3L);
+        user.setEmail("park01sb@naver.com");
+        user.setUsername("박상빈");
 
-        return ResponseEntity.ok(new Post());
+        for (long i = 1; i <= 30; i++) {
+            Post post = new Post();
+            post.setUser(user);
+            post.setPostId(i);
+            post.setTitle("게시글 " + i + " 제목");
+            post.setSubject("게시글 " + i + " 내용");
+            post.setCreatedAt(LocalDateTime.now());
+            post.setUpdatedAt(LocalDateTime.now().plusDays(30));
+            allPosts.add(post);
+        }
+
+        if (true) {
+            Post post = new Post();
+            post.setUser(user);
+            post.setPostId(50L);
+            post.setTitle("안녕하세요 안녕하세요 안녕하세요 안녕하세요안녕하세요 안녕하세요안녕하세요 안녕하세요안녕하세요 안녕하세요안녕하세요 안녕하세요안녕하세요 안녕하세요안녕하세요 안녕하세요안녕하세요 안녕하세요안녕하세요 안녕하세요");
+            post.setSubject("안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오안녕하지오");
+            post.setCreatedAt(LocalDateTime.now());
+            post.setUpdatedAt(LocalDateTime.now().plusDays(30));
+            allPosts.add(post);
+        }
+
+        // 키워드 검색이 있을 경우 필터링
+        List<Post> filteredPosts = allPosts;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            filteredPosts = allPosts.stream()
+                    .filter(post -> post.getTitle().contains(keyword) || post.getSubject().contains(keyword))
+                    .collect(Collectors.toList());
+        }
+
+        if (filteredPosts.size() == 0) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("totalCount", 0);
+            response.put("content", new ArrayList<>());
+            return ResponseEntity.ok(response);
+        }
+
+        // 페이지네이션 처리
+        int totalCount = filteredPosts.size();
+        int start = (page - 1) * size;
+        int end = Math.min(start + size, totalCount);
+
+        if (start >= totalCount) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("페이지 번호가 범위를 벗어났습니다.");
+        }
+
+        List<Post> paginatedPosts = filteredPosts.subList(start, end);
+
+        // 응답 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", paginatedPosts);  // 현재 페이지에 해당하는 게시글 목록
+        response.put("totalCount", totalCount);  // 총 게시글 수
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("")

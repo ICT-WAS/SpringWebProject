@@ -9,14 +9,14 @@ function CommunityCards() {
   
   /* 임시 데이터 */
   const communityInfo = [
-    {title:'청약 당첨되신 분 있긴 한가요?', content:'통장 10년째 유지중인데 30번 넘게 신청했지만 주변에서도 그렇고 당첨된 사람을 본 적이 없…'},
-    {title:'당첨됐어요!!!!!!!!!!!!!!!', content:'저도 이제 제 집이 생기네요 !! 다들  포기하지 말고 노려봐요!!!!!!'},
-    {title:'당첨됐어요!!!!!!!!!!!!!!!', content:'저도 이제 제 집이 생기네요 !! 다들  포기하지 말고 노려봐요!!!!!!'},
+    {title:'청약 당첨되신 분 있긴 한가요?', subject:'통장 10년째 유지중인데 30번 넘게 신청했지만 주변에서도 그렇고 당첨된 사람을 본 적이 없…', postId: "박상빈", createdAt: "2024-12-13T13:09:22"},
+    {title:'당첨됐어요!!!!!!!!!!!!!!!', subject:'저도 이제 제 집이 생기네요 !! 다들  포기하지 말고 노려봐요!!!!!!', postId: "박상빈", createdAt: "2024-12-13T13:09:22"},
+    {title:'당첨됐어요!!!!!!!!!!!!!!!', subject:'저도 이제 제 집이 생기네요 !! 다들  포기하지 말고 노려봐요!!!!!!', postId: "박상빈", createdAt: "2024-12-13T13:09:22"},
   ];
 
-  const communityCardList = communityInfo.map(community =>
-    CommunityCard({community})
-  );
+  // const communityCardList = communityInfo.map(community =>
+  //   CommunityCard({community})
+  // );
 
   return (
     <>
@@ -26,7 +26,7 @@ function CommunityCards() {
         </a>
       </p>
       <Stack direction='horizontal' gap={3}>
-        {communityCardList}
+        {/* {communityCardList} */}
       </Stack>
       
     </>
