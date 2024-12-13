@@ -43,8 +43,8 @@ public class Comment {
 
     @Schema(description = "대댓글 시 댓글 고유 pk")
     @ManyToOne
-    @JoinColumn(name = "comment_id", referencedColumnName = "comment_id", insertable = false, updatable = false)
-    private Comment comment;
+    @JoinColumn(name = "parent_comment_id", referencedColumnName = "comment_id")
+    private Comment parentComment;
 
     @NotNull
     @Schema(description = "내용")

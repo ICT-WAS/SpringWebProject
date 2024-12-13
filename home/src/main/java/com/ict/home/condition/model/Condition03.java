@@ -61,7 +61,7 @@ public class Condition03 {
     private Integer familyAverageMonthlyIncome;
 
     @NotNull
-    @Schema(description = "전년도 월 평균 소득 (단위: 만원)")
+    @Schema(description = "본인의 전년도 월 평균 소득 (단위: 만원)")
     @Column(name = "previous_year_average_monthly_income", nullable = false)
     private Integer previousYearAverageMonthlyIncome;
 
