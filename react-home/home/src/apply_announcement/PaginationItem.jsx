@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import { Pagination } from 'react-bootstrap';
 
-
  /* Pagination */
-export default function PaginationItem({ onPageChanged, totalCount, pageSize }) {
+const PaginationItem = forwardRef(({ onPageChanged, totalCount, pageSize }, ref) => {
   const [currentPage, setCurrentPage] = useState(1);  // 현재 페이지
 
   // 전체 페이지 수 계산
@@ -12,6 +11,15 @@ export default function PaginationItem({ onPageChanged, totalCount, pageSize }) 
   // 10개 단위로 페이지 범위 계산
   const rangeStart = Math.floor((currentPage - 1) / 10) * 10 + 1;  // 현재 페이지를 기준으로 시작 페이지
   const rangeEnd = Math.min(rangeStart + 9, totalPages);  // 시작 페이지 + 9 (최대 10개까지 표시)
+
+  const resetPage = () => {
+    handlePageChange(1);
+  };
+
+  // 부모에게 메서드를 expose
+  useImperativeHandle(ref, () => ({
+    resetPage,
+  }));
 
   // 페이지 변경 시 호출되는 함수
   const handlePageChange = (pageNumber) => {
@@ -59,4 +67,6 @@ export default function PaginationItem({ onPageChanged, totalCount, pageSize }) 
       </div>
     </>
   );
-} 
+});
+
+export default PaginationItem;
