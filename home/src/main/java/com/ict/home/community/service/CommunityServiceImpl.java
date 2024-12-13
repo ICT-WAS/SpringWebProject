@@ -3,7 +3,7 @@ package com.ict.home.community.service;
 import com.ict.home.community.model.Post;
 import com.ict.home.community.repository.PostRepository;
 import com.ict.home.user.User;
-import com.ict.home.user.UserRepository;
+import com.ict.home.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
