@@ -3,7 +3,7 @@ import { Container, Row } from 'react-bootstrap';
 import React, { useState, useEffect } from 'react';
 import { conditionSubCategory } from './conditionInfo.js';
 import PaginationItem from './PaginationItem';
-import NewSubscriptionCards from './NewSubscriptionCards';
+import SubscriptionCards from './SubscriptionCards';
 import Filters from './Filters';
 import Conditions from './Conditions.jsx';
 
@@ -38,6 +38,17 @@ function convertFiltersToQuery(selectedFilter) {
   });
 
   return param;
+}
+
+function convertFiltersToUrl(filters) {
+  let queryParams = {};
+
+  Object.keys(filters).forEach(key => {
+    // 배열을 콤마(,)로 결합하여 하나의 문자열로 변환
+    queryParams[key] = filters[key].join(',');
+  });
+
+  return queryParams;
 }
 
 export default function MainContent() {
@@ -200,7 +211,7 @@ export default function MainContent() {
         </Row>
         {loading && <p>로딩중</p>}
         <Row>
-          <NewSubscriptionCards subscriptions={subscriptions} totalCount={totalCount} />
+          <SubscriptionCards subscriptions={subscriptions} totalCount={totalCount} />
         </Row>
         <Row>
           <PaginationItem onPageChanged={onPageChanged} totalCount={totalCount} pageSize={pageSize} />
@@ -208,15 +219,4 @@ export default function MainContent() {
       </Container>
     </>
   );
-}
-
-function convertFiltersToUrl(filters) {
-  let queryParams = {};
-
-  Object.keys(filters).forEach(key => {
-    // 배열을 콤마(,)로 결합하여 하나의 문자열로 변환
-    queryParams[key] = filters[key].join(',');
-  });
-
-  return queryParams;
 }
