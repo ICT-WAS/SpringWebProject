@@ -179,7 +179,7 @@ export default function Condition03Content() {
 
                 {/* 본인의 전년도 월 평균소득을 입력해주세요 */}
                 <InputNumberItem number={9} question={'본인의 전년도 월 평균소득을 입력해주세요'}
-                    name={'averageMonthlyIncome'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
+                    name={'previousYearAverageMonthlyIncome'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
 
                 {/* 소득활동 여부를 선택해주세요 */}
                 {hasSpouse === true && <RadioButtonItem number={10} question={'소득활동 여부를 선택해주세요'}
