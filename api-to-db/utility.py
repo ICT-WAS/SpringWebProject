@@ -5,7 +5,7 @@ import json
 
 
 # 정보  파일 경로
-info_file = 'info.txt 파일 경로'
+info_file = './info.txt'
 
 info = json.load(open(info_file, 'r', encoding='utf-8'))
 

@@ -749,10 +749,8 @@ function convertFiltersToUrl(filters) {
   let queryParams = {};
 
   Object.keys(filters).forEach(key => {
-    filters[key].forEach((value, index) => {
-      // 배열 항목을 쿼리 파라미터로 변환할 때, 두 번째 인코딩을 방지
-      queryParams[`${key}%5B${index}%5D`] = value; // 이 부분에서 두 번째 인코딩을 피합니다.
-    });
+    // 배열을 콤마(,)로 결합하여 하나의 문자열로 변환
+    queryParams[key] = filters[key].join(',');
   });
 
   return queryParams;
