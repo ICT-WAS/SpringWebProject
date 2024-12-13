@@ -177,11 +177,7 @@ const Email = ({
           onClick={handleClick}
           disabled={isVerified || isTimerActive}
         >
-          {isVerified
-            ? "인증 완료"
-            : isTimerActive
-            ? "인증 진행 중"
-            : "인증하기"}
+          {isVerified ? "인증 완료" : isTimerActive ? "인증 중" : "인증하기"}
         </button>
       </div>
       {error && <span className="error-message">{error}</span>}

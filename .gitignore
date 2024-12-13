@@ -46,3 +46,16 @@ Thumbs.db
 
 # info.txt 파일을 무시
 /api-to-db/info.txt
+
+# React
+
+/react-home/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/react-home/build
+
