@@ -1,13 +1,12 @@
-import { Button, Card, Dropdown, Stack, Table, Pagination } from 'react-bootstrap';
+import { Button, Card, Dropdown, Stack, Table, Pagination, Form } from 'react-bootstrap';
 import axios from 'axios';
 import { Container, Row, Col } from 'react-bootstrap';
 import FilteredTag from './FilteredTag';
 import Nav from 'react-bootstrap/Nav';
 import React, { useState, useEffect } from 'react';
 import NotificationButton from './NotificationButton';
-import { conditions } from './conditions';
-
-
+import { conditions, conditionSubCategory } from './conditions';
+import { Range } from "react-range";
 
 
 function NewSubscriptionCard({ subscription, index }) {
@@ -44,80 +43,15 @@ function NewSubscriptionCard({ subscription, index }) {
 }
 
 /* 공고 리스트 */
-function NewSubscriptionCards() {
-  const [subscriptions, setSubscriptions] = useState([]);  // 공고 리스트 상태
-  // const [loading, setLoading] = useState(true);  // 로딩 상태
-  // const [error, setError] = useState(null);  // 에러 상태
-  const [totalCount, setTotalCount] = useState(0);  // 전체 데이터 개수
-  const [currentPage, setCurrentPage] = useState(1);  // 현재 페이지
-  const pageSize = 10;  // 한 페이지에 표시할 항목 수
-
-  // 페이지 변경 시 호출되는 함수
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  // API 호출을 위한 useEffect
-  useEffect(() => {
-    // 데이터를 가져오는 함수
-    const fetchData = async () => {
-      // try {
-        const response = await axios.get('http://localhost:8989/house', {
-          params: {
-            page: currentPage - 1,  // 서버에서는 0부터 시작하므로 1을 빼서 전달
-            size: pageSize,
-          },
-        });
-        setSubscriptions(response.data.houseInfoList);  // 데이터를 상태에 저장
-        setTotalCount(response.data.totalCount);
-      // } catch (err) {
-      //   setError('데이터를 가져오는 데 실패했습니다.');
-      // } finally {
-      //   setLoading(false);  // 로딩 끝
-      // }
-    };
-
-    fetchData();  // 컴포넌트가 마운트되면 데이터 가져오기
-  }, [currentPage]);
-
-  // // 로딩 중일 때 표시할 메시지
-  // if (loading) {
-  //   return <p>로딩 중...</p>;
-  // }
-
-  // // 에러가 발생한 경우 표시할 메시지
-  // if (error) {
-  //   return <p>{error}</p>;
-  // }
+function NewSubscriptionCards({ subscriptions, totalCount }) {
 
   const newSubscriptionList = subscriptions.map((subscription, index) =>
-    <NewSubscriptionCard  
+    <NewSubscriptionCard
       key={subscription.title + index}
       subscription={subscription}
       index={index}
-   />
+    />
   );
-
-  // 전체 페이지 수 계산
-  const totalPages = Math.ceil(totalCount / pageSize);  // 전체 페이지 수
-
-  // 10개 단위로 페이지 범위 계산
-  const rangeStart = Math.floor((currentPage - 1) / 10) * 10 + 1;  // 현재 페이지를 기준으로 시작 페이지
-  const rangeEnd = Math.min(rangeStart + 9, totalPages);  // 시작 페이지 + 9 (최대 10개까지 표시)
-
-  // 페이지 아이템 생성
-  const paginationItems = [];
-  for (let i = rangeStart; i <= rangeEnd; i++) {
-    paginationItems.push(
-      <Pagination.Item
-        key={i}
-        active={i === currentPage}
-        onClick={() => handlePageChange(i)}
-      >
-        {i}
-      </Pagination.Item>
-    );
-  }
 
   return (
     <>
@@ -139,7 +73,43 @@ function NewSubscriptionCards() {
 
         {newSubscriptionList}
       </Stack>
+    </>
+  );
+}
 
+{/* Pagination */ }
+function AnnouncementPagination({ onPageChanged, totalCount, pageSize }) {
+  const [currentPage, setCurrentPage] = useState(1);  // 현재 페이지
+
+  // 전체 페이지 수 계산
+  const totalPages = Math.ceil(totalCount / pageSize);  // 전체 페이지 수
+
+  // 10개 단위로 페이지 범위 계산
+  const rangeStart = Math.floor((currentPage - 1) / 10) * 10 + 1;  // 현재 페이지를 기준으로 시작 페이지
+  const rangeEnd = Math.min(rangeStart + 9, totalPages);  // 시작 페이지 + 9 (최대 10개까지 표시)
+
+  // 페이지 변경 시 호출되는 함수
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    onPageChanged(pageNumber);
+  };
+
+  // 페이지 아이템 생성
+  const paginationItems = [];
+  for (let i = rangeStart; i <= rangeEnd; i++) {
+    paginationItems.push(
+      <Pagination.Item
+        key={i}
+        active={i === currentPage}
+        onClick={() => handlePageChange(i)}
+      >
+        {i}
+      </Pagination.Item>
+    );
+  }
+
+  return (
+    <>
       {/* Pagination */}
       <div className="d-flex justify-content-center mt-3">
         <Pagination className="custom-pagination">
@@ -167,41 +137,41 @@ function NewSubscriptionCards() {
 }
 
 // filters를 쿼리 파라미터로 변환하는 함수
-function convertFiltersToQuery(filters) {
-  const params = new URLSearchParams();
+function convertFiltersToQuery(selectedFilter) {
+  let param = {};
 
-  filters.forEach((filter) => {
-    filter.subcategories.forEach((sub) => {
-      sub.values.forEach((value) => {
-        // 필터의 카테고리, 서브카테고리 이름, 값 을 쿼리 파라미터로 추가
-        params.append(`${filter.category}[${sub.category}]`, value.value);
+  selectedFilter.map((filter) => {
+
+    const subcategories = filter.subcategories;
+
+    subcategories.map((sub) => {
+      sub.values.map((value) => {
+        if (filter.category === '희망지역') {
+          param['regions'] = [
+            ...(param['regions'] || []),
+            value.submitData ? value.submitData : value.value
+          ];
+        } else if (sub.category === '공급금액') {
+          param[conditionSubCategory[sub.category]] = [
+            ...(param[conditionSubCategory[sub.category]] || []),
+            ...value.submitData.slice(0, 2)
+          ];
+        } else {
+          param[conditionSubCategory[sub.category]] = [
+            ...(param[conditionSubCategory[sub.category]] || []),
+            value.submitData
+          ];
+        }
       });
     });
   });
 
-  return params.toString();  // 최종 쿼리 문자열 반환
-}
-
-// 필터 버튼 클릭 시 처리하는 함수
-function handleFilterButtonClick({selectedFilter}) {
-
-  // filters를 쿼리 파라미터로 변환
-  const queryString = convertFiltersToQuery(selectedFilter);
-
-  // axios로 GET 요청 보내기
-  axios.get(`http://localhost:8989/house?${queryString}`)
-    .then(response => {
-      // 서버에서 받은 데이터를 처리 (예: 공고 목록 갱신)
-      console.log(response.data);
-    })
-    .catch(error => {
-      // 에러 처리
-      console.error("API 요청 실패:", error);
-    });
+  return param;
 }
 
 /* 선택된 태그 목록*/
-function Filters({ selectedFilter, handleClose }) {
+function Filters({ selectedFilter, handleClose, handleFilterButtonClick }) {
+
   const filters = selectedFilter.map((filter) => {
     const subcategories = filter.subcategories;
 
@@ -227,10 +197,9 @@ function Filters({ selectedFilter, handleClose }) {
             </Stack>
           </Col>
         </Row>
-        </React.Fragment>
+      </React.Fragment>
     );
   });
-
 
   return (
     <>
@@ -238,7 +207,7 @@ function Filters({ selectedFilter, handleClose }) {
         <Container>
           {filters}
         </Container>
-        <Button variant='dark' style={{ whiteSpace: 'nowrap' }} onClick={() => handleFilterButtonClick({selectedFilter: filters})}>
+        <Button variant='dark' style={{ whiteSpace: 'nowrap' }} onClick={() => handleFilterButtonClick({ selectedFilter: selectedFilter })}>
           0,000 건의 공고 보기
         </Button>
       </Stack>
@@ -271,14 +240,14 @@ function Conditions({ onClickedFilter }) {
       </p>
 
       <Nav justify variant="tabs" defaultActiveKey="WishRegion" onSelect={handleSelect} style={{ paddingRight: 0 }}>
-        <Nav.Item>
-          <Nav.Link eventKey="WishRegion">희망지역</Nav.Link>
+        <Nav.Item style={{ color: 'gray' }}>
+          <Nav.Link className='condition-nav' eventKey="WishRegion">희망지역</Nav.Link>
         </Nav.Item>
         <Nav.Item>
-          <Nav.Link eventKey="HomeInfo">주택정보</Nav.Link>
+          <Nav.Link className='condition-nav' eventKey="HomeInfo">주택정보</Nav.Link>
         </Nav.Item>
         <Nav.Item>
-          <Nav.Link eventKey="ApplicationPeriod">모집기간</Nav.Link>
+          <Nav.Link className='condition-nav' eventKey="ApplicationPeriod">모집정보</Nav.Link>
         </Nav.Item>
       </Nav>
       {selectedCondition}
@@ -299,7 +268,9 @@ function SubcategorySection({ subcategoryIndex, category, values, handleClick })
 
             {values.map((item, index) => (
               <tr key={item + index} onClick={handleClick}>
-                <td data-subcategory-index={subcategoryIndex} data-index={index} data-value={item.value}>{item.value}</td>
+                <td data-subcategory-index={subcategoryIndex}
+                  data-subcategory={category}
+                  data-index={index} data-value={item.value}>{item.value}</td>
               </tr>
             ))}
           </tbody>
@@ -326,9 +297,17 @@ function WishRegion({ onClickedFilter }) {
 
   function handleClick(e) {
     const selectedValue = e.target.getAttribute('data-value');
+    const index = e.target.getAttribute('data-index');
     const subcategoryName = sidoData[sidoIndex].category;
-    onClickedFilter({ category: categoryName, subcategoryName: subcategoryName, value: selectedValue });
+
+    let submitData = null;
+    if (index >= 0) {
+      submitData = sidoData[sidoIndex].category + ' ' + gunguData[index].value;
+    }
+
+    onClickedFilter({ category: categoryName, subcategoryName: subcategoryName, value: selectedValue, submitData: submitData });
   }
+
 
   const sidoList = () => {
     return sidoData.map((item, index) => (
@@ -373,7 +352,7 @@ function WishRegion({ onClickedFilter }) {
             <Table hover borderless>
               <tbody>
                 <tr key={'전체0'} onClick={handleClick}>
-                  <td data-index={0} data-value={sidoData[sidoIndex].category}>{'전체'}</td>
+                  <td data-index={-1} data-value={sidoData[sidoIndex].category + ' 전체'}>{'전체'}</td>
                 </tr>
                 {gunguList()}
               </tbody>
@@ -395,16 +374,17 @@ function HomeInfo({ onClickedFilter }) {
     const selectedValue = e.target.getAttribute('data-value');
     const subcategoryIndex = e.target.getAttribute('data-subcategory-index');
     const subcategoryName = subcategories[subcategoryIndex].category;
-    onClickedFilter({ category: categoryName, subcategoryName: subcategoryName, value: selectedValue });
+    const submitData = selectedValue.split('(')[0];
+    onClickedFilter({ category: categoryName, subcategoryName: subcategoryName, value: selectedValue, submitData: submitData });
   }
 
   const subCategorieSections = () => {
     return subcategories.map((subCategory, index) =>
       <SubcategorySection key={subCategory + index}
-        subcategoryIndex = {index}
+        subcategoryIndex={index}
         category={subCategory.category}
-           values={subCategory.values}
-          handleClick={handleClick} />
+        values={subCategory.values}
+        handleClick={handleClick} />
     );
   }
 
@@ -412,12 +392,158 @@ function HomeInfo({ onClickedFilter }) {
     <>
       <Stack direction='horizontal' style={{ width: '100%', padding: '0' }} gap={1}>
         {subCategorieSections()}
+
+        {/* 공급금액 */}
+        <SupplyPirce categoryName={categoryName} onClickedFilter={onClickedFilter} />
+
       </Stack>
     </>
   );
 }
 
-/* 모집기간 */
+/* 공급금액 */
+// 단위 : 만
+function SupplyPirce({ categoryName, onClickedFilter }) {
+
+  const subCategoryName = '공급금액';
+  const [values, setValues] = useState([0, 150000]); // 초기 값 [최소, 최대]
+  const [minPrice, setMinPrice] = useState('0만');
+  const [maxPrice, setMaxPrice] = useState('15억');
+
+  function handleRangeChanged(newValues) {
+    setValues(newValues);
+
+    const newMinPrice = formatCurrency(newValues[0]);
+    const newMaxPrice = formatCurrency(newValues[1]);
+    setMinPrice(newMinPrice);
+    setMaxPrice(newMaxPrice);
+
+    const newVlaue = newMinPrice + " ~ " + newMaxPrice;
+    onClickedFilter({ category: categoryName, subcategoryName: subCategoryName, value: newVlaue, submitData: newValues });
+  }
+
+  return (
+    <>
+      <div className='border-div'>
+        <p className='filter-category'>
+          {subCategoryName}
+        </p>
+        <hr className='p-text' />
+        <div className="scrollable-table">
+          <Table hover borderless>
+            <tbody>
+              <tr>
+                <td data-min={values[0]} data-max={values[1]}>
+                  <TwoHandleRange onChangeValue={handleRangeChanged} />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  {minPrice} ~ {maxPrice}
+                </td>
+              </tr>
+            </tbody>
+          </Table>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function TwoHandleRange({ onChangeValue }) {
+
+  const [values, setValues] = useState([0, 150000]); // 초기 값 [최소, 최대]
+
+  function onChangeVal(newValues) {
+    setValues(newValues);
+
+    if (onChangeValue) {
+      onChangeValue(newValues);
+    }
+  }
+
+  return (
+    <div style={{ margin: "2rem", width: "300px" }}>
+      <Range
+        step={1000} // 핸들 이동 간격
+        min={0} // 최소값
+        max={150000} // 최대값
+        values={values}
+        onChange={onChangeVal}
+        renderTrack={({ props, children }) => (
+          <div
+            {...props}
+            style={{
+              height: "6px",
+              width: "100%",
+              background: "lightgray",
+              borderRadius: "3px",
+              position: "relative",
+            }}
+          >
+            {/* 선택된 구간 강조 */}
+            <div
+              style={{
+                position: "absolute",
+                height: "6px",
+                background: "blue",
+                borderRadius: "3px",
+                left: `${((values[0] - props.min) / (props.max - props.min)) * 100}%`,
+                right: `${100 - ((values[1] - props.min) / (props.max - props.min)) * 100}%`,
+              }}
+            />
+            {children}
+          </div>
+        )}
+        renderThumb={({ props, index }) => (
+          <div
+            {...props}
+            style={{
+              height: "30px", // 핸들러 크기 증가
+              width: "60px",
+              background: "black", // 핸들 색상 강조
+              borderRadius: "15px",
+              outline: "none",
+              border: "2px solid white", // 테두리 추가
+              boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.5)", // 그림자 효과
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontSize: "14px",
+              fontWeight: "bold",
+            }}
+          >
+            {index === 0 ? "최저" : "최고"}
+          </div>
+        )}
+      />
+    </div>
+  );
+}
+
+function formatCurrency(amount) {
+  if (amount === 0) return "0만";
+
+  let result = "";
+
+  const units = ["만", "억", "조"];
+  let unitIndex = 0;
+
+  while (amount > 0) {
+    const part = amount % 10000; // 10,000 단위로 나눔
+    if (part > 0) {
+      const formattedPart = new Intl.NumberFormat('ko-KR').format(part);
+      result = `${formattedPart}${units[unitIndex]} ${result}`.trim();
+    }
+    amount = Math.floor(amount / 10000); // 다음 단위로 넘어감
+    unitIndex++;
+  }
+
+  return result.trim();
+}
+
+/* 모집정보 */
 function ApplicationPeriod({ onClickedFilter }) {
 
   const categoryName = conditions.applicationPeriod.category;
@@ -427,16 +553,16 @@ function ApplicationPeriod({ onClickedFilter }) {
     const selectedValue = e.target.getAttribute('data-value');
     const subcategoryIndex = e.target.getAttribute('data-subcategory-index');
     const subcategoryName = subcategories[subcategoryIndex].category;
-    onClickedFilter({ category: categoryName, subcategoryId: subcategoryName, value: selectedValue });
+    onClickedFilter({ category: categoryName, subcategoryName: subcategoryName, value: selectedValue, submitData: selectedValue });
   }
 
   const subCategorieSections = () => {
     return subcategories.map((subCategory, index) =>
       <SubcategorySection key={subCategory + index}
-        subcategoryIndex = {index}
+        subcategoryIndex={index}
         category={subCategory.category}
-           values={subCategory.values}
-          handleClick={handleClick} />
+        values={subCategory.values}
+        handleClick={handleClick} />
     );
   }
 
@@ -444,67 +570,6 @@ function ApplicationPeriod({ onClickedFilter }) {
     <>
       <Stack direction='horizontal' style={{ width: '100%', padding: '0' }} gap={1}>
         {subCategorieSections()}
-
-        <div className='border-div'>
-          <p className='filter-category'>
-            상세조회
-          </p>
-          <hr className='p-text' />
-          <div className="scrollable-table">
-            <Table hover borderless>
-              <tbody>
-                <tr>
-                  <td>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="warning" className='dropdown-transparent' >
-                        공급접수시작일
-                      </Dropdown.Toggle>
-
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">일반공급접수시작일</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">특별공급접수시작일</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                  <td>
-                    2024-01-01
-                  </td>
-                  <td>
-                    <Button className='btn-transparent'>
-                      <i className='bi bi-calendar' />
-                    </Button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <Dropdown>
-                      <Dropdown.Toggle variant="warning" className='dropdown-transparent' >
-                        공급접수종료일
-                      </Dropdown.Toggle>
-
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">일반공급접수종료일</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">특별공급접수종료일</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                  <td>
-                    2024-01-01
-                  </td>
-                  <td>
-                    <Button className='btn-transparent'>
-                      <i className='bi bi-calendar' />
-                    </Button>
-                  </td>
-                </tr>
-
-              </tbody>
-
-            </Table>
-          </div>
-        </div>
-
-
       </Stack>
     </>
   );
@@ -512,15 +577,42 @@ function ApplicationPeriod({ onClickedFilter }) {
 
 export default function MainContent() {
   const [selectedFilter, setSelectedFilter] = useState([]);
+  const [loading, setLoading] = useState(true);  // 로딩 상태
 
-  // 카테고리('희망지역') > 서브카테고리('시/도') > 값 ('군/구')
-  // 카테고리('주택정보') > 서브카테고리('주택분류') > 값 ('민영주택')
+  const [subscriptions, setSubscriptions] = useState([]);  // 공고 리스트 상태
+  const [totalCount, setTotalCount] = useState(0);  // 전체 데이터 개수
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const pageSize = 10;  // 한 페이지에 표시할 항목 수
+
+  function onPageChanged(page) {
+    setCurrentPage(page);
+  }
+
+  // API 호출을 위한 useEffect
+  useEffect(() => {
+    // 데이터를 가져오는 함수
+    const fetchData = async () => {
+      // try {
+      const response = await axios.get('http://localhost:8989/house', {
+        params: {
+          page: currentPage - 1,  // 서버에서는 0부터 시작하므로 1을 빼서 전달
+          size: pageSize,
+        },
+      });
+      setSubscriptions(response.data.houseInfoList);  // 데이터를 상태에 저장
+      setTotalCount(response.data.totalCount);
+    };
+
+    fetchData();  // 컴포넌트가 마운트되면 데이터 가져오기
+  }, [currentPage]);
+  
+
   // {category: '주택정보', subcategories: [{category: '주택분류', values: [{value: '민영주택'}]}]}
 
   /* 필터 적용시 */
-  function onClickedFilter({ category, subcategoryName, value }) {
+  function onClickedFilter({ category, subcategoryName, value, submitData }) {
 
-    
     setSelectedFilter((prevFilters) => {
       let handledUpdate = false;
 
@@ -529,6 +621,7 @@ export default function MainContent() {
           return filter;
         }
 
+        // 중복x => 값 추가
         let updatedSubcategories = filter.subcategories.map((sub) => {
           if (sub.category !== subcategoryName) {
             return sub;
@@ -543,16 +636,34 @@ export default function MainContent() {
             return sub;
           }
 
+          // 공급금액 변경되면 삭제 후 추가
+          // '전체'로 끝나는 값을 추가하려는 경우 해당 subcategory 내의 모든 아이템 삭제
+          // '전체' 값이 이미 존재하는 경우, 해당 subcategory 내의 모든 아이템 삭제
+          let clearSubCategory = false;
+          if (category === '희망지역' && subcategoryName === sub.category) {
+            if (value.endsWith('전체') || sub.values.some((v) => v.value.endsWith('전체'))) {
+              clearSubCategory = true;
+            }
+          } else if (subcategoryName === '공급금액') {
+            clearSubCategory = true;
+          }
+
+          if (clearSubCategory) {
+            return {
+              ...sub, values: [{ value: value, submitData: submitData }]  // 모든 값을 삭제
+            };
+          }
+
           // 서브카테고리에 새로운 값을 추가한 객체 반환
           return {
             ...sub,
-            values: [...sub.values, { value: value }]
+            values: [...sub.values, { value: value, submitData: submitData }],
           };
         });
 
         // 존재하는 카테고리에 서브카테고리와 값 추가
         if (!handledUpdate) {
-          updatedSubcategories.push({ category: subcategoryName, values: [{ value }] });
+          updatedSubcategories.push({ category: subcategoryName, values: [{ value, submitData }] });
           handledUpdate = true;
         }
 
@@ -561,7 +672,7 @@ export default function MainContent() {
 
       // 새로운 카테고리에 새 값 추가
       if (!handledUpdate) {
-        return [...prevFilters, { category: category, subcategories: [{ category: subcategoryName, values: [{ value }] }] }];
+        return [...prevFilters, { category: category, subcategories: [{ category: subcategoryName, values: [{ value, submitData }] }] }];
       }
 
       return updatedFilters;
@@ -578,11 +689,39 @@ export default function MainContent() {
             ...sub, values:
               sub.values.filter(value => value.value !== filterName),
           })),
-        }))
+      }))
         .filter((filter) =>
           filter.subcategories.some((sub) => sub.values.length > 0)
         )
     );
+  }
+
+  const fetchData = (filters) => {
+    setLoading(true);
+    setCurrentPage(1);
+    axios
+      .get("http://localhost:8989/house", {
+        params: {
+          ...filters,
+          page: 1,
+          size: pageSize,
+        },
+      })
+      .then((response) => {
+        setSubscriptions(response.data.houseInfoList); // 게시글 목록
+        setTotalCount(response.data.totalCount); // 총 게시글 수
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("데이터 요청 실패:", error);
+        setLoading(false);
+      });
+  }
+
+  function handleFilterButtonClick({selectedFilter}) {
+    const filters = convertFiltersToQuery(selectedFilter);
+    const queryParams = convertFiltersToUrl(filters);
+    fetchData(queryParams);
   }
 
   return (
@@ -592,12 +731,29 @@ export default function MainContent() {
           <Conditions onClickedFilter={onClickedFilter} />
         </Row>
         <Row className="mb-5">
-          <Filters selectedFilter={selectedFilter} handleClose={handleClose} />
+          <Filters pageSize={pageSize} selectedFilter={selectedFilter} handleClose={handleClose} handleFilterButtonClick={handleFilterButtonClick} />
+        </Row>
+        {loading && <p>로딩중</p>}
+        <Row>
+          <NewSubscriptionCards subscriptions={subscriptions} totalCount={totalCount} />
         </Row>
         <Row>
-          <NewSubscriptionCards />
+          <AnnouncementPagination onPageChanged={onPageChanged} totalCount={totalCount} pageSize={pageSize} />
         </Row>
       </Container>
     </>
   );
+}
+
+function convertFiltersToUrl(filters) {
+  let queryParams = {};
+
+  Object.keys(filters).forEach(key => {
+    filters[key].forEach((value, index) => {
+      // 배열 항목을 쿼리 파라미터로 변환할 때, 두 번째 인코딩을 방지
+      queryParams[`${key}%5B${index}%5D`] = value; // 이 부분에서 두 번째 인코딩을 피합니다.
+    });
+  });
+
+  return queryParams;
 }

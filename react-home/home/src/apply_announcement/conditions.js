@@ -327,12 +327,14 @@ export const conditions = {
                 {value: '40평대(132 ~ 165m²)'},
                 {value: '50평 이상(1165m² ~)'},
             ]},
-            {category: '공급금액', values: [
-                {value: '1개월 이상'},
-                {value: '6개월 이상'},
-                {value: '1년 이상'},
-                {value: '2년 이상'},
-                {value: '3년 이상'},
+        ]
+    },
+    applicationPeriod : {
+        category: '모집정보', subcategories: [
+            {category: '접수상태', values: [
+                {value: '접수전'},
+                {value: '접수중'},
+                {value: '접수마감'},
             ]},
             {category: '특별공급', values: [
                 {value: '다자녀가구'},
@@ -344,16 +346,15 @@ export const conditions = {
                 {value: '기관추천'},
                 {value: '이전기관'},
                 {value: '기타'},
-            ]},
-        ]
-    },
-    applicationPeriod : {
-        category: '모집기간', subcategories: [
-            {category: '접수상태', values: [
-                {value: '접수전'},
-                {value: '접수중'},
-                {value: '접수마감'},
-            ]},
+            ]}
         ]
     }
 };
+
+export const conditionSubCategory = {
+    주택분류: 'houseTypes',
+    면적: 'area',
+    공급금액: 'prices',
+    접수상태: 'statuses',
+    특별공급: 'supplies',
+}
