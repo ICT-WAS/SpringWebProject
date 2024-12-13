@@ -1,4 +1,4 @@
-package com.ict.home.login.kakao.dto;
+package com.ict.home.login.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

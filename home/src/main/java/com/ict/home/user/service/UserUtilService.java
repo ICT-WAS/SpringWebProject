@@ -1,6 +1,8 @@
-package com.ict.home.user;
+package com.ict.home.user.service;
 
 import com.ict.home.exception.BaseException;
+import com.ict.home.user.User;
+import com.ict.home.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

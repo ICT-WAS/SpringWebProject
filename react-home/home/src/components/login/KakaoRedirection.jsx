@@ -24,10 +24,10 @@ const KakaoRedirection = () => {
         if (response.data.isSuccess) {
           const { accessToken } = response.data.result;
           localStorage.setItem("accessToken", accessToken);
-          // setIsLogin(true);
+          setIsLogin(true);
 
           //로그인 성공 시 리다이렉트 - 로그인 성공해도 해당 페이지에 머물러야 할 수 있음, 차후 조건 처리 필요함!
-          // navigate("/");
+          navigate("/");
         } else {
           // setLoginErrorTitle("로그인 실패");
           // setLoginError(response.data.message);

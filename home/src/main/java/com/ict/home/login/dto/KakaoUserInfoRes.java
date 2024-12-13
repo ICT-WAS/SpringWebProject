@@ -1,4 +1,4 @@
-package com.ict.home.login.kakao.dto;
+package com.ict.home.login.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,6 +12,11 @@ import java.util.HashMap;
 @NoArgsConstructor //역직렬화를 위한 기본 생성자
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class KakaoUserInfoRes {
+
+    /**
+     * 유저 정보: https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
+     */
+
     //회원 번호
     @JsonProperty("id")
     public Long id;

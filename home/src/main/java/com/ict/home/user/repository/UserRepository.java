@@ -1,5 +1,6 @@
-package com.ict.home.user;
+package com.ict.home.user.repository;
 
+import com.ict.home.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
