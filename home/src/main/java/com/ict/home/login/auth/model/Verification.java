@@ -1,6 +1,6 @@
-package com.ict.home.login.auth.entity;
+package com.ict.home.login.auth.model;
 
-import com.ict.home.login.auth.VerifyEnum.VerificationType;
+import com.ict.home.login.auth.enums.VerificationType;
 import com.ict.home.util.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,6 @@
 package com.ict.home.login.auth.dto;
 
-import com.ict.home.login.auth.VerifyEnum.VerificationType;
+import com.ict.home.login.auth.enums.VerificationType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
