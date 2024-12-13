@@ -1,7 +1,7 @@
 import { Container, Stack } from "react-bootstrap";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
-import Condition01Content from "./Condition01Content";
+import Condition02Content from "./Condition02Content";
 
 export default function Condition02() {
     return (
@@ -9,7 +9,7 @@ export default function Condition02() {
         <Container className="p-5" fluid="md">
             <Stack direction="vertical" gap={5}>
                 <Header />
-                <Condition01Content />
+                <Condition02Content />
                 <Footer />
             </Stack>
         </Container>

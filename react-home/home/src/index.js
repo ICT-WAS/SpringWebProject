@@ -21,6 +21,7 @@ import PrivateRoute from "./components/routes/PrivateRoute";
 import LoginRoute from "./components/routes/LoginRoute";
 import KakaoRedirection from "./components/login/KakaoRedirection";
 import NaverRedirection from "./components/login/NaverRedirection";
+import CommunityPostList from "./community/CommunityPostList";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -42,6 +43,9 @@ root.render(
         <Route path="/condition-1" element={<Condition01 />} />
         <Route path="/condition-2" element={<Condition02 />} />
         <Route path="/condition-3" element={<Condition03 />} />
+        
+        {/* 커뮤니티 */}
+        <Route exact path="/community" element={<CommunityPostList/>} />
 
         {/* 소셜 로그인 리다이렉트 경로 */}
         <Route exact path="/kakao/callback" element={<KakaoRedirection />} />

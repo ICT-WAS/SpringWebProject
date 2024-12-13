@@ -57,6 +57,10 @@ function NavBar() {
   function handleConditionsClick() {
     navigate("/conditions");
   }
+
+  function handlePostListClick(){
+    navigate("/community");
+  }
                 
   return (
     <>
@@ -73,14 +77,13 @@ function NavBar() {
           </Col>
 
           <Col md="auto">
-            <p className="nav-bar-links">
-              <a
-                href="#"
+          <Button variant="link" onClick={handlePostListClick}
                 className="link-body-emphasis link-underline link-underline-opacity-0"
               >
+                <p className="nav-bar-links">
                 커뮤니티
-              </a>
-            </p>
+                </p>
+              </Button>
           </Col>
 
           <Col md="auto">
