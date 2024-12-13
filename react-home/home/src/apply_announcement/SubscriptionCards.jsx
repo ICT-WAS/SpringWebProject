@@ -7,7 +7,7 @@ export default function SubscriptionCards({ subscriptions, totalCount }) {
 
   const newSubscriptionList = subscriptions.map((subscription, index) =>
     <SubscriptionCard
-      key={subscription.title + index}
+      key={index}
       subscription={subscription}
       index={index}
     />

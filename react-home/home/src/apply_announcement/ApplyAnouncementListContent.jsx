@@ -66,6 +66,27 @@ export default function MainContent() {
     
   }
 
+  // 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:8989/house', {
+          params: {
+            page: 0,  // 서버에서는 0부터 시작하므로 1을 빼서 전달
+            size: pageSize,
+          },
+        });
+        setSubscriptions(response.data.houseInfoList);  // 데이터를 상태에 저장
+        setTotalCount(response.data.totalCount);
+      } catch (err) {
+         
+      } finally {
+         setLoading(false);  // 로딩 끝
+      }
+    };
+    fetchData();  // 컴포넌트가 마운트되면 데이터 가져오기
+  }, []);
+
   // {category: '주택정보', subcategories: [{category: '주택분류', values: [{value: '민영주택'}]}]}
 
   /* 필터 적용시 */
