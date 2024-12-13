@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Pagination } from 'react-bootstrap';
 
 
- {/* Pagination */ }
+ /* Pagination */
 export default function PaginationItem({ onPageChanged, totalCount, pageSize }) {
   const [currentPage, setCurrentPage] = useState(1);  // 현재 페이지
 

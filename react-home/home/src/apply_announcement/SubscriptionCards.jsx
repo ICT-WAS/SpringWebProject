@@ -3,10 +3,10 @@ import NotificationButton from "./NotificationButton";
 
 
 /* 공고 리스트 */
-export default function NewSubscriptionCards({ subscriptions, totalCount }) {
+export default function SubscriptionCards({ subscriptions, totalCount }) {
 
   const newSubscriptionList = subscriptions.map((subscription, index) =>
-    <NewSubscriptionCard
+    <SubscriptionCard
       key={subscription.title + index}
       subscription={subscription}
       index={index}
@@ -37,7 +37,7 @@ export default function NewSubscriptionCards({ subscriptions, totalCount }) {
   );
 }
 
-function NewSubscriptionCard({ subscription, index }) {
+function SubscriptionCard({ subscription, index }) {
   return (
     <>
       <Container>

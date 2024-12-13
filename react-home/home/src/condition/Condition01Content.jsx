@@ -208,18 +208,16 @@ export default function Condition01Content() {
     );
 }
 
-{/* 거주지역 - 현재 사는 지역 */ }
+/* 거주지역 - 현재 사는 지역 */
 function MoveInDate({ onChangedInputValue, changeVisibility }) {
     
     const [sidoSelectedName, setSidoSelectedName] = useState('시/도');
     const [gunguSelectedName, setGunguelectedName] = useState('군/구');
 
     const sidoData = conditionInfo.wishRegion.subcategories;
-    const [sidoIndex, setSidoIndex] = useState(0);
     const [gunguData, setGunguData] = useState([{value: '군/구'}]);
 
     function handleChangedSidoDropdown({index}) {
-        setSidoIndex(index);
         setGunguData(sidoData[index].values);
         setSidoSelectedName(sidoData[index].category);
         
@@ -232,7 +230,7 @@ function MoveInDate({ onChangedInputValue, changeVisibility }) {
         const sidoCode = sidoData[index].code;
 
         // 서울, 인천, 경기?
-        const trueCondition = sidoCode === 100 || sidoCode === 400 || sidoCode == 410;
+        const trueCondition = sidoCode === 100 || sidoCode === 400 || sidoCode === 410;
         changeVisibility({ condition: trueCondition, name: 'metropolitanAreaDate'});
 
         // 경기/충북/충남/전북/전남/경북/경남/강원
@@ -296,7 +294,7 @@ function MoveInDate({ onChangedInputValue, changeVisibility }) {
     );
 }
 
-{/* 거주지역 - 특정 지역()에 거주하기 시작한 날 */ }
+/* 거주지역 - 특정 지역()에 거주하기 시작한 날 */
 function MoveInFollwUpQuestion1({ siDo, onChangedInputValue, visibility }) {
 
     if (visibility === false) {
@@ -309,7 +307,7 @@ function MoveInFollwUpQuestion1({ siDo, onChangedInputValue, visibility }) {
     );
 }
 
-{/* 거주지역 - 서울, 경기, 인천에 거주하기 시작한 날 */ }
+/* 거주지역 - 서울, 경기, 인천에 거주하기 시작한 날 */
 function MoveInFollwUpQuestion2({ onChangedInputValue, visibility }) {
 
     if (visibility === false) {
@@ -322,7 +320,7 @@ function MoveInFollwUpQuestion2({ onChangedInputValue, visibility }) {
     );
 }
 
-{/* 결혼 여부 - 혼인신고일 */ }
+/* 결혼 여부 - 혼인신고일 */
 function MarriedFollwUpQuestion({ onChangedInputValue, visibility }) {
 
     if (!visibility) {
@@ -335,7 +333,7 @@ function MarriedFollwUpQuestion({ onChangedInputValue, visibility }) {
     );
 }
 
-{/* 청약 통장 - 청약 통장 정보 */ }
+/* 청약 통장 - 청약 통장 정보 */
 function AccountInfoQuestion({ onChangedInputValue, visibility }) {
 
     if (!visibility) {
@@ -356,7 +354,7 @@ function AccountInfoQuestion({ onChangedInputValue, visibility }) {
     );
 }
 
-{/* 배우자 청약통장 - 가입일자 */ }
+/* 배우자 청약통장 - 가입일자 */
 function SpouseAccountInfoQuestion({ onChangedInputValue }) {
 
     return (

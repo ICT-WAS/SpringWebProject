@@ -42,17 +42,31 @@ public class HouseController {
                                           @RequestParam(defaultValue = "10") int size) {
         List<HouseInfo> houseInfoListByFilter = hs.getHouseInfoListByFilter(regions, houseTypes, area, prices, supplies, statuses, userId, orderBy);
 
+        System.out.println("regions = " + regions);
+        System.out.println("houseTypes = " + houseTypes);
+        System.out.println("area = " + area);
+        System.out.println("prices = " + prices);
+        System.out.println("supplies = " + supplies);
+        System.out.println("statuses = " + statuses);
+        System.out.println("userId = " + userId);
+        System.out.println("orderBy = " + orderBy);
+        System.out.println("page = " + page);
+        System.out.println("size = " + size);
+
+        if (houseInfoListByFilter.isEmpty() || houseInfoListByFilter.size() < 10) {
+            HashMap<String, Object> stringObjectHashMap = new HashMap<>();
+            stringObjectHashMap.put("totalCount", houseInfoListByFilter.size());
+            stringObjectHashMap.put("houseInfoList", houseInfoListByFilter);
+            return ResponseEntity.ok(stringObjectHashMap);
+        }
+
         int fromIndex = page * size;
         int toIndex = Math.min(fromIndex + size, houseInfoListByFilter.size());
         List<HouseInfo> paginatedList = houseInfoListByFilter.subList(fromIndex, toIndex);
 
-        return ResponseEntity.ok(new HashMap<String, Object>(){{
+        return ResponseEntity.ok(new HashMap<String, Object>() {{
             put("totalCount", houseInfoListByFilter.size());
             put("houseInfoList", paginatedList);
         }});
     }
-
-
-
-
 }
