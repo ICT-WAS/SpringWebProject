@@ -1,9 +1,10 @@
 import { Card, Col, Container, Dropdown, Row, Stack } from "react-bootstrap";
 import NotificationButton from "./NotificationButton";
+import Spinners from "../common/Spinners";
 
 
 /* 공고 리스트 */
-export default function SubscriptionCards({ subscriptions, totalCount }) {
+export default function SubscriptionCardsWithHeader({ subscriptions, totalCount, loading }) {
 
   const newSubscriptionList = subscriptions.map((subscription, index) =>
     <SubscriptionCard
@@ -31,11 +32,28 @@ export default function SubscriptionCards({ subscriptions, totalCount }) {
           </Dropdown.Menu>
         </Dropdown>
 
+        {loading && <Spinners />}
+
         {newSubscriptionList}
       </Stack>
     </>
   );
 }
+
+/* 공고 리스트 */
+export function SubscriptionCards({ subscriptions }) {
+
+  const newSubscriptionList = subscriptions.map((subscription, index) =>
+    <SubscriptionCard
+      key={index}
+      subscription={subscription}
+      index={index}
+    />
+  );
+
+  return (newSubscriptionList);
+}
+
 
 function SubscriptionCard({ subscription, index }) {
   return (

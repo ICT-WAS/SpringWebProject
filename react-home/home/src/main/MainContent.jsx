@@ -1,10 +1,19 @@
 import { Image, Stack } from 'react-bootstrap';
 import { Container, Row, Col } from 'react-bootstrap';
-import SubscriptionCards from '../apply_announcement/SubscriptionCards';
+import {SubscriptionCards} from '../apply_announcement/SubscriptionCards';
+import CommunityCard from '../community/CommunityCard';
 
 function CommunityCards() {
+
+  
   /* 최근 게시물 5개*/
-  const communityInfo = [ ];
+  const posts = [
+    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
+    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
+    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
+    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
+    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
+   ];
 
   return (
     <>
@@ -14,7 +23,14 @@ function CommunityCards() {
         </a>
       </p>
       <Stack direction='horizontal' gap={3}>
-        {/* {communityCardList} */}
+        {/* {communityCardList} */} 
+        {posts.map((post, index) => {
+          return (
+            <div key={index} >
+              <CommunityCard post={post} />
+            </div>
+          );
+        })}
       </Stack>
       
     </>
@@ -23,7 +39,13 @@ function CommunityCards() {
 
 function NewSubscriptionCards() {
   /* 최근 공고 5개*/
-  const subscriptions = [ ];
+  const subscriptions = [ 
+    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
+    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
+    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
+    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
+    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
+  ];
 
   return (
     <>

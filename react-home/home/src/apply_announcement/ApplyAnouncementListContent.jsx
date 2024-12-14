@@ -1,11 +1,12 @@
 import axios from 'axios';
-import { Container, Row } from 'react-bootstrap';
+import { Container, Dropdown, Row, Stack } from 'react-bootstrap';
 import React, { useState, useEffect, useRef } from 'react';
 import { conditionSubCategory } from './conditionInfo.js';
+import SubscriptionCardsWithHeader, { SubscriptionCards } from './SubscriptionCards.jsx'
 import PaginationItem from './PaginationItem';
-import SubscriptionCards from './SubscriptionCards';
 import Filters from './Filters';
 import Conditions from './Conditions.jsx';
+import Spinners from '../common/Spinners.jsx';
 
 // filters를 쿼리 파라미터로 변환하는 함수
 function convertFiltersToQuery(selectedFilter) {
@@ -63,28 +64,16 @@ export default function MainContent() {
 
   function onPageChanged(page) {
     setCurrentPage(page);
-    
+
+    const filters = convertFiltersToQuery(selectedFilter);
+    const queryParams = convertFiltersToUrl(filters);
+    fetchData(queryParams, page);
   }
 
-  // 
+  // 최초 렌더링링
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('http://localhost:8989/house', {
-          params: {
-            page: 0,  // 서버에서는 0부터 시작하므로 1을 빼서 전달
-            size: pageSize,
-          },
-        });
-        setSubscriptions(response.data.houseInfoList);  // 데이터를 상태에 저장
-        setTotalCount(response.data.totalCount);
-      } catch (err) {
-         
-      } finally {
-         setLoading(false);  // 로딩 끝
-      }
-    };
-    fetchData();  // 컴포넌트가 마운트되면 데이터 가져오기
+
+    fetchData(null, currentPage);
   }, []);
 
   // {category: '주택정보', subcategories: [{category: '주택분류', values: [{value: '민영주택'}]}]}
@@ -175,13 +164,13 @@ export default function MainContent() {
     );
   }
 
-  const fetchData = (filters) => {
+  const fetchData = (filters, page) => {
     setLoading(true);
     axios
       .get("http://localhost:8989/house", {
         params: {
           ...filters,
-          page: 1,
+          page: page - 1,
           size: pageSize,
         },
       })
@@ -196,12 +185,7 @@ export default function MainContent() {
       });
   }
 
-  function handleFilterButtonClick({ selectedFilter }) {
-    const filters = convertFiltersToQuery(selectedFilter);
-    const queryParams = convertFiltersToUrl(filters);
-    fetchData(queryParams);
-
-    
+  function handleFilterButtonClick() {
     resetPage();
   }
 
@@ -220,9 +204,9 @@ export default function MainContent() {
         <Row className="mb-5">
           <Filters pageSize={pageSize} selectedFilter={selectedFilter} handleClose={handleClose} handleFilterButtonClick={handleFilterButtonClick} />
         </Row>
-        {loading && <p>로딩중</p>}
+        
         <Row>
-          <SubscriptionCards subscriptions={subscriptions} totalCount={totalCount} />
+            <SubscriptionCardsWithHeader subscriptions={subscriptions} totalCount={totalCount} loading={loading} />
         </Row>
         <Row>
           <PaginationItem ref={paginationRef} onPageChanged={onPageChanged} totalCount={totalCount} pageSize={pageSize} />
