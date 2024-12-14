@@ -1,9 +1,41 @@
-import { Button, Col, Container, Row, Stack } from "react-bootstrap";
+import axios from 'axios';
+import { Button, Col, Container, Placeholder, Row, Spinner, Stack } from "react-bootstrap";
 import FilteredTag from "./FilteredTag";
-import React from "react";
+import React, { useState, useEffect } from 'react';
+import { convertFiltersToQuery, convertFiltersToUrl } from '../common/utils';
 
 /* 선택된 태그 목록*/
 export default function Filters({ selectedFilter, handleClose, handleFilterButtonClick }) {
+
+    const [currentFilterTotalCount, setCurrentFilterTotalCount] = useState(0);  // 필터를 누를 때마다 바뀌는 전체 데이터 개수
+    const [currentFilterTotalloading, setCurrentFilterTotalLoading] = useState(false);  // 로딩 상태
+
+    const getTotalData = () => {
+        const filters = convertFiltersToQuery(selectedFilter);
+        const queryParams = convertFiltersToUrl(filters);
+        setCurrentFilterTotalLoading(true);
+        axios
+            .get("http://localhost:8989/house", {
+                params: {
+                    ...queryParams,
+                    page: 1,
+                    size: 1,
+                },
+            })
+            .then((response) => {
+                setCurrentFilterTotalCount(response.data.totalCount); // 총 게시글 수
+                setCurrentFilterTotalLoading(false);
+            })
+            .catch((error) => {
+                console.error("데이터 요청 실패:", error);
+                setCurrentFilterTotalLoading(false);
+            });
+    }
+
+    useEffect(() => {
+        getTotalData();
+    }, [selectedFilter]);
+
 
     const filters = selectedFilter.map((filter) => {
         const subcategories = filter.subcategories;
@@ -41,7 +73,17 @@ export default function Filters({ selectedFilter, handleClose, handleFilterButto
                     {filters}
                 </Container>
                 <Button variant='dark' style={{ whiteSpace: 'nowrap' }} onClick={handleFilterButtonClick}>
-                    0,000 건의 공고 보기
+                    {currentFilterTotalloading
+                        ? <Spinner
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                        />
+                        : <span>{currentFilterTotalCount}</span>
+                    }
+                    건의 공고 보기
                 </Button>
             </Stack>
         </>

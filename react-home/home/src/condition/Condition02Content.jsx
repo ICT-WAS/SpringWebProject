@@ -1,11 +1,9 @@
-import { Button, Container, Dropdown, Form, Row, Stack, Table } from "react-bootstrap";
+import { Button, Dropdown, Form, Stack, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { FamilyInputNumberSubItem, formatDateToCustomFormat, InputNumberItem, InputNumberLoopSubItemWithFollowQuestions, InputNumberSubItem } from "./InputNumberItem";
-import { FamilyRadioButtonSubItem, RadioButtonItem, RadioButtonSubItem } from "./RadioButtonItem";
-import { CheckButtonSubItem, CheckButtonSubItemWithFollowQuestions } from "./CheckButtonItem";
+import { formatDateToCustomFormat } from "./InputNumberItem";
 import { placeholderText } from "./placeholderText";
-import { familyList, FamilyMember, familyMemberNames, getEnumKeyFromValue } from "./family.ts";
+import { FamilyMember, familyMemberNames } from "./family.ts";
 
 export default function Condition02Content() {
 
@@ -124,7 +122,7 @@ export default function Condition02Content() {
     );
 }
 
-{/* 본인과의 관계 드롭다운 */ }
+/* 본인과의 관계 드롭다운 */
 function FamilyRelationshipDropdown({ married, handleChange }) {
 
     const [slectedItem, setSlectedItem] = useState('선택');     // 한글
@@ -184,7 +182,7 @@ function FamilyRelationshipDropdown({ married, handleChange }) {
 
 }
 
-{/* 동거기간 드롭다운 */ }
+/* 동거기간 드롭다운 */
 function LivingTogetherDateDropdown({ handleChange }) {
 
     const [slectedItem, setSlectedItem] = useState('선택');     // 한글
@@ -227,7 +225,7 @@ function LivingTogetherDateDropdown({ handleChange }) {
 
 }
 
-{/* 본인 세대의 세대원 */ }
+/* 본인 세대의 세대원 */
 function FamilyForm({ married, handleChange, userBirth, hasSeperateHouseSpouse }) {
 
     const [loopCount, setLoopCount] = useState(0);
@@ -260,7 +258,7 @@ function FamilyForm({ married, handleChange, userBirth, hasSeperateHouseSpouse }
     );
 }
 
-{/* 배우자 세대의 세대원 */ }
+/* 배우자 세대의 세대원 */
 function SpouseFamilyForm({ married, handleChange }) {
 
     const [loopCount, setLoopCount] = useState(0);

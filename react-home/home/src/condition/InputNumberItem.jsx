@@ -80,9 +80,6 @@ export function InputText({ name, onChange, type='normal', placeholder }) {
 
     function handleInputChange(e) {
 
-        const today = new Date();
-        const formattedDate = today.getFullYear().toString() + (today.getMonth() + 1).toString() + today.getDate().toString();
-
         const name = e.target.getAttribute('name');
         let value = null;
 

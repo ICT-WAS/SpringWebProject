@@ -1,4 +1,4 @@
-import { Button, Dropdown, Form, Stack } from "react-bootstrap";
+import { Button, Form, Stack } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { InputNumberItem, InputNumberSubItem } from "./InputNumberItem";
@@ -229,7 +229,6 @@ function MoveInDate({ onChangedInputValue, changeVisibility }) {
     const [sidoSelectedName, setSidoSelectedName] = useState('시/도');
     const [gunguSelectedName, setGunguelectedName] = useState('군/구');
 
-    
     const [sidoSelectedIndex, setSidoSelectedIndex] = useState("");
     const [gunguSelectedIndex, setGunguSelectedIndex] = useState("");
 
