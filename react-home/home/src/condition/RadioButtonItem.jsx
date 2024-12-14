@@ -1,6 +1,5 @@
 import React from "react";
 import { Form, Stack } from "react-bootstrap";
-import { useState } from "react";
 
 export function RadioButtonItem({ question, buttons, direction, depth, flexAuto, onChange, handleFollowUpQuestion }) {
 
