@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Form, Stack } from "react-bootstrap";
 
-export function CheckButtonItem({ number, question, buttons, depth, flexAuto, onChange, handleFollowUpQuestion, reverseCheck }) {
+export function CheckButtonItem({ question, buttons, depth, flexAuto, onChange, handleFollowUpQuestion, reverseCheck }) {
 
     return (
         <>
-            <div key={`${number}-${question}`}>
-                <p className="card-header-text"><b className="px-2">{number.toString().padStart(2, '0')}</b>{question}</p>
+            <div key={`${question}`}>
+                <p className="card-header-text">{question}</p>
                 <StackedCheckButtons buttons={buttons} depth={depth} flexAuto={flexAuto} onChange={onChange}
                     handleFollowUpQuestion={handleFollowUpQuestion} reverseCheck={reverseCheck} />
             </div>
@@ -14,14 +14,14 @@ export function CheckButtonItem({ number, question, buttons, depth, flexAuto, on
     );
 }
 
-export function CheckButtonSubItem({ number, question, buttons, depth = 1, flexAuto, onChange, handleFollowUpQuestion }) {
+export function CheckButtonSubItem({ question, buttons, depth = 1, flexAuto, onChange, handleFollowUpQuestion }) {
 
     const marginClass = `ms-${depth}`;
 
     return (
         <>
-            <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6' }} className={marginClass}>
-                <p className="card-header-text">{number}.{question}</p>
+            <div key={`${question}`} style={{ backgroundColor: '#F6F6F6' }} className={marginClass}>
+                <p className="card-header-text">{question}</p>
                 <StackedCheckButtons buttons={buttons} flexAuto={flexAuto} onChange={onChange}
                     handleFollowUpQuestion={handleFollowUpQuestion} />
             </div>
@@ -89,14 +89,14 @@ function CheckButtons({ buttons, flexAuto = true, onChange, handleFollowUpQuesti
     );
 }
 
-export function CheckButtonSubItemWithFollowQuestions({ number, question, buttons, depth = 1, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue, index }) {
+export function CheckButtonSubItemWithFollowQuestions({ question, buttons, depth = 1, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue, index }) {
 
     const marginClass = `ms-${depth}`;
 
     return (
         <>
-            <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6' }} className={marginClass}>
-                <p className="card-header-text">{number}.{question}</p>
+            <div key={`${question}`} style={{ backgroundColor: '#F6F6F6' }} className={marginClass}>
+                <p className="card-header-text">{question}</p>
                 <StackedCheckButtonsWithFollowQuestions buttons={buttons} flexAuto={flexAuto} onChange={onChange}
                     handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} reverseCheck={reverseCheck} onChangedFamilyValue={onChangedFamilyValue} index={index} />
             </div>
@@ -177,14 +177,14 @@ function CheckButtonsWithFollowQuestions({ buttons, flexAuto = true, onChange, h
     );
 }
 
-export function FetusCheckButtonSubItemWithFollowQuestions({ number, question, buttons, depth = 1, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue, index }) {
+export function FetusCheckButtonSubItemWithFollowQuestions({ question, buttons, depth = 1, flexAuto, onChange, handleFollowUpQuestion, subQuestion, reverseCheck, onChangedFamilyValue, index }) {
 
     const marginClass = `ms-${depth}`;
 
     return (
         <>
-            <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6' }} className={marginClass}>
-                <p className="card-header-text">{number}.{question}</p>
+            <div key={`${question}`} style={{ backgroundColor: '#F6F6F6' }} className={marginClass}>
+                <p className="card-header-text">{question}</p>
                 <FetusStackedCheckButtonsWithFollowQuestions buttons={buttons} flexAuto={flexAuto} onChange={onChange}
                     handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} reverseCheck={reverseCheck} onChangedFamilyValue={onChangedFamilyValue} index={index} />
             </div>
