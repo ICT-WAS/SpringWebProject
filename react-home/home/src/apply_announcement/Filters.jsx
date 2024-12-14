@@ -40,7 +40,7 @@ export default function Filters({ selectedFilter, handleClose, handleFilterButto
                 <Container>
                     {filters}
                 </Container>
-                <Button variant='dark' style={{ whiteSpace: 'nowrap' }} onClick={() => handleFilterButtonClick({ selectedFilter: selectedFilter })}>
+                <Button variant='dark' style={{ whiteSpace: 'nowrap' }} onClick={handleFilterButtonClick}>
                     0,000 건의 공고 보기
                 </Button>
             </Stack>
