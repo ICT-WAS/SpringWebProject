@@ -58,42 +58,46 @@ function NavBar() {
     navigate("/conditions");
   }
 
-  function handlePostListClick(){
+  function handlePostListClick() {
     navigate("/community");
   }
-                
+
+  function handleMyPageClick() {
+    navigate("/mypage");
+  }
+
   return (
     <>
       <Container>
         <Row className="align-items-center">
           <Col md="auto">
-              <Button variant="link" onClick={handleListClick}
-                className="link-body-emphasis link-underline link-underline-opacity-0"
-              >
-                <p className="nav-bar-links">
+            <Button variant="link" onClick={handleListClick}
+              className="link-body-emphasis link-underline link-underline-opacity-0"
+            >
+              <p className="nav-bar-links">
                 청약 공고
-                </p>
-              </Button>
+              </p>
+            </Button>
           </Col>
 
           <Col md="auto">
-          <Button variant="link" onClick={handlePostListClick}
-                className="link-body-emphasis link-underline link-underline-opacity-0"
-              >
-                <p className="nav-bar-links">
+            <Button variant="link" onClick={handlePostListClick}
+              className="link-body-emphasis link-underline link-underline-opacity-0"
+            >
+              <p className="nav-bar-links">
                 커뮤니티
-                </p>
-              </Button>
+              </p>
+            </Button>
           </Col>
 
           <Col md="auto">
             <Button variant="link" onClick={handleConditionsClick}
-                className="link-body-emphasis link-underline link-underline-opacity-0"
-              >
-                <p className="nav-bar-links">
+              className="link-body-emphasis link-underline link-underline-opacity-0"
+            >
+              <p className="nav-bar-links">
                 조건 등록
-                </p>
-              </Button>
+              </p>
+            </Button>
           </Col>
 
           <Col md="auto">
@@ -108,14 +112,18 @@ function NavBar() {
           </Col>
 
           <Col md="auto">
-            <p>
-              <a
-                href="#"
-                className="link-body-emphasis link-underline link-underline-opacity-0"
-              >
-                <i className="bi bi-bell" />
-              </a>
-            </p>
+            <Button variant="link" onClick={handleMyPageClick}
+              className="link-body-emphasis link-underline link-underline-opacity-0"
+            >
+              <p>
+                <a
+                  href="#"
+                  className="link-body-emphasis link-underline link-underline-opacity-0"
+                >
+                  <i className="bi bi-bell" />
+                </a>
+              </p>
+            </Button>
           </Col>
 
           <LoginStateButton />

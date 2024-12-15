@@ -74,6 +74,12 @@ p {
   font-weight: 600 !important;
 }
 
+.btn-mypage-card {
+  background-color: transparent !important; /* 배경색 제거 */
+  border: none !important;                /* 보더 제거 */
+  color: inherit !important;              /* 기본 텍스트 색상 유지 */
+}
+
 .btn-no-bg-family {
   background-color: transparent !important; /* 배경색 제거 */
   border: none !important;                /* 보더 제거 */

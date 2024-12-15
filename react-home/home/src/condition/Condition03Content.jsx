@@ -110,8 +110,6 @@ export default function Condition03Content() {
         const token = localStorage.getItem("accessToken");
         const userId = getUserIdFromToken(token);
 
-        console.log(userId);
-
         // POST 요청
         
         setLoading(true);
