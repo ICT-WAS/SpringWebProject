@@ -8,34 +8,44 @@ import { FamilyMember, familyMemberNames } from "./family.ts";
 export default function Condition02Content() {
 
     const navigate = useNavigate();
-    const [married, setMarried] = useState(0);
+
+    const [validated, setValidated] = useState(false);
 
     /* 제출용 데이터 */
     const [formData1, setFormData1] = useState({});
+    const [accountDTOList, setAccountDTOList] = useState({});
+    const [familyDataList, setFamilyDataList] = useState([]);
+    const [spouseFamilyDataList, setSpouseFamilyDataList] = useState([]);
 
     const [myData, setMyData] = useState([{ relationship: 1, livingTogether: 1 }]);
     const [spouseData, setSpouseData] = useState([]);
-    const [familyData, setFamilyData] = useState([]);
-    const [spouseFamilyData, setSpouseFamilyData] = useState([]);
+
+    const [married, setMarried] = useState(0);
+
     const [hasSeperateHouseSpouse, setHasSeperateHouseSpouse] = useState(false);
     const [userBirth, setUserBirth] = useState(null);
 
     useEffect(() => {
         /* 이전 폼 데이터 읽어오기 */
         
+        const nextHasSeperateSpouse = sessionStorage.getItem('livingWithSpouse') === 'N';
+        setHasSeperateHouseSpouse(nextHasSeperateSpouse);
+
         const sessionData = sessionStorage.getItem('formData1');
+        const accountData = sessionStorage.getItem('accountDTOList');
         if (!sessionData) return;
 
         let userData = null;
         try {
             userData = JSON.parse(sessionData);
             setFormData1(userData);
+
+            const account = JSON.parse(accountData);
+            setAccountDTOList(account);
         } catch (error) { }
 
-        const nextHasSeperateSpouse = userData.spouse === 'N';
         const prevMarried = Number(userData.married);
         setMarried(prevMarried);
-        setHasSeperateHouseSpouse(nextHasSeperateSpouse);
         setUserBirth(userData.birthday);
 
         setMyData([{ relationship: 1, livingTogether: 1 }]);
@@ -59,50 +69,61 @@ export default function Condition02Content() {
         navigate("/condition-1");
     }
 
-    function handleNextButtonClick(e) {
+    // 세대구성원 추가/수정
+    function handleFamilyRowChange({ index, familyRow }) {
 
-        let finalFamilyData = [ ...familyData, ...myData];
+        const updatedFamilyData = familyDataList.length > index
+            ? familyDataList.map((item, idx) =>
+                idx === index ? { ...familyRow } : item // 해당 index에서만 교체
+            )
+            : [...familyDataList, familyRow]; // 인덱스가 없으면 새로운 항목 추가
+
+        setFamilyDataList(updatedFamilyData);
+    }
+
+    // 배우자 세대구성원 추가/수정
+    function handleSpouseFamilyRowChange({ index, familyRow }) {
+
+        const updatedFamilyData = spouseFamilyDataList.length > index
+            ? spouseFamilyDataList.map((item, idx) =>
+                idx === index ? { ...familyRow } : item // 해당 index에서만 교체
+            )
+            : [...spouseFamilyDataList, familyRow]; // 인덱스가 없으면 새로운 항목 추가
+
+        setSpouseFamilyDataList(updatedFamilyData);
+    }
+
+    function handleSubmit(event) {
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+            setValidated(true);
+            return;
+        } 
+
+        let finalFamilyData = [ ...familyDataList, ...myData];
         if(spouseData.length > 0) {
             finalFamilyData = [...finalFamilyData, ...spouseData];
         }
         
         const finalHasSpouse = (married === 1 || married === 2);
 
-        sessionStorage.removeItem('hasSpouse');
-
         sessionStorage.setItem('hasSpouse', finalHasSpouse);
-        sessionStorage.setItem('familyData', JSON.stringify(finalFamilyData));
+        sessionStorage.setItem('familyDataList', JSON.stringify(finalFamilyData));
         sessionStorage.setItem('formData1', JSON.stringify(formData1));
+        sessionStorage.setItem('accountDTOList', JSON.stringify(accountDTOList));
 
         navigate("/condition-3");
     }
 
-    // 세대구성원 추가/수정
-    function handleFamilyRowChange({ index, familyRow }) {
-
-        const updatedFamilyData = familyData.length > index
-            ? familyData.map((item, idx) =>
-                idx === index ? { ...familyRow } : item // 해당 index에서만 교체
-            )
-            : [...familyData, familyRow]; // 인덱스가 없으면 새로운 항목 추가
-
-        setFamilyData(updatedFamilyData);
-    }
-
-    // 배우자 세대구성원 추가/수정
-    function handleSpouseFamilyRowChange({ index, familyRow }) {
-
-        const updatedFamilyData = spouseFamilyData.length > index
-            ? spouseFamilyData.map((item, idx) =>
-                idx === index ? { ...familyRow } : item // 해당 index에서만 교체
-            )
-            : [...spouseFamilyData, familyRow]; // 인덱스가 없으면 새로운 항목 추가
-
-        setSpouseFamilyData(updatedFamilyData);
-    }
-
     return (
-        <Form>
+        <>
+        <p className='heading-text'>
+          조건 등록 (2/3) - 세대구성원 정보 입력
+        </p>
+
+        <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Stack direction='vertical' gap={5} >
 
                 {/* 본인 세대의 세대원 */}
@@ -114,23 +135,23 @@ export default function Condition02Content() {
                 {/* 다음으로 */}
                 <Stack direction="horizontal" gap={2}>
                     <Button variant="light" onClick={handlePrevButtonClick} style={{ flex: '1' }} >이전</Button>
-                    <Button variant="dark" onClick={handleNextButtonClick} style={{ flex: '1' }} >다음</Button>
+                    <Button variant="dark"  type="submit" style={{ flex: '1' }} >다음</Button>
                 </Stack>
             </Stack>
 
         </Form>
+        </>
     );
 }
 
-/* 본인과의 관계 드롭다운 */
+/* 본인과의 관계 */
 function FamilyRelationshipDropdown({ married, handleChange }) {
 
-    const [slectedItem, setSlectedItem] = useState('선택');     // 한글
-    const [slectedValue, setSlectedValue] = useState(0);   // 숫자값
+    const [slectedItem, setSlectedItem] = useState('선택'); 
 
     // 미혼 3~8
     const notMarriedFamilyList = Object.keys(FamilyMember).filter(key =>
-        (typeof FamilyMember[key] !== 'number') && key > 2 && key < 8
+        (typeof FamilyMember[key] !== 'number') && (key > 2 && key < 8)
     );
 
     // 기혼
@@ -145,7 +166,7 @@ function FamilyRelationshipDropdown({ married, handleChange }) {
 
     // 한부모 13~ 제외
     const singleParentFamilyList = Object.keys(FamilyMember).filter(key =>
-        (typeof FamilyMember[key] !== 'number') && key > 2 && key < 13
+        (typeof FamilyMember[key] !== 'number') && (key > 2 && key < 13)
     );
 
     const familyOptinList = [notMarriedFamilyList, marriedFamilyList, engagedFamilyList, singleParentFamilyList];
@@ -162,7 +183,6 @@ function FamilyRelationshipDropdown({ married, handleChange }) {
 
     function handleChangedDropdown(relationship) {
         setSlectedItem(familyMemberNames[relationship]);
-        setSlectedValue(relationship);
 
         handleChange({ key: 'relationship', value: Number(relationship) });
 
@@ -182,10 +202,8 @@ function FamilyRelationshipDropdown({ married, handleChange }) {
 
 }
 
-/* 동거기간 드롭다운 */
-function LivingTogetherDateDropdown({ handleChange }) {
-
-    const [slectedItem, setSlectedItem] = useState('선택');     // 한글
+/* 동거기간 */
+function LivingTogetherDateDropdown({ handleChange, required, disabled }) {
 
     const livingTogetherData = [
         { data: '1년 미만', value: 0 },
@@ -193,34 +211,21 @@ function LivingTogetherDateDropdown({ handleChange }) {
         { data: '3년 이상', value: 2 }];
 
     const livingTogetherDataList = () => {
-        return livingTogetherData.map((livingTogether) => (
-            <Dropdown.Item key={livingTogether}
-                data-value={livingTogether.value}
-                data-name={livingTogether.data}
-                onClick={(e) => handleChangedDropdown(e)}>
-                {livingTogether.data}
-            </Dropdown.Item>
+        return livingTogetherData.map((livingTogether, index) => (
+            <option key={index} value={livingTogether.value}>{livingTogether.data}</option>
         ));
     }
 
-    function handleChangedDropdown(e) {
-        const value = e.target.getAttribute('data-value');
-        const name = e.target.getAttribute('data-name');
-        setSlectedItem(name);
-
-        handleChange({ key: 'livingTogetherDate', value: Number(value) });
+    function handleChanged(e) {
+        const value = Number(e.target.value);
+        handleChange({ key: 'livingTogetherDate', value: value });
     }
 
     return (
-        <Dropdown style={{ flex: 1 }}>
-            <Dropdown.Toggle variant="warning" className='dropdown-transparent flex-fill' >
-                {slectedItem}
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-                {livingTogetherDataList()}
-            </Dropdown.Menu>
-        </Dropdown>
+        <Form.Select required={required} disabled={disabled} onChange={handleChanged}>
+            <option value="" >선택</option>
+            {livingTogetherDataList()}
+        </Form.Select>
     );
 
 }
@@ -229,7 +234,7 @@ function LivingTogetherDateDropdown({ handleChange }) {
 function FamilyForm({ married, handleChange, userBirth, hasSeperateHouseSpouse }) {
 
     const [loopCount, setLoopCount] = useState(0);
-    const hasSpouse = !hasSeperateHouseSpouse && (married == 1 || married == 2);
+    const hasSpouse = !hasSeperateHouseSpouse && (married === 1 || married === 2);
 
     function handleButtonClick() {
         setLoopCount(prev => prev + 1);
@@ -246,9 +251,7 @@ function FamilyForm({ married, handleChange, userBirth, hasSeperateHouseSpouse }
                     <SelfFormRow married={married} userBirth={userBirth} />
                     {hasSpouse && <SpouseFormRow />}
                     {Array.from({ length: loopCount }, (_, index) => (
-                        <>
-                            <FamilyFormRow index={index} livingTogether={1} married={married} handleChange={handleChange} />
-                        </>
+                        <FamilyFormRow index={index} livingTogether={1} married={married} handleChange={handleChange} />
                     ))}
 
                 </tbody>
@@ -305,22 +308,51 @@ function FamilyFormHead() {
 function FamilyFormRow({ livingTogether, index, married, handleChange }) {
 
     const [familyRowData, setFamilyRowData] = useState({ livingTogether: livingTogether });
+    const [relationship, setRelationship] = useState(null);
+    const [resetValue, setResetValue] = useState(false);
+
+    const [hasError, setHasError] = useState(false);
+
+    const isRequireBirthday = relationship === FamilyMember.CHILD || relationship === FamilyMember.MOTHER || relationship === FamilyMember.FATHER;
+    const isRequireLivingTogetherDate = !(relationship === FamilyMember.UNBORN_CHILD || relationship === FamilyMember.SON_IN_LAW_OR_DAUGHTER_IN_LAW);
+
+    function resetFormData(relationship) {
+        setFamilyRowData({
+            livingTogether: livingTogether,
+            relationship: relationship
+        });
+    }
+
+    function handleChangeRelation({ key, value }) {
+
+        if(relationship === value) {
+            return;
+        }
+
+        setRelationship(value);
+        resetFormData(value);
+        setResetValue(true);
+    }
 
     function handleChangeFormValue({ key, value }) {
 
-        const nextFamilyRowData = {
-            ...familyRowData,
+        const nextFamilyRowData = (prev) => ({
+            ...prev,
             [key]: value
-        };
+        });
 
-        setFamilyRowData(nextFamilyRowData);
-        handleChange({ index: index, familyRow: nextFamilyRowData });
+        setFamilyRowData((prev) => nextFamilyRowData(prev));
+        handleChange({ index: index, familyRow: nextFamilyRowData(familyRowData) });
     }
 
     // 폼 Input 타입 관리
     function handleInputChanged(e) {
         const name = e.target.getAttribute('data-name');
-        const value = e.target.value;
+        let value = Number(e.target.value);
+
+        if(value < 0) {
+            value = 0;
+        }
 
         handleChangeFormValue({ key: name, value: value });
     }
@@ -328,9 +360,20 @@ function FamilyFormRow({ livingTogether, index, married, handleChange }) {
     // 폼 Input date 타입 관리
     function handleDateInputChanged(e) {
         const name = e.target.getAttribute('data-name');
-        const value = formatDateToCustomFormat(e.target.value);
+        const value = formatDateToCustomFormat(e.target.value.toString());
+        if(value == null) {
+            setHasError(true);
+        } else {
+            setHasError(false);
+        }
         
         handleChangeFormValue({ key: name, value: value });
+    }
+
+    function handleFocus() {
+        if(resetValue) {
+            setResetValue(false);
+        }
     }
 
     return (
@@ -339,12 +382,14 @@ function FamilyFormRow({ livingTogether, index, married, handleChange }) {
 
                 {/* 관계 */}
                 <td>
-                    <FamilyRelationshipDropdown index={index} married={married} handleChange={handleChangeFormValue} />
+                    <FamilyRelationshipDropdown index={index} married={married} handleChange={handleChangeRelation} />
                 </td>
 
                 {/* 동거기간 */}
                 <td>
-                    <LivingTogetherDateDropdown handleChange={handleChangeFormValue} />
+                    <LivingTogetherDateDropdown handleChange={handleChangeFormValue} 
+                        required={isRequireLivingTogetherDate}
+                        disabled={!isRequireLivingTogetherDate} />
                 </td>
 
                 {/* 생년월일 */}
@@ -354,8 +399,11 @@ function FamilyFormRow({ livingTogether, index, married, handleChange }) {
                         placeholder={placeholderText.dateType}
                         name={`birth-${index}`}
                         data-name={'birthday'}
-                        required
+                        {...(resetValue ? { value: "" } : {})}
+                        onFocus={handleFocus}
                         onBlur={handleDateInputChanged}
+                        required={isRequireBirthday}
+                        disabled={!isRequireBirthday}
                     />
                 </td>
 
@@ -366,8 +414,11 @@ function FamilyFormRow({ livingTogether, index, married, handleChange }) {
                         name={`married-${index}`}
                         label={'기혼'}
                         data-name={'isMarried'}
+                        {...(resetValue ? { value: "" } : {})}
+                        onFocus={handleFocus}
                         id={`married-${index}`}
                         style={{ flex: 1 }}
+                        disabled={relationship !== FamilyMember.CHILD}
                     />
                 </td>
 
@@ -378,8 +429,11 @@ function FamilyFormRow({ livingTogether, index, married, handleChange }) {
                         placeholder={placeholderText.houseCountType}
                         name={`house-${index}`}
                         data-name={'houseCount'}
+                        {...(resetValue ? { value: "" } : {})}
+                        onFocus={handleFocus}
                         onBlur={handleInputChanged}
-                        required
+                        required={relationship !== FamilyMember.UNBORN_CHILD}
+                        disabled={relationship === FamilyMember.UNBORN_CHILD}
                     />
                 </td>
 
@@ -390,9 +444,12 @@ function FamilyFormRow({ livingTogether, index, married, handleChange }) {
                         placeholder={placeholderText.dateType}
                         name={`houseSold-${index}`}
                         data-name={'houseSoldDate'}
+                        {...(resetValue ? { value: "" } : {})}
+                        onFocus={handleFocus}
                         onBlur={handleDateInputChanged}
-                        required
+                        disabled={relationship === FamilyMember.UNBORN_CHILD}
                     />
+                    {hasError && <p className="inputTypeError">올바르지 않은 형식입니다.</p>}
                 </td>
 
             </tr>
@@ -444,7 +501,6 @@ function SelfFormRow({ married, userBirth }) {
                         type="number"
                         placeholder={placeholderText.dateType}
                         name={`houseSold`}
-                        required
                     />
                 </td>
 
@@ -472,7 +528,7 @@ function SpouseFormRow({ index }) {
                         type="number"
                         placeholder={placeholderText.dateType}
                         name={`birth-${index}`}
-                        required
+                        disabled
                     />
                 </td>
 
@@ -497,7 +553,6 @@ function SpouseFormRow({ index }) {
                         type="number"
                         placeholder={placeholderText.dateType}
                         name={`houseSold-${index}`}
-                        required
                     />
                 </td>
 
