@@ -68,74 +68,80 @@ export default function CommunityPostListContent() {
     }, [currentPage]); // currentPage가 변경될 때마다 API 호출
 
     return (
-        <Container className="p-5" fluid="md">
-            {/* 검색 입력 필드와 버튼 */}
-            <Row className="mb-4">
-                <Col md={8}>
-                    <InputGroup>
-                        <Form.Control
-                            placeholder="제목으로 검색"
-                            aria-label="Search"
-                            value={keyword}
-                            onChange={(e) => setKeyword(e.target.value)} // 검색어 상태 변경
-                        />
-                        <Button variant="light" onClick={handleSearch}>
-                            <i className="bi bi-search" />
-                        </Button>
-                    </InputGroup>
-                </Col>
-                <Col md={4} className="text-end">
-                    <PostingButton/>
-                </Col>
-            </Row>
+        <>
+            <Container className="px-5" fluid="md">
+                <p className='heading-text '>
+                    커뮤니티
+                </p>
+                <div className="mb-5"></div>
+                {/* 검색 입력 필드와 버튼 */}
+                <Row className="mb-4">
+                    <Col md={8}>
+                        <InputGroup>
+                            <Form.Control
+                                placeholder="제목으로 검색"
+                                aria-label="Search"
+                                value={keyword}
+                                onChange={(e) => setKeyword(e.target.value)} // 검색어 상태 변경
+                            />
+                            <Button variant="light" onClick={handleSearch}>
+                                <i className="bi bi-search" />
+                            </Button>
+                        </InputGroup>
+                    </Col>
+                    <Col md={4} className="text-end">
+                        <PostingButton />
+                    </Col>
+                </Row>
 
-            <div className='heading-text'>
-                게시글 목록
-                <div className='card-body-text mb-0'>{totalCount} 건</div>
-            </div>
-            <br/>
-            
-            
-
-            {/* 로딩 중 표시 */}
-            {loading ? (
-                <p>로딩 중...</p>
-            ) : (
-                <div>
-                    {totalCount === 0 ? (
-                        <p>해당 키워드가 포함된 게시글이 없습니다.</p>
-                    ) : (
-                        posts.map((post) => (
-                            <div key={post.postId}>
-                                <CommunityCard post={post} />
-                            </div>
-                        ))
-                    )}
+                <div className='heading-text'>
+                    게시글 목록
+                    <div className='card-body-text mb-0'>{totalCount} 건</div>
                 </div>
-            )}
+                <br />
 
-            {/* 페이지네이션 */}
-            <div className="d-flex justify-content-center mt-3">
-                <Pagination className="custom-pagination">
-                    <Pagination.First
-                        onClick={() => handlePageChange(1)}
-                        disabled={currentPage === 1}
-                    />
-                    <Pagination.Prev
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                    />
-                    {paginationItems}
-                    <Pagination.Next
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                    />
-                    <Pagination.Last
-                        onClick={() => handlePageChange(totalPages)}
-                        disabled={currentPage === totalPages}
-                    />
-                </Pagination>
-            </div>
-        </Container>
+
+
+                {/* 로딩 중 표시 */}
+                {loading ? (
+                    <p>로딩 중...</p>
+                ) : (
+                    <div>
+                        {totalCount === 0 ? (
+                            <p>해당 키워드가 포함된 게시글이 없습니다.</p>
+                        ) : (
+                            posts.map((post) => (
+                                <div key={post.postId}>
+                                    <CommunityCard post={post} />
+                                </div>
+                            ))
+                        )}
+                    </div>
+                )}
+
+                {/* 페이지네이션 */}
+                <div className="d-flex justify-content-center mt-3">
+                    <Pagination className="custom-pagination">
+                        <Pagination.First
+                            onClick={() => handlePageChange(1)}
+                            disabled={currentPage === 1}
+                        />
+                        <Pagination.Prev
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        />
+                        {paginationItems}
+                        <Pagination.Next
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        />
+                        <Pagination.Last
+                            onClick={() => handlePageChange(totalPages)}
+                            disabled={currentPage === totalPages}
+                        />
+                    </Pagination>
+                </div>
+            </Container>
+        </>
     );
 }
