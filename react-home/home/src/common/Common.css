@@ -74,6 +74,14 @@ p {
   font-weight: 600 !important;
 }
 
+.btn-no-bg-family {
+  background-color: transparent !important; /* 배경색 제거 */
+  border: none !important;                /* 보더 제거 */
+  color: inherit !important;              /* 기본 텍스트 색상 유지 */
+  padding: 0.5rem !important;  
+  font-weight: 400 !important;
+}
+
 .scrollable-table {
   min-height: 17vh;
   max-height: 17vh; /* 스크롤 영역 높이 제한 */
