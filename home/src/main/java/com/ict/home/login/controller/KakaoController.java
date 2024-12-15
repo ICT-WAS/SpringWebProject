@@ -55,15 +55,10 @@ public class KakaoController {
 
         try {
             if (!socialAccountRepository.existsByProviderUserId(providerUserId)) {
-                //카카오 유저 정보와 일치하는 소셜 테이블 정보가 없는 경우
-                if (userRepository.existsByEmail(userInfo.getKakaoAccount().getEmail())) {
-                    //카카오 유저 정보와 일치하는 이메일이 이미 디비에 있을 때
-                    return new BaseResponse<>(POST_USERS_EXISTS_EMAIL);
-                    //error code 2001 -> 이미 사용중인 이메일입니다. 연동하시려면 청약이지 회원가입/로그인 - 마이페이지 - 정보수정 - 소셜 로그인 연동 기능을 사용해주세요.
-                }
-                //유저 정보가 없으면 자동으로 소셜 회원가입
+                //카카오 유저 정보와 일치하는 소셜 테이블 정보가 없는 경우 자동으로 소셜 회원가입
                 kakaoService.kakaoSignup(userInfo, providerUserId);
             }
+            //받아온 providerUserId 로 로그인
             return new BaseResponse<>(kakaoService.kakaoLogin(providerUserId, response));
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
