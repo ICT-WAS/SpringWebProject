@@ -93,6 +93,7 @@ export default function CommunityPostListContent() {
                 게시글 목록
                 <div className='card-body-text mb-0'>{totalCount} 건</div>
             </div>
+            <br/>
             
             
 

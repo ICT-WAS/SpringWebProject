@@ -24,6 +24,8 @@ import NaverRedirection from "./components/login/NaverRedirection";
 import CommunityPostList from "./community/CommunityPostList";
 import CommunityPosting from "./community/CommunityPosting";
 import MyPage from "./mypage/MyPage";
+import PostDetail from "./community/PostDetail";
+import UpdatePost from "./community/UpdatePost";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -54,6 +56,8 @@ root.render(
         {/* 커뮤니티 */}
         <Route exact path="/community" element={<CommunityPostList/>} />
         <Route exact path="/community/posting" element={<CommunityPosting/>} />
+        <Route exact path="/community/:postId" element={<PostDetail />} />
+        <Route exact path="/community/posting/:postId" element={<UpdatePost/>} />
 
         {/* 소셜 로그인 리다이렉트 경로 */}
         <Route exact path="/kakao/callback" element={<KakaoRedirection />} />
