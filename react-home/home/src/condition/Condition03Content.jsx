@@ -1,15 +1,15 @@
-import { Button, Dropdown, Form, Stack } from "react-bootstrap";
-import { data, useNavigate } from "react-router-dom";
+import { Button, Form, Stack } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { InputNumberItem, InputNumberSubItem } from "./InputNumberItem";
-import { RadioButtonItem, RadioButtonSubItem } from "./RadioButtonItem";
-import { CheckButtonItem, CheckButtonSubItem, CheckButtonSubItemWithFollowQuestions } from "./CheckButtonItem";
+import { RadioButtonItem } from "./RadioButtonItem";
 import { placeholderText } from "./placeholderText";
-import { FamilyMember, familyMemberNames, getEnumKeyFromValue, getFamilyMemberName } from "./family.ts";
 
 export default function Condition03Content() {
 
     const navigate = useNavigate();
+
+    const [validated, setValidated] = useState(false);
 
     const totalPropertyValueButtons = { name: 'propertyPrice', values: [{ data: '미보유 혹은 2억 1,150만원 이하', value: 0 }, { data: '2억 1,150만원 초과 3억 3,100만원 이하', value: 1 }, { data: '3억 3,100만원 초과', value: 2 }] }
     const incomeActivityTypeButtons = { name: 'incomeActivity', values: [{ data: '외벌이', value: 0 }, { data: '맞벌이', value: 1, hasFollowUpQuestion: true }] }
@@ -78,8 +78,6 @@ export default function Condition03Content() {
         console.log(formData1);
         console.log(formData3);
         console.log(familyData);
-        // 제출
-        handleSubmit();
 
         // navigate("/condition-3");
         sessionStorage.removeItem('formData3');
@@ -87,9 +85,15 @@ export default function Condition03Content() {
     }
 
     {/* 폼 제출 */}
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        
+    const handleSubmit = async (event) => {
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+            setValidated(true);
+            return;
+        } 
+
         try {
           const response = await fetch('https://localhost:8989/', {
             method: 'POST',
@@ -112,7 +116,7 @@ export default function Condition03Content() {
         } catch (error) {
           console.error('Error:', error);
         }
-      };
+    };
 
 
     function onChangedInputValue({ name, value }) {
@@ -146,7 +150,7 @@ export default function Condition03Content() {
     }
 
     return (
-        <Form onSubmit={handleSubmit}>
+        <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Stack direction='vertical' gap={5} >
 
                 {/* 차량가액을 입력해주세요 */}
@@ -157,32 +161,32 @@ export default function Condition03Content() {
                 <VehicleValueQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['vehicleValue']} />
 
                 {/* 소유하신 부동산(건축물 + 토지)총 가액을 선택해주세요 */}
-                <RadioButtonItem number={4} question={'소유하신 부동산(건축물 + 토지)총 가액을 선택해주세요'}
+                <RadioButtonItem question={'소유하신 부동산(건축물 + 토지)총 가액을 선택해주세요'}
                     buttons={totalPropertyValueButtons} onChange={onChangedInputValue} />
 
                 {/* 세대구성원 전원의 총 자산을 입력해주세요 */}
-                <InputNumberItem number={5} question={'세대구성원 전원의 총 자산을 입력해주세요'}
+                <InputNumberItem question={'세대구성원 전원의 총 자산을 입력해주세요'}
                     name={'totalAsset'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
 
                 {/* 본인의 총 자산을 입력해주세요 */}
-                <InputNumberItem number={6} question={'본인의 총 자산을 입력해주세요'}
+                <InputNumberItem question={'본인의 총 자산을 입력해주세요'}
                     name={'myAsset'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
 
                 {/* 배우자의 총 자산을 입력해주세요 */}
-                {hasSpouse === true && (<InputNumberItem number={7} question={'배우자의 총 자산을 입력해주세요'}
+                {hasSpouse === true && (<InputNumberItem question={'배우자의 총 자산을 입력해주세요'}
                     name={'spouseAsset'} onChange={onChangedInputValue}
                     placeholder={placeholderText.largeMoneyUnitType} />)}
 
                 {/* 세대구성원 중 만 19세 이상 세대원 전원의 전년도 월 평균소득을 모두 합산한 금액 */}
-                <InputNumberItem number={8} question={'세대구성원 중 만 19세 이상 세대원 전원의 전년도 월 평균소득을 모두 합산한 금액'}
+                <InputNumberItem question={'세대구성원 중 만 19세 이상 세대원 전원의 전년도 월 평균소득을 모두 합산한 금액'}
                     name={'familyAverageMonthlyIncome'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
 
                 {/* 본인의 전년도 월 평균소득을 입력해주세요 */}
-                <InputNumberItem number={9} question={'본인의 전년도 월 평균소득을 입력해주세요'}
+                <InputNumberItem question={'본인의 전년도 월 평균소득을 입력해주세요'}
                     name={'previousYearAverageMonthlyIncome'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
 
                 {/* 소득활동 여부를 선택해주세요 */}
-                {hasSpouse === true && <RadioButtonItem number={10} question={'소득활동 여부를 선택해주세요'}
+                {hasSpouse === true && <RadioButtonItem question={'소득활동 여부를 선택해주세요'}
                     buttons={incomeActivityTypeButtons} direction={'horizontal'} onChange={onChangedInputValue}
                     handleFollowUpQuestion={handleFollowUpQuestion} />}
 
@@ -190,11 +194,11 @@ export default function Condition03Content() {
                 <SpouseIncomeQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['spouseIncome']} />
 
                 {/* 소득세 납부 기간 */}
-                <InputNumberItem number={11} question={'소득세 납부 기간'}
+                <InputNumberItem question={'소득세 납부 기간'}
                     name={'incomeTaxPaymentPeriod'} onChange={onChangedInputValue} placeholder={placeholderText.yearCountType} />
 
                 {/* 신청자 및 세대구성원이 과거 주택 청약에 당첨된 적 있나요? */}
-                <RadioButtonItem number={14} question={'신청자 및 세대구성원이 과거 주택 청약에 당첨된 적 있나요?'}
+                <RadioButtonItem question={'신청자 및 세대구성원이 과거 주택 청약에 당첨된 적 있나요?'}
                     buttons={winningHistoryButtons} direction={'horizontal'} onChange={onChangedInputValue}
                     handleFollowUpQuestion={handleFollowUpQuestion} />
 
@@ -222,7 +226,6 @@ export default function Condition03Content() {
 }
 
 function HasVehicle({handleFollowUpQuestion, onChangedInputValue}) {
-    const number=3;
 
     function handleCheckChange(e) {
 
@@ -238,7 +241,7 @@ function HasVehicle({handleFollowUpQuestion, onChangedInputValue}) {
     return (
         <>
             <div>
-                <p className="card-header-text"><b className="px-2">{number.toString().padStart(2, '0')}</b>{'차량가액을 입력해주세요'}</p>
+                <p className="card-header-text">{'차량가액을 입력해주세요'}</p>
                     <Form.Check
                         type={'checkbox'}
                         name={'hasVehicle'}
@@ -259,7 +262,7 @@ function VehicleValueQuestion({ onChangedInputValue, visibility}) {
     }
 
     return (
-        <InputNumberSubItem number={'3-1'} question={'차량가액을 입력해주세요'} depth={3}
+        <InputNumberSubItem question={'차량가액을 입력해주세요'} depth={3}
             name={'carPrice'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
     );
 }
@@ -271,7 +274,7 @@ function SpouseIncomeQuestion({ onChangedInputValue, visibility }) {
     }
 
     return (
-        <InputNumberSubItem number={'10-1'} question={'배우자의 월평균소득을 입력해주세요'} depth={3}
+        <InputNumberSubItem question={'배우자의 월평균소득을 입력해주세요'} depth={3}
             name={'spouseAverageMonthlyIncome'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
     );
 }
@@ -283,7 +286,7 @@ function WinningDateQuestion({ onChangedInputValue, visibility }) {
     }
 
     return (
-        <InputNumberSubItem number={'14-1'} question={'가장 최근에 당첨된 날짜를 입력해주세요'} depth={3}
+        <InputNumberSubItem question={'가장 최근에 당첨된 날짜를 입력해주세요'} depth={3}
             name={'lastWinned'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
     );
 }
@@ -295,7 +298,7 @@ function DisqualifiedDate({ onChangedInputValue, visibility }) {
     }
 
     return (
-        <InputNumberSubItem number={'15-1'} question={'부적격자 판정된 날짜가 언제인가요?'} depth={3}
+        <InputNumberSubItem question={'부적격자 판정된 날짜가 언제인가요?'} depth={3}
             name={'ineligible'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
     );
 }

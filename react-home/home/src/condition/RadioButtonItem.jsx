@@ -1,12 +1,12 @@
 import React from "react";
 import { Form, Stack } from "react-bootstrap";
 
-export function RadioButtonItem({ number, question, buttons, direction, depth, flexAuto, onChange, handleFollowUpQuestion }) {
+export function RadioButtonItem({ question, buttons, direction, depth, flexAuto, onChange, handleFollowUpQuestion }) {
 
     return (
         <>
-            <div key={`${number}-${question}`}>
-                <p className="card-header-text"><b className="px-2">{number.toString().padStart(2, '0')}</b>{question}</p>
+            <div key={`${question}`}>
+                <p className="card-header-text">{question}</p>
                 <StackedRadioButtons buttons={buttons} direction={direction} depth={depth} flexAuto={flexAuto} onChange={onChange}
                     handleFollowUpQuestion={handleFollowUpQuestion} />
             </div>
@@ -14,14 +14,14 @@ export function RadioButtonItem({ number, question, buttons, direction, depth, f
     );
 }
 
-export function RadioButtonSubItem({ number, question, buttons, direction, depth = 1, flexAuto, onChange, handleFollowUpQuestion}) {
+export function RadioButtonSubItem({ question, buttons, direction, depth = 1, flexAuto, onChange, handleFollowUpQuestion}) {
 
     const marginClass = `ms-${depth}`;
 
     return (
         <>
-            <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
-                <p className="card-header-text">{number}.{question}</p>
+            <div key={`${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
+                <p className="card-header-text">{question}</p>
                 <StackedRadioButtons buttons={buttons} direction={direction} flexAuto={flexAuto} onChange={onChange}
                     handleFollowUpQuestion={handleFollowUpQuestion} />
             </div>
@@ -31,6 +31,7 @@ export function RadioButtonSubItem({ number, question, buttons, direction, depth
 }
 
 function RadioButtons({ buttons, flexAuto = true, onChange, handleFollowUpQuestion }) {
+
     const flexValue = flexAuto ? 1 : 'none';
 
     function handleRadioChange(e) {
@@ -52,6 +53,7 @@ function RadioButtons({ buttons, flexAuto = true, onChange, handleFollowUpQuesti
     return buttons.values.map((button, index) =>
         <React.Fragment key={`buttons-${index}`}>
             <Form.Check
+            required
                 type={'radio'}
                 name={buttons.name}
                 label={button.data}
@@ -77,14 +79,14 @@ function StackedRadioButtons({ buttons, direction = 'vertical', flexAuto, onChan
 }
 
 
-export function FamilyRadioButtonSubItem({ index, number, question, direction, buttons, depth = 1, onChangedFamilyValue}) {
+export function FamilyRadioButtonSubItem({ index, question, direction, buttons, depth = 1, onChangedFamilyValue}) {
 
     const marginClass = `ms-${depth}`;
 
     return (
         <>
-            <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
-                <p className="card-header-text">{number }.{question}</p>
+            <div key={`${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
+                <p className="card-header-text">{question}</p>
                 <FamilyStackedRadioButtons index={index} buttons={buttons} direction={direction}
                     onChangedFamilyValue={onChangedFamilyValue} />
             </div>
@@ -123,6 +125,7 @@ function FamilyRadioButtons({ index = 0, buttons, onChangedFamilyValue }) {
                 id={`${buttons.code}-${buttons.name}-${index}-${idx}`}
                 style={{ flex: 1 }}
                 onChange={handleRadioChange}
+                required
             />
         </React.Fragment>
     );

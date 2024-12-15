@@ -1,38 +1,38 @@
 import { Form } from "react-bootstrap";
 import { useState } from "react";
 
-export function InputNumberItem({ number, question, name, onChange, type, placeholder }) {
+export function InputNumberItem({ question, name, onChange, type, placeholder }) {
 
     return (
         <>
-            <div key={`${number}-${question}`}>
-                <p className="card-header-text"><b className="px-2">{number.toString().padStart(2, '0')}</b>{question}</p>
+            <div key={`-${question}`}>
+                <p className="card-header-text">{question}</p>
                 <InputText name={name} onChange={onChange} type={type} placeholder={placeholder} />
             </div>
         </>
     );
 }
 
-export function InputNumberSubItem({ number, question, depth = 1, name, onChange, type, placeholder }) {
+export function InputNumberSubItem({ question, depth = 1, name, onChange, type, placeholder }) {
     const marginClass = `ms-${depth * 1}`;
 
     return (
         <>
-            <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
-                <p className="card-header-text">{number}.&nbsp;{question}</p>
+            <div key={`${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
+                <p className="card-header-text">{question}</p>
                 <InputText name={name} onChange={onChange} type={type} placeholder={placeholder} />
             </div>
         </>
     );
 }
 
-export function FamilyInputNumberSubItem({ code, number, question, depth = 1, name, onChangedFamilyValue, type, placeholder, index }) {
+export function FamilyInputNumberSubItem({ code, question, depth = 1, name, onChangedFamilyValue, type, placeholder, index }) {
     const marginClass = `ms-${depth * 1}`;
 
     return (
         <>
-            <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
-                <p className="card-header-text">{number}.&nbsp;{question}</p>
+            <div key={`${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
+                <p className="card-header-text">{question}</p>
                 <FamilyInputText code={code} name={name} onChangedFamilyValue={onChangedFamilyValue} type={type} placeholder={placeholder} index={index} />
             </div>
         </>
@@ -80,9 +80,6 @@ export function InputText({ name, onChange, type='normal', placeholder }) {
 
     function handleInputChange(e) {
 
-        const today = new Date();
-        const formattedDate = today.getFullYear().toString() + (today.getMonth() + 1).toString() + today.getDate().toString();
-
         const name = e.target.getAttribute('name');
         let value = null;
 
@@ -122,13 +119,13 @@ export function InputText({ name, onChange, type='normal', placeholder }) {
     );
 }
 
-export function InputNumberLoopSubItemWithFollowQuestions({ number, question, depth = 1, name, onChange, handleFollowUpQuestion, subQuestion, type, placeholder, unit, onChangedFamilyValue }) {
+export function InputNumberLoopSubItemWithFollowQuestions({ question, depth = 1, name, onChange, handleFollowUpQuestion, subQuestion, type, placeholder, unit, onChangedFamilyValue }) {
     const marginClass = `ms-${depth * 1}`;
 
     return (
         <>
-            <div key={`${number}-${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
-                <p className="card-header-text">{number}.&nbsp;{question}</p>
+            <div key={`${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
+                <p className="card-header-text">{question}</p>
                 <InputTextWithFollowQuestions name={name} onChange={onChange} 
                     handleFollowUpQuestion={handleFollowUpQuestion} subQuestion={subQuestion} type={type} placeholder={placeholder} unit={unit} onChangedFamilyValue={onChangedFamilyValue} />
             </div>

@@ -1,14 +1,17 @@
-import { Button, Dropdown, Form, Stack } from "react-bootstrap";
+import { Button, Form, Stack } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { InputNumberItem, InputNumberSubItem } from "./InputNumberItem";
 import { RadioButtonItem, RadioButtonSubItem } from "./RadioButtonItem";
-import { conditions } from '../apply_announcement/conditions';
+import { conditionInfo } from '../apply_announcement/conditionInfo.js';
 import { placeholderText } from "./placeholderText";
+import { Sido } from "../common/Enums.ts";
 
 export default function Condition01Content() {
 
     const navigate = useNavigate();
+
+    const [validated, setValidated] = useState(false);
 
     const houseHolderButtons = { name: 'householder', values: [{ data: '세대원', value: 'N', }, { data: '세대주', value: 'Y', }] }
     const marriedButtons = { name: 'married', values: [{ data: '미혼', value: 0 }, { data: '기혼', value: 1, hasFollowUpQuestion: true }, { data: '예비신혼부부', value: 2 }, { data: '한부모', value: 3 }] }
@@ -20,7 +23,7 @@ export default function Condition01Content() {
             { data: '주택청약종합저축', value: 'COMBINED_SAVINGS', hasFollowUpQuestion: true }]
     }
     const spouseHasAccountButtons = { name: 'spouseHasAccount', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
-    const livingWithSpouseButtons = { name: 'spouse', values: [{ data: '예', value: 'Y' }, { data: '아니오', value: 'N'}] }
+    const livingWithSpouseButtons = { name: 'spouse', values: [{ data: '예', value: 'Y' }, { data: '아니오', value: 'N' }] }
 
     /* 제출용 데이터 */
     const [formData, setFormData] = useState({});
@@ -28,19 +31,20 @@ export default function Condition01Content() {
 
     /* 꼬리질문 가시성 */
     const [hasSpouse, setHasSpouse] = useState(false);
-    const followUpQuestions = { 
-        married: [{value: 1, subQuestionId: 'marriedDate'}], 
-        moveInDate: [{value: 1, subQuestionId: 'metropolitanAreaDate'}, {value: 2, subQuestionId: 'regionMoveInDate'}],
+    const followUpQuestions = {
+        married: [{ value: 1, subQuestionId: 'marriedDate' }],
+        moveInDate: [{ value: 1, subQuestionId: 'metropolitanAreaDate' }, { value: 2, subQuestionId: 'regionMoveInDate' }],
         type: [{ value: 'SAVINGS_ACCOUNT', subQuestionId: 'accountInfo' },
-            { value: 'SAVINGS_PLAN', subQuestionId: 'accountInfo' },
-            { value: 'SAVINGS_DEPOSIT', subQuestionId: 'accountInfo' },
-            { value: 'COMBINED_SAVINGS', subQuestionId: 'accountInfo' }],
-        spouseHasAccount: [{ value: 'Y', subQuestionId: 'spouseAccountDate' }], };
+        { value: 'SAVINGS_PLAN', subQuestionId: 'accountInfo' },
+        { value: 'SAVINGS_DEPOSIT', subQuestionId: 'accountInfo' },
+        { value: 'COMBINED_SAVINGS', subQuestionId: 'accountInfo' }],
+        spouseHasAccount: [{ value: 'Y', subQuestionId: 'spouseAccountDate' }],
+    };
 
-    const [visibility, setVisibility] = useState({ 
+    const [visibility, setVisibility] = useState({
         marriedDate: false, metropolitanAreaDate: false, regionMoveInDate: false,
-        accountInfo: false, spouseAccountDate: false, 
-     });
+        accountInfo: false, spouseAccountDate: false,
+    });
 
     useEffect(() => {
         const keysToRemove = Object.keys(visibility).filter(
@@ -59,14 +63,14 @@ export default function Condition01Content() {
     }, [visibility]);
 
     useEffect(() => {
-        setHasSpouse(formData['married'] === 1 || formData['married'] === 2 );
+        setHasSpouse(formData['married'] === 1 || formData['married'] === 2);
     }, [formData]);
 
-    function handleClick(e) {
+    function handleNextButtonClick() {
 
         let formData1 = formData;
-        if(hasSpouse) {
-            formData1 = {...formData1, ...spouseFormData};
+        if (hasSpouse) {
+            formData1 = { ...formData1, ...spouseFormData };
         }
 
         // 폼 데이터 저장
@@ -102,19 +106,19 @@ export default function Condition01Content() {
         });
     }
 
-    function changeVisibility({condition, name}) {
+    function changeVisibility({ condition, name }) {
         setVisibility((prev) => {
-            if(condition) {
-                return {...prev, [name]: true};                                                               
+            if (condition) {
+                return { ...prev, [name]: true };
             } else {
-                return {...prev, [name]: false};
+                return { ...prev, [name]: false };
             }
         });
         setFormData((prev) => {
-            if(condition) {
-                return prev;                                                               
+            if (condition) {
+                return prev;
             } else {
-                const {[name]: _, ...rest} = prev;
+                const { [name]: _, ...rest } = prev;
                 return rest;
             }
         })
@@ -138,35 +142,47 @@ export default function Condition01Content() {
         });
     }
 
+    function handleSubmit(event) {
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+            setValidated(true);
+            return;
+        } 
+
+        handleNextButtonClick();
+    }
+
     return (
-        <Form>
+        <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Stack direction='vertical' gap={5} >
 
                 {/* 신청자 생년월일 */}
-                <InputNumberItem number={1} question={'신청자 생년월일'}
+                <InputNumberItem question={'신청자 생년월일'}
                     name={'birthday'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
 
                 {/* 현재 거주지 */}
                 <MoveInDate onChangedInputValue={onChangedInputValue} changeVisibility={changeVisibility} />
 
                 {/* 현재 거주지에 입주한 날 */}
-                <InputNumberItem number={3} question={`${formData.gunGu ?? 'OOO'}에 입주한 날(주민등록표등본에 있는 전입일자)`}
+                <InputNumberItem question={`${formData.gunGu ?? 'OOO'}에 입주한 날(주민등록표등본에 있는 전입일자)`}
                     name={'transferDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
 
                 {/* [꼬리질문] 현재 지역(시/도)에 거주하기 시작한 날 */}
                 <MoveInFollwUpQuestion1 onChangedInputValue={onChangedInputValue}
-                    visibility={visibility['regionMoveInDate']} siDo={formData.siDoName} />
+                    visibility={visibility['regionMoveInDate']} siDo={Sido[formData.siDo]} />
 
                 {/* [꼬리질문] 서울, 경기, 인천에 거주하기 시작한 날 */}
                 <MoveInFollwUpQuestion2 onChangedInputValue={onChangedInputValue}
                     visibility={visibility['metropolitanAreaDate']} type='date' placeholder={placeholderText.dateType} />
 
                 {/* 세대주 여부 */}
-                <RadioButtonItem number={4} question={'세대주 여부'}
+                <RadioButtonItem question={'세대주 여부'}
                     buttons={houseHolderButtons} direction={'horizontal'} onChange={onChangedInputValue} />
 
                 {/* 결혼 여부 */}
-                <RadioButtonItem number={5} question={'결혼을 하셨습니까?'}
+                <RadioButtonItem question={'결혼을 하셨습니까?'}
                     buttons={marriedButtons} direction={'vertical'} onChange={onChangedInputValue}
                     handleFollowUpQuestion={handleFollowUpQuestion} />
 
@@ -174,12 +190,12 @@ export default function Condition01Content() {
                 <MarriedFollwUpQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['marriedDate']} />
 
                 {/* [꼬리질문] 배우자 동거 여부 */}
-                {hasSpouse && <RadioButtonSubItem number={5} question={'배우자와 같이 살고 계신가요?'} depth={3}
+                {hasSpouse && <RadioButtonSubItem question={'배우자와 같이 살고 계신가요?'} depth={3}
                     buttons={livingWithSpouseButtons} direction={'horizontal'} onChange={onSpouseChangedInputValue}
                     handleFollowUpQuestion={handleFollowUpQuestion} />}
-                
+
                 {/* 소유하신 청약 통장의 종류를 선택해주세요 */}
-                <RadioButtonItem number={6} question={'소유하신 청약 통장의 종류를 선택해주세요'}
+                <RadioButtonItem question={'소유하신 청약 통장의 종류를 선택해주세요'}
                     buttons={accountTypeButtons} direction={'horizontal'} onChange={onChangedInputValue}
                     handleFollowUpQuestion={handleFollowUpQuestion} />
 
@@ -189,7 +205,6 @@ export default function Condition01Content() {
                 {/* 배우자도 청약 통장이 있으신가요? */}
                 {hasSpouse && (
                     <RadioButtonSubItem
-                        number={2}
                         question={'배우자도 청약 통장이 있으신가요?'} depth={3}
                         buttons={spouseHasAccountButtons}
                         direction={'horizontal'}
@@ -201,68 +216,73 @@ export default function Condition01Content() {
                 {(visibility['spouseAccountDate'] && hasSpouse) && <SpouseAccountInfoQuestion onChangedInputValue={onSpouseChangedInputValue} />}
 
                 {/* 다음으로 */}
-                <Button variant="dark" onClick={handleClick}>다음</Button>
+                <Button variant="dark" type="submit" >다음</Button>
             </Stack>
 
         </Form>
     );
 }
 
-{/* 거주지역 - 현재 사는 지역 */ }
+/* 거주지역 - 현재 사는 지역 */
 function MoveInDate({ onChangedInputValue, changeVisibility }) {
-    
+
     const [sidoSelectedName, setSidoSelectedName] = useState('시/도');
     const [gunguSelectedName, setGunguelectedName] = useState('군/구');
 
-    const sidoData = conditions.wishRegion.subcategories;
-    const [sidoIndex, setSidoIndex] = useState(0);
-    const [gunguData, setGunguData] = useState([{value: '군/구'}]);
+    const [sidoSelectedIndex, setSidoSelectedIndex] = useState("");
+    const [gunguSelectedIndex, setGunguSelectedIndex] = useState("");
 
-    function handleChangedSidoDropdown({index}) {
-        setSidoIndex(index);
-        setGunguData(sidoData[index].values);
-        setSidoSelectedName(sidoData[index].category);
-        
-        onChangedInputValue({name: 'siDo', value: sidoData[index].code});
-        onChangedInputValue({name: 'siDoName', value: sidoData[index].category});
+    const sidoData = conditionInfo.wishRegion.subcategories;
+    const [gunguData, setGunguData] = useState([]);
 
-        setGunguelectedName('군/구');
-        onChangedInputValue({name: 'gunGu', value: null});
+    function handleChangedSido(e) {
 
-        const sidoCode = sidoData[index].code;
+        const index = Number(e.target.value);
+        setSidoSelectedIndex(index);
+
+        setGunguSelectedIndex("");
+        onChangedInputValue({ name: 'gunGu', value: null });
+
+        let nextGunguData = [];
+        let nextSidoData = { name: 'siDo', value: null };
+        let sidoCode = 0;
+        if(index > 0) {
+            nextGunguData = sidoData[index - 1].values;
+            nextSidoData = { name: 'siDo', value: sidoData[index - 1].code };
+            sidoCode = sidoData[index - 1].code;
+        } 
+
+        setGunguData(nextGunguData);
+        onChangedInputValue(nextSidoData);
 
         // 서울, 인천, 경기?
-        const trueCondition = sidoCode === 100 || sidoCode === 400 || sidoCode == 410;
-        changeVisibility({ condition: trueCondition, name: 'metropolitanAreaDate'});
+        const trueCondition = sidoCode === 100 || sidoCode === 400 || sidoCode === 410;
+        changeVisibility({ condition: trueCondition, name: 'metropolitanAreaDate' });
 
         // 경기/충북/충남/전북/전남/경북/경남/강원
         const regionMoveinSidoList = [410, 360, 312, 560, 513, 712, 621, 200];
         const regionMoveinCondition = regionMoveinSidoList.includes(sidoCode);
-        changeVisibility({ condition: regionMoveinCondition, name: 'regionMoveInDate'});
+        changeVisibility({ condition: regionMoveinCondition, name: 'regionMoveInDate' });
     }
 
-    function handleChangedGuGunDropdown({index}) {
-        
+    function handleChangedGungu(e) {
+
+        const index = Number(e.target.value);
+        setGunguSelectedIndex(index);
+
         // 값 저장
-        setGunguelectedName(gunguData[index].value);
-        onChangedInputValue({name: 'gunGu', value: gunguData[index].value});
+        setGunguelectedName(gunguData[index - 1].value);
+        onChangedInputValue({ name: 'gunGu', value: gunguData[index - 1].value });
     }
 
     const sidoList = () => {
         return sidoData.map((item, index) => (
-            <Dropdown.Item href="#/action-1" key={index}
-                onClick={() => handleChangedSidoDropdown({index: index})}>
-                {item.category}
-            </Dropdown.Item>
+            <option key={index + 1} value={index + 1} >{item.category}</option>
         ));
     }
-
     const gunguList = () => {
         return gunguData.map((item, index) => (
-            <Dropdown.Item href="#/action-1" key={index}
-            onClick={() => handleChangedGuGunDropdown({index: index})}>
-                {item.value}
-            </Dropdown.Item>
+            <option key={index + 1} value={index + 1} >{item.value}</option>
         ));
     }
 
@@ -271,24 +291,14 @@ function MoveInDate({ onChangedInputValue, changeVisibility }) {
             <div>
                 <p className="card-header-text">현재 거주지</p>
                 <Stack direction='horizontal' gap={2} >
-                    <Dropdown style={{ flex: 1 }}>
-                        <Dropdown.Toggle variant="warning" className='dropdown-transparent flex-fill' >
-                            {sidoSelectedName}
-                        </Dropdown.Toggle>
-
-                        <Dropdown.Menu>
-                            {sidoList()}
-                        </Dropdown.Menu>
-                    </Dropdown>
-                    <Dropdown style={{ flex: 1 }} >
-                        <Dropdown.Toggle variant="warning" className='dropdown-transparent flex-fill' >
-                            {gunguSelectedName}
-                        </Dropdown.Toggle>
-
-                        <Dropdown.Menu>
-                            {gunguList()}
-                        </Dropdown.Menu>
-                    </Dropdown>
+                    <Form.Select required value={sidoSelectedIndex} onChange={handleChangedSido}>
+                        <option value="" >시/군 선택</option>
+                        {sidoList()}
+                    </Form.Select>
+                    <Form.Select required value={gunguSelectedIndex} onChange={handleChangedGungu}>
+                        <option value="" >군/구 선택</option>
+                        {gunguList()}
+                    </Form.Select>
                 </Stack>
             </div>
 
@@ -296,7 +306,7 @@ function MoveInDate({ onChangedInputValue, changeVisibility }) {
     );
 }
 
-{/* 거주지역 - 특정 지역()에 거주하기 시작한 날 */ }
+/* 거주지역 - 특정 지역()에 거주하기 시작한 날 */
 function MoveInFollwUpQuestion1({ siDo, onChangedInputValue, visibility }) {
 
     if (visibility === false) {
@@ -304,12 +314,12 @@ function MoveInFollwUpQuestion1({ siDo, onChangedInputValue, visibility }) {
     }
 
     return (
-        <InputNumberSubItem number={'3-1'} question={`${siDo}에 거주하기 시작한 날`} depth={3}
+        <InputNumberSubItem question={`${siDo}에 거주하기 시작한 날`} depth={3}
             name={'regionMoveInDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
     );
 }
 
-{/* 거주지역 - 서울, 경기, 인천에 거주하기 시작한 날 */ }
+/* 거주지역 - 서울, 경기, 인천에 거주하기 시작한 날 */
 function MoveInFollwUpQuestion2({ onChangedInputValue, visibility }) {
 
     if (visibility === false) {
@@ -317,12 +327,12 @@ function MoveInFollwUpQuestion2({ onChangedInputValue, visibility }) {
     }
 
     return (
-        <InputNumberSubItem number={'3-2'} question={'서울, 경기, 인천에 거주하기 시작한 날'} depth={3}
+        <InputNumberSubItem question={'서울, 경기, 인천에 거주하기 시작한 날'} depth={3}
             name={'metropolitanAreaDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
     );
 }
 
-{/* 결혼 여부 - 혼인신고일 */ }
+/* 결혼 여부 - 혼인신고일 */
 function MarriedFollwUpQuestion({ onChangedInputValue, visibility }) {
 
     if (!visibility) {
@@ -330,12 +340,12 @@ function MarriedFollwUpQuestion({ onChangedInputValue, visibility }) {
     }
 
     return (
-        <InputNumberSubItem number={'5-1'} question={'혼인신고일'} depth={3}
+        <InputNumberSubItem question={'혼인신고일'} depth={3}
             name={'marriedDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
     );
 }
 
-{/* 청약 통장 - 청약 통장 정보 */ }
+/* 청약 통장 - 청약 통장 정보 */
 function AccountInfoQuestion({ onChangedInputValue, visibility }) {
 
     if (!visibility) {
@@ -344,23 +354,23 @@ function AccountInfoQuestion({ onChangedInputValue, visibility }) {
 
     return (
         <div>
-            <InputNumberSubItem number={'1-1'} question={'가입일자 입력'} depth={3}
+            <InputNumberSubItem question={'가입일자 입력'} depth={3}
                 name={'createdAt'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
-            <InputNumberSubItem number={'1-2'} question={'납입 횟수 입력'} depth={3}
+            <InputNumberSubItem question={'납입 횟수 입력'} depth={3}
                 name={'paymentCount'} onChange={onChangedInputValue} placeholder={placeholderText.countType} />
-            <InputNumberSubItem number={'1-3'} question={'총 납입 금액 입력'} depth={3}
+            <InputNumberSubItem question={'총 납입 금액 입력'} depth={3}
                 name={'totalAmount'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
-            <InputNumberSubItem number={'1-4'} question={'납입 인정 금액 입력'} depth={3}
+            <InputNumberSubItem question={'납입 인정 금액 입력'} depth={3}
                 name={'recognizedAmount'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
         </div>
     );
 }
 
-{/* 배우자 청약통장 - 가입일자 */ }
+/* 배우자 청약통장 - 가입일자 */
 function SpouseAccountInfoQuestion({ onChangedInputValue }) {
 
     return (
-        <InputNumberSubItem number={'2-1'} question={'가입일자 입력'} depth={3}
+        <InputNumberSubItem question={'가입일자 입력'} depth={3}
             name={'spouseAccountDate'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
     );
 }

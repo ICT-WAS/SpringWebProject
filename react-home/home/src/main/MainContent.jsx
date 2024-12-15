@@ -1,22 +1,19 @@
-import { Card, Image, Stack } from 'react-bootstrap';
+import { Image, Stack } from 'react-bootstrap';
 import { Container, Row, Col } from 'react-bootstrap';
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
+import {SubscriptionCards} from '../apply_announcement/SubscriptionCards';
 import CommunityCard from '../community/CommunityCard';
-import NotificationButton from '../apply_announcement/NotificationButton';
 
 function CommunityCards() {
-  
-  /* 임시 데이터 */
-  const communityInfo = [
-    {title:'청약 당첨되신 분 있긴 한가요?', subject:'통장 10년째 유지중인데 30번 넘게 신청했지만 주변에서도 그렇고 당첨된 사람을 본 적이 없…', postId: "박상빈", createdAt: "2024-12-13T13:09:22"},
-    {title:'당첨됐어요!!!!!!!!!!!!!!!', subject:'저도 이제 제 집이 생기네요 !! 다들  포기하지 말고 노려봐요!!!!!!', postId: "박상빈", createdAt: "2024-12-13T13:09:22"},
-    {title:'당첨됐어요!!!!!!!!!!!!!!!', subject:'저도 이제 제 집이 생기네요 !! 다들  포기하지 말고 노려봐요!!!!!!', postId: "박상빈", createdAt: "2024-12-13T13:09:22"},
-  ];
 
-  // const communityCardList = communityInfo.map(community =>
-  //   CommunityCard({community})
-  // );
+  
+  /* 최근 게시물 5개*/
+  const posts = [
+    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
+    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
+    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
+    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
+    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
+   ];
 
   return (
     <>
@@ -26,58 +23,29 @@ function CommunityCards() {
         </a>
       </p>
       <Stack direction='horizontal' gap={3}>
-        {/* {communityCardList} */}
+        {/* {communityCardList} */} 
+        {posts.map((post, index) => {
+          return (
+            <div key={index} >
+              <CommunityCard post={post} />
+            </div>
+          );
+        })}
       </Stack>
       
     </>
   );
 }
 
-function NewSubscriptionCard({subscription}) {
-  return (
-    <>
-      <Container>
-        <Card body>
-          <Row>
-            <Col>
-              <Container>
-                <Row>
-                  <Col><p className='card-header-text'>
-          <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
-                  {subscription.title}
-                  </a>
-                  </p>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col md="auto"><p className='card-body-text'>{subscription.type}</p></Col>
-                  <Col md="auto"><p className='card-body-text'>{subscription.region}</p></Col>
-                  <Col><p className='card-body-text'>{subscription.date}</p></Col>
-                </Row>
-              </Container>
-            </Col>
-            <Col md="auto">
-              <NotificationButton />
-            </Col>
-          </Row>
-        </Card>
-      </Container>
-    </>
-  );
-}
-
 function NewSubscriptionCards() {
-  /* 임시 데이터 */
-  const subscriptions = [
-    {title:'화성 비봉지구 B1블록 금성백조 예미지2차', type:'민영', region:'경기도 > 화성시', date:'2024-05-02'},
-    {title:'화성 비봉지구 B1블록 금성백조 예미지2차', type:'민영', region:'경기도 > 화성시', date:'2024-05-02'},
-    {title:'화성 비봉지구 B1블록 금성백조 예미지2차', type:'민영', region:'경기도 > 화성시', date:'2024-05-02'},
-    {title:'화성 비봉지구 B1블록 금성백조 예미지2차', type:'민영', region:'경기도 > 화성시', date:'2024-05-02'}
+  /* 최근 공고 5개*/
+  const subscriptions = [ 
+    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
+    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
+    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
+    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
+    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
   ];
-
-  const newSubscriptionList = subscriptions.map(subscription =>
-    NewSubscriptionCard({subscription})
-  );
 
   return (
     <>
@@ -87,7 +55,7 @@ function NewSubscriptionCards() {
         </a>
       </p>
       <Stack direction='vertical' gap={3}>
-        {newSubscriptionList}
+        <SubscriptionCards subscriptions={subscriptions} />
         </Stack>
     </>
   );

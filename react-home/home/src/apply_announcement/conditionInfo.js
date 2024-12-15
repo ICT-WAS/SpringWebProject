@@ -1,4 +1,4 @@
-export const conditions = {
+export const conditionInfo = {
     wishRegion:
         {
             category: '희망지역', subcategories: [
