@@ -2,11 +2,9 @@ package com.ict.home.user.controller;
 
 import com.ict.home.exception.BaseException;
 import com.ict.home.exception.BaseResponse;
-import com.ict.home.user.dto.PostLoginReq;
-import com.ict.home.user.dto.PostLoginRes;
+import com.ict.home.user.dto.*;
 
-import com.ict.home.user.dto.PostUserReq;
-import com.ict.home.user.dto.PostUserRes;
+import com.ict.home.user.enums.UserVerify;
 import com.ict.home.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -88,6 +86,19 @@ public class UserController {
         try{
             return new BaseResponse<>(userService.createAccessToken(userId));
         } catch(BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 인증된 핸드폰 번호로 이메일 찾기
+     */
+    @PostMapping("/find/email")
+    public BaseResponse<String> findEmail(@RequestBody PostFindEmailReq postFindEmailReq) {
+        try {
+            String phoneNumber = postFindEmailReq.getPhoneNumber();
+            return new BaseResponse <>(userService.findEmailByPhoneNumber(phoneNumber));
+        } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
     }

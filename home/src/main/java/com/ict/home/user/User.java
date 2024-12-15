@@ -59,9 +59,9 @@ public class User extends BaseTimeEntity { //아이디, 유저이름, 패스워�
     }
 
     //소셜 회원가입
-    public void createUser(String username, String email, boolean isSocial) {
+    public void createUser(String username, boolean isSocial) {
         this.username = username;
-        this.email = email;
+        this.email = null;
         this.password = null;
         this.phoneNumber = null;
         this.status = UserStatus.ACTIVE;  //회원가입 시 자동 활성화

@@ -115,7 +115,7 @@ public class NaverService {
     public User naverSignup(NaverUserInfoRes userInfo, String providerUserID) {
         User user = new User();
 
-        user.createUser(userInfo.getResponse().getUsername(), userInfo.getResponse().getEmail(), true);
+        user.createUser(userInfo.getResponse().getUsername(), true);
         userRepository.save(user);
 
         //어카운트 테이블 생성 및 할당

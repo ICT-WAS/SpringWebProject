@@ -24,6 +24,10 @@ public class UserUtilService {
         return userRepository.findById(userId).orElseThrow(()-> new BaseException(POST_USERS_NONE_EXISTS_ID));
     }
 
+    public User findByPhoneNumberValidation(String phoneNumber) {
+        return userRepository.findByPhoneNumber(phoneNumber).orElseThrow(()-> new BaseException(USERS_NONE_EXISTS_PHONE));
+    }
+
     public Boolean findByUserId(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new BaseException(POST_USERS_NONE_EXISTS_ID);

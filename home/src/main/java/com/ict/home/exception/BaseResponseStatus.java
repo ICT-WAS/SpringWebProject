@@ -23,6 +23,8 @@ public enum BaseResponseStatus {
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
     INVALID_MEMBER_ID(false, 2011, "멤버 아이디와 이메일이 일치하지 않습니다."),
     PASSWORD_CANNOT_BE_NULL(false, 2012, "비밀번호를 입력해주세요."),
+    USERS_NONE_EXISTS_PHONE(false, 2013, "등록되지 않은 핸드폰 번호입니다."),
+
     // email-verify
     INVALID_EMAIL_CODE(false, 2020, "이메일 인증 코드가 일치하지 않습니다."),
     CODE_EXPIRED(false, 2021, "인증 코드가 만료되었습니다."),

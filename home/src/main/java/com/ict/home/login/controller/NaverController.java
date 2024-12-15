@@ -54,10 +54,6 @@ public class NaverController {
 
         try {
             if (!socialAccountRepository.existsByProviderUserId(providerUserId)) {
-                if (userRepository.existsByEmail(userInfo.getResponse().getEmail())) {
-                    return new BaseResponse<>(POST_USERS_EXISTS_EMAIL);
-                    //error code 2001 -> 이미 사용중인 이메일입니다. 연동하시려면 청약이지 회원가입/로그인 - 마이페이지 - 정보수정 - 소셜 로그인 연동 기능을 사용해주세요.
-                }
                 naverService.naverSignup(userInfo, providerUserId);
             }
             return new BaseResponse<>(naverService.naverLogin(providerUserId, response));
