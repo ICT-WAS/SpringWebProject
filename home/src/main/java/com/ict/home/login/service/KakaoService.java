@@ -108,7 +108,7 @@ public class KakaoService {
     public User kakaoSignup(KakaoUserInfoRes userInfo, String providerUserId) {
         User user = new User();
 
-        user.createUser(userInfo.getKakaoAccount().getProfile().getNickName(), userInfo.getKakaoAccount().getEmail(), true);
+        user.createUser(userInfo.getKakaoAccount().getProfile().getNickName(), true);
         userRepository.save(user);
 
         //어카운트 테이블 생성 및 할당
