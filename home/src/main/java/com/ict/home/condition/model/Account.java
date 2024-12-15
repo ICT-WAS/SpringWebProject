@@ -29,7 +29,7 @@ public class Account {
 
     @Schema(description = "회원 고유 pk")
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 
     @Schema(description = "청약통장종류")

@@ -6,6 +6,7 @@ import { InputNumberItem, InputNumberSubItem } from "./InputNumberItem";
 import { RadioButtonItem } from "./RadioButtonItem";
 import { placeholderText } from "./placeholderText";
 import Spinners from '../common/Spinners';
+import { getUserIdFromToken } from '../api/TokenUtils';
 
 export default function Condition03Content() {
 
@@ -105,12 +106,17 @@ export default function Condition03Content() {
 
         console.log(submitData);
 
+
+        const token = localStorage.getItem("accessToken");
+        const userId = getUserIdFromToken(token);
+
+        console.log(userId);
+
         // POST 요청
         
         setLoading(true);
         axios
-            // .post("http://localhost:8989/condition/test/${userId}",
-            .post("http://localhost:8989/condition/test", submitData)
+            .post(`http://localhost:8989/condition/${userId}`,submitData)
             .then((response) => {
                 setLoading(false);
             })

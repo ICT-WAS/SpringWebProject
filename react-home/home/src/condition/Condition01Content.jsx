@@ -148,7 +148,7 @@ export default function Condition01Content() {
         } 
 
         let accountDTOList = { accountDTOList: [{ ...accountData }]};
-        if (hasSpouse) {
+        if (hasSpouse && spouseAccountData.createdAt) {
             accountDTOList = { accountDTOList: [{...accountData,}, {...spouseAccountData}] };
         }
 
