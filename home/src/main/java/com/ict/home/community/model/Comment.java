@@ -53,7 +53,7 @@ public class Comment {
 
     @NotNull
     @Schema(description = "내용")
-    @Column(name = "comments", nullable = false)
+    @Column(name = "comments", nullable = false, columnDefinition = "TEXT")
     private String comments;
 
     @NotNull

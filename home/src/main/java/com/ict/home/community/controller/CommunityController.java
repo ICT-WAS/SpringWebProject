@@ -139,6 +139,7 @@ public class CommunityController {
 
         String title = postUpdateRequest.getTitle();
         String subject = postUpdateRequest.getSubject();
+        subject = subject.replaceAll("\n", "<br>");
 
         return cs.updatePost(postId, title, subject);
     }
