@@ -1,12 +1,15 @@
 package com.ict.home.user.service;
 
 import com.ict.home.exception.BaseException;
+import com.ict.home.exception.BaseResponse;
+import com.ict.home.exception.BaseResponseStatus;
 import com.ict.home.login.auth.model.Verification;
 import com.ict.home.login.auth.repository.VerificationRepository;
 import com.ict.home.login.jwt.JwtProvider;
 import com.ict.home.login.jwt.Secret;
 import com.ict.home.login.jwt.Token;
 import com.ict.home.login.jwt.TokenRepository;
+import com.ict.home.user.enums.UserVerify;
 import com.ict.home.user.repository.UserRepository;
 import com.ict.home.user.dto.PostLoginReq;
 import com.ict.home.user.dto.PostLoginRes;
@@ -150,57 +153,6 @@ public class UserService {
         }
     }
 
-    //리프레시 토큰의 만료 확인 후 사용자 정보에 맞는 유저 반환
-    public String checkRefreshTokenExpire(Token token, User user) {
-        //1. 만료 되었을 시
-        if (token.isExpired()) {
-            //1-1. 기존 리프레시 토큰 삭제
-            tokenRepository.deleteByUserId(user.getId());
-
-            //1-2. 리프레시 토큰을 재발급 후 저장 및 반환
-            return createAndSaveRefreshToken(user);
-        } else{
-            //2. 만료되지 않았을 시 - 기존 리프레시 토큰을 반환
-            return token.getRefreshToken();
-        }
-    }
-
-    //액세스 토큰 발급 - 재발급 시 사용
-    public String createAccessToken(Long userId) {
-        log.info("재발급 로직 탔음~!!! userId:{}", userId);
-        User user = userUtilService.findByIdWithValidation(userId);
-        
-        if (user == null) {
-            throw new BaseException(POST_USERS_NONE_EXISTS_ID);
-        }
-
-        Token token = tokenRepository.findByUserId(userId);
-        if (token == null) {
-            throw new BaseException(TOKEN_NOT_FOUND_IN_USER);
-        }
-
-        //리프레시 토큰의 만료 확인 후 사용자 정보에 맞는 리프레시 토큰 반환
-        String refreshToken = checkRefreshTokenExpire(token, user);
-
-        String accessToken = null;
-        if (refreshToken != null) {
-            accessToken = jwtProvider.createAccessToken(user);
-        }
-        return accessToken;
-    }
-
-    //리프레시 토큰 발급 및 저장
-    public String createAndSaveRefreshToken(User user) {
-        String refreshToken = jwtProvider.createRefreshToken(user);
-        
-        Token token = Token.builder()
-                .refreshToken(refreshToken)
-                .user(user)
-                .build();
-        tokenRepository.save(token);
-        return refreshToken;
-    }
-
     /**
      * 로그아웃
      */
@@ -229,6 +181,30 @@ public class UserService {
     }
 
     /**
+     * 이메일 찾기 - 인증된 핸드폰으로 찾기
+     */
+    public String findEmailByPhoneNumber(String phoneNumber) {
+        //데이터베이스에 있는 회원일 시
+        User user = userUtilService.findByPhoneNumberValidation(phoneNumber);
+
+        //핸드폰 인증 회원이 아닐 경우
+        if (user.getUserVerify() != UserVerify.PHONE_VERIFIED) {
+            throw new BaseException(BaseResponseStatus.PHONE_VERIFICATION_FAILED);
+        }
+
+        //핸드폰 인증 회원일 경우
+        return user.getEmail();
+    }
+
+    /**
+     * 회원 탈퇴
+     */
+
+    /**
+     * 회원정보 불러오기
+     */
+
+    /**
      * 비동기 처리를 위한 email, 휴대폰 번호, 유저 이름 중복 체크
      */
     public boolean checkEmailExists(String email) {
@@ -241,5 +217,56 @@ public class UserService {
 
     public boolean checkUsernameExists(String username) {
         return userRepository.existsByUsername(username);
+    }
+
+    //리프레시 토큰의 만료 확인 후 사용자 정보에 맞는 유저 반환
+    public String checkRefreshTokenExpire(Token token, User user) {
+        //1. 만료 되었을 시
+        if (token.isExpired()) {
+            //1-1. 기존 리프레시 토큰 삭제
+            tokenRepository.deleteByUserId(user.getId());
+
+            //1-2. 리프레시 토큰을 재발급 후 저장 및 반환
+            return createAndSaveRefreshToken(user);
+        } else{
+            //2. 만료되지 않았을 시 - 기존 리프레시 토큰을 반환
+            return token.getRefreshToken();
+        }
+    }
+
+    //액세스 토큰 발급 - 재발급 시 사용
+    public String createAccessToken(Long userId) {
+        log.info("재발급 로직 탔음~!!! userId:{}", userId);
+        User user = userUtilService.findByIdWithValidation(userId);
+
+        if (user == null) {
+            throw new BaseException(POST_USERS_NONE_EXISTS_ID);
+        }
+
+        Token token = tokenRepository.findByUserId(userId);
+        if (token == null) {
+            throw new BaseException(TOKEN_NOT_FOUND_IN_USER);
+        }
+
+        //리프레시 토큰의 만료 확인 후 사용자 정보에 맞는 리프레시 토큰 반환
+        String refreshToken = checkRefreshTokenExpire(token, user);
+
+        String accessToken = null;
+        if (refreshToken != null) {
+            accessToken = jwtProvider.createAccessToken(user);
+        }
+        return accessToken;
+    }
+
+    //리프레시 토큰 발급 및 저장
+    public String createAndSaveRefreshToken(User user) {
+        String refreshToken = jwtProvider.createRefreshToken(user);
+
+        Token token = Token.builder()
+                .refreshToken(refreshToken)
+                .user(user)
+                .build();
+        tokenRepository.save(token);
+        return refreshToken;
     }
 }

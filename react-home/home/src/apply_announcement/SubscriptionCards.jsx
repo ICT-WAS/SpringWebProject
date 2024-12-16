@@ -34,6 +34,7 @@ export default function SubscriptionCardsWithHeader({ subscriptions, totalCount,
 
         {loading && <Spinners />}
 
+        {subscriptions.length < 1 && <p>검색 결과가 없습니다.</p>}
         {newSubscriptionList}
       </Stack>
     </>
