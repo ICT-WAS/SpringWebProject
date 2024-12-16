@@ -13,7 +13,7 @@ export default function Condition01Content() {
 
     const [validated, setValidated] = useState(false);
 
-    const houseHolderButtons = { name: 'householder', values: [{ data: '세대원', value: 'N', }, { data: '세대주', value: 'Y', }] }
+    const houseHolderButtons = { name: 'isHouseHolder', values: [{ data: '세대원', value: false, }, { data: '세대주', value: true, }] }
     const marriedButtons = { name: 'married', values: [{ data: '미혼', value: 0 }, { data: '기혼', value: 1, hasFollowUpQuestion: true }, { data: '예비신혼부부', value: 2 }, { data: '한부모', value: 3 }] }
     const accountTypeButtons = {
         name: 'type', values: [
@@ -28,6 +28,8 @@ export default function Condition01Content() {
     /* 제출용 데이터 */
     const [formData, setFormData] = useState({});
     const [spouseFormData, setSpouseFormData] = useState({});
+    const [accountData, setAccountData] = useState({});
+    const [spouseAccountData, setSpouseAccountData] = useState({});
 
     /* 꼬리질문 가시성 */
     const [hasSpouse, setHasSpouse] = useState(false);
@@ -66,20 +68,6 @@ export default function Condition01Content() {
         setHasSpouse(formData['married'] === 1 || formData['married'] === 2);
     }, [formData]);
 
-    function handleNextButtonClick() {
-
-        let formData1 = formData;
-        if (hasSpouse) {
-            formData1 = { ...formData1, ...spouseFormData };
-        }
-
-        // 폼 데이터 저장
-        sessionStorage.setItem('formData1', JSON.stringify(formData1));
-        // console.log(formData1);
-
-        navigate("/condition-2");
-    }
-
     function onChangedInputValue({ name, value }) {
         const questionName = followUpQuestions[name];
 
@@ -93,6 +81,10 @@ export default function Condition01Content() {
         });
     }
 
+    function onChangedAccount({ name, value }) {
+        setAccountData((prev) => ({ ...prev, [name]: value, relationship: 1 }));
+    }
+
     function onSpouseChangedInputValue({ name, value }) {
         const questionName = followUpQuestions[name];
 
@@ -104,6 +96,10 @@ export default function Condition01Content() {
                 [name]: value
             };
         });
+    }
+
+    function onSpouseChangedAccount({ name, value }) {
+        setSpouseAccountData({ [name]: value, relationship: 2 });
     }
 
     function changeVisibility({ condition, name }) {
@@ -151,10 +147,25 @@ export default function Condition01Content() {
             return;
         } 
 
-        handleNextButtonClick();
+        let accountDTOList = { accountDTOList: [{ ...accountData }]};
+        if (hasSpouse && spouseAccountData.createdAt) {
+            accountDTOList = { accountDTOList: [{...accountData,}, {...spouseAccountData}] };
+        }
+
+        // 폼 데이터 저장
+        sessionStorage.setItem('formData1', JSON.stringify(formData));
+        sessionStorage.setItem('accountDTOList', JSON.stringify(accountDTOList));
+        sessionStorage.setItem('livingWithSpouse', spouseFormData.spouse);
+
+        navigate("/condition-2");
     }
 
     return (
+        <>
+        <p className='heading-text'>
+          조건 등록 (1/3) - 신청자/배우자 정보 입력
+        </p>
+
         <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Stack direction='vertical' gap={5} >
 
@@ -196,11 +207,11 @@ export default function Condition01Content() {
 
                 {/* 소유하신 청약 통장의 종류를 선택해주세요 */}
                 <RadioButtonItem question={'소유하신 청약 통장의 종류를 선택해주세요'}
-                    buttons={accountTypeButtons} direction={'horizontal'} onChange={onChangedInputValue}
+                    buttons={accountTypeButtons} direction={'horizontal'} onChange={onChangedAccount}
                     handleFollowUpQuestion={handleFollowUpQuestion} />
 
                 {/* [꼬리질문] 청약 통장 정보 */}
-                <AccountInfoQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['accountInfo']} />
+                <AccountInfoQuestion onChangedInputValue={onChangedAccount} visibility={visibility['accountInfo']} />
 
                 {/* 배우자도 청약 통장이 있으신가요? */}
                 {hasSpouse && (
@@ -213,13 +224,14 @@ export default function Condition01Content() {
                     />
                 )}
                 {/* [꼬리질문] 배우자의 청약 통장 정보 */}
-                {(visibility['spouseAccountDate'] && hasSpouse) && <SpouseAccountInfoQuestion onChangedInputValue={onSpouseChangedInputValue} />}
+                {(visibility['spouseAccountDate'] && hasSpouse) && <SpouseAccountInfoQuestion onChangedInputValue={onSpouseChangedAccount} />}
 
                 {/* 다음으로 */}
                 <Button variant="dark" type="submit" >다음</Button>
             </Stack>
 
         </Form>
+        </>
     );
 }
 
@@ -371,6 +383,6 @@ function SpouseAccountInfoQuestion({ onChangedInputValue }) {
 
     return (
         <InputNumberSubItem question={'가입일자 입력'} depth={3}
-            name={'spouseAccountDate'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
+            name={'createdAt'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
     );
 }

@@ -23,6 +23,9 @@ import KakaoRedirection from "./components/login/KakaoRedirection";
 import NaverRedirection from "./components/login/NaverRedirection";
 import CommunityPostList from "./community/CommunityPostList";
 import CommunityPosting from "./community/CommunityPosting";
+import MyPage from "./mypage/MyPage";
+import PostDetail from "./community/PostDetail";
+import UpdatePost from "./community/UpdatePost";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -40,14 +43,21 @@ root.render(
         <Route path="/signup" element={<Signup />} />
         <Route path="/subscriptions" element={<ApplyAnnouncementList />} />
         <Route path="/subscriptions/info" element={<ApplyAnnouncement />} />
+
+         {/* 조건등록 */}
         <Route path="/conditions" element={<Conditions />} />
         <Route path="/condition-1" element={<Condition01 />} />
         <Route path="/condition-2" element={<Condition02 />} />
         <Route path="/condition-3" element={<Condition03 />} />
+
+        {/* 마이페이지 */}
+        <Route path="/mypage" element={<MyPage />} />
         
         {/* 커뮤니티 */}
         <Route exact path="/community" element={<CommunityPostList/>} />
         <Route exact path="/community/posting" element={<CommunityPosting/>} />
+        <Route exact path="/community/:postId" element={<PostDetail />} />
+        <Route exact path="/community/posting/:postId" element={<UpdatePost/>} />
 
         {/* 소셜 로그인 리다이렉트 경로 */}
         <Route exact path="/kakao/callback" element={<KakaoRedirection />} />

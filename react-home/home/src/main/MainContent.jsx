@@ -1,19 +1,37 @@
+import axios from 'axios';
 import { Image, Stack } from 'react-bootstrap';
 import { Container, Row, Col } from 'react-bootstrap';
-import {SubscriptionCards} from '../apply_announcement/SubscriptionCards';
+import { SubscriptionCards } from '../apply_announcement/SubscriptionCards';
 import CommunityCard from '../community/CommunityCard';
+import Spinners from '../common/Spinners';
+import { useState, useEffect } from 'react';
 
 function CommunityCards() {
 
-  
+  const [loading, setLoading] = useState(false);
+
   /* 최근 게시물 5개*/
-  const posts = [
-    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
-    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
-    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
-    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
-    {title: '임시 데이터', subject: '임시에요~~', createdAt: new Date(), postId: 123, user : {username: '이현지'}},
-   ];
+  const [posts, setPosts] = useState([]);
+
+  // 초기 데이터 로딩
+  useEffect(() => {
+    setLoading(true);
+    axios
+      .get("http://localhost:8989/community", {
+        params: {
+          page: 1,
+          size: 5,
+        },
+      })
+      .then((response) => {
+        setPosts(response.data.content);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("데이터 요청 실패:", error);
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <>
@@ -22,8 +40,10 @@ function CommunityCards() {
           커뮤니티 질문 &gt;
         </a>
       </p>
+      {loading && <Spinners />}
+      {posts.length < 1 && <p className='filter-values'>게시물이 없습니다.</p>}
       <Stack direction='horizontal' gap={3}>
-        {/* {communityCardList} */} 
+        {/* {communityCardList} */}
         {posts.map((post, index) => {
           return (
             <div key={index} >
@@ -32,31 +52,53 @@ function CommunityCards() {
           );
         })}
       </Stack>
-      
+
     </>
   );
 }
 
 function NewSubscriptionCards() {
+
+  const [loading, setLoading] = useState(false);
+
   /* 최근 공고 5개*/
-  const subscriptions = [ 
-    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
-    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
-    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
-    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
-    {houseId: 1, houseNm: '임시 데이터', type: '일반', region1: '경기도', region2: '광명시', rcritPblancDe: '2024-12-13'},
-  ];
+  const [subscriptions, setSubscriptions] = useState([]);
+
+  // 초기 데이터 로딩
+  useEffect(() => {
+    setLoading(true);
+    axios
+      .get("http://localhost:8989/house", {
+        params: {
+          orderBy: '최신순',
+          page: 1,
+          size: 5,
+        },
+      })
+      .then((response) => {
+        setSubscriptions(response.data.houseInfoList);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("데이터 요청 실패:", error);
+        setLoading(false);
+      });
+  }, []);
+
 
   return (
     <>
-    <p className='heading-text'>
+      <p className='heading-text'>
         <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
           새로 올라온 공고 &gt;
         </a>
       </p>
+
+      {loading && <Spinners />}
+      {subscriptions.length < 1 && <p className='filter-values'>공고가 없습니다.</p>}
       <Stack direction='vertical' gap={3}>
         <SubscriptionCards subscriptions={subscriptions} />
-        </Stack>
+      </Stack>
     </>
   );
 }
