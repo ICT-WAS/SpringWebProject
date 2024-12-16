@@ -1,60 +1,62 @@
 import { Form } from "react-bootstrap";
 import { useState } from "react";
 
-export function InputNumberItem({ question, name, onChange, type, placeholder }) {
+export function InputNumberItem({ question, name, onChange, type, placeholder, value, hasError }) {
 
     return (
         <>
             <div key={`-${question}`}>
                 <p className="card-header-text">{question}</p>
-                <InputText name={name} onChange={onChange} type={type} placeholder={placeholder} />
+                <InputText name={name} onChange={onChange} type={type} placeholder={placeholder} value={value} hasError={hasError} />
             </div>
         </>
     );
 }
 
-export function InputNumberSubItem({ question, depth = 1, name, onChange, type, placeholder }) {
+export function InputNumberSubItem({ question, depth = 1, name, onChange, type, placeholder, value, hasError }) {
     const marginClass = `ms-${depth * 1}`;
 
     return (
         <>
             <div key={`${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
                 <p className="card-header-text">{question}</p>
-                <InputText name={name} onChange={onChange} type={type} placeholder={placeholder} />
+                <InputText name={name} onChange={onChange} type={type} placeholder={placeholder} value={value} hasError={hasError}/>
             </div>
         </>
     );
 }
 
-export function InputText({ name, onChange, type='normal', placeholder }) {
+export function InputText({ name, onChange, type='normal', placeholder, value, hasError }) {
 
     const [error, setError] = useState(null);
 
-    function handleInputChange(e) {
+    function handleChange(e) {
+        const name = e.target.getAttribute('name');
+        const value = e.target.value;
+        onChange({name: name, value: value});
+    }
+
+    function handleBlur(e) {
 
         const name = e.target.getAttribute('name');
         let value = null;
 
-        let nextError = "값을 입력해주세요.";
-        setError();
-        if(e.target.value !== null || e.target.value.length !== 0) {
-            nextError = null;
-        } 
-
-        if(type === 'date') {
+        let nextError = null;
+        if(e.target.value === null || e.target.value.length === 0) {
+            nextError = "값을 입력해주세요.";
+        } else if(type === 'date') {
             value = formatDateToCustomFormat(e.target.value.toString());
             if(value === null) {
                 e.target.value = '';
                 nextError = "올바르지 않은 형식입니다.";
-            } else {
-            }
+            } 
         } else {
             e.target.value = Math.max(0, e.target.value);
             value = Number(e.target.value);
         }
 
         setError(nextError);
-        onChange({name: name, value: value});
+        hasError(nextError === null);
     }
 
     return (
@@ -63,8 +65,10 @@ export function InputText({ name, onChange, type='normal', placeholder }) {
                     type="number"
                     placeholder={placeholder}
                     name={name}
-                    onBlur={handleInputChange}
+                    onBlur={handleBlur}
+                    onChange={handleChange}
                     required
+                    value={value || ''}
                 />
             <p className="inputTypeError">{error}</p>
         </>
