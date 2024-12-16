@@ -20,8 +20,9 @@ export default function PostDetailContent() {
 
     // 댓글 수정 함수
     const handleEditComment = (commentId, currentContent) => {
+        const contents = currentContent.replaceAll("<br>", '\n');
         setEditingCommentId(commentId);  // 수정 중인 댓글 ID 저장
-        setEditedComment(currentContent); // 해당 댓글의 기존 내용을 저장하여 수정할 수 있게 함
+        setEditedComment(contents); // 해당 댓글의 기존 내용을 저장하여 수정할 수 있게 함
     };
 
     const handleSaveEdit = async (commentId, _userId) => {
@@ -46,11 +47,39 @@ export default function PostDetailContent() {
             // 서버가 응답을 OK로 반환하면 성공 처리
             if (response.ok) {
                 const data = await response.text();
-    
+                const showComment = editedComment.replaceAll(/\n/g, "<br>");
                 // 댓글 수정 성공 시
-                setComments(comments.map((comment) =>
-                    comment.commentId === commentId ? { ...comment, comments: editedComment } : comment
-                ));
+                setComments(comments.map((comment) => {
+                    // commentId와 일치하는 댓글을 찾았을 때
+                    if (comment.commentId === commentId) {
+                        return {
+                            ...comment,
+                            comments: showComment, // 댓글 내용 업데이트
+                            replies: comment.replies.map((reply) => {
+                                // 댓글 안의 대댓글 중 commentId와 일치하는 대댓글을 찾아 업데이트
+                                if (reply.commentId === commentId) {
+                                    return { ...reply, comments: showComment };
+                                }
+                                return reply; // 일치하지 않으면 그대로 반환
+                            }),
+                        };
+                    }
+                
+                    // 댓글 안에 대댓글이 있는 경우, 대댓글에서 commentId와 일치하는 값을 찾음
+                    const updatedReplies = comment.replies.map((reply) => {
+                        if (reply.commentId === commentId) {
+                            return { ...reply, comments: showComment };
+                        }
+                        return reply;
+                    });
+                
+                    return {
+                        ...comment,
+                        replies: updatedReplies, // 대댓글이 업데이트된 상태로 반환
+                    };
+                }));
+                
+            
                 setEditingCommentId(null);  // 수정 상태 종료
                 setEditedComment("");  // 입력 필드 초기화
                 alert("댓글이 수정되었습니다.");  // 사용자에게 성공 메시지 표시
@@ -147,6 +176,11 @@ export default function PostDetailContent() {
             userId: userId
         };
 
+        if(userId===null){
+            alert("로그인 후 이용해주세요.");
+            return;
+        }
+
         fetch(`http://localhost:8989/community/${postId}/comments`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -163,12 +197,18 @@ export default function PostDetailContent() {
 
     // 답글 작성 함수
     const handleReplySubmit = (commentId) => {
+
+        if(userId === null){
+            alert("로그인 후 이용해주세요.");
+            return;
+        }
+
         const replyData = {
             comments: newReply.replace(/\n/g, "<br>"),
             depth: 2,  // 답글이므로 depth는 2
             parentCommentId: commentId,
             postId: postId,
-            userId
+            userId: userId
         };
 
         fetch(`http://localhost:8989/community/${postId}/comments`, {

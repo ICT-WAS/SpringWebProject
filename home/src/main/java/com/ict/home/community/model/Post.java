@@ -39,12 +39,12 @@ public class Post {
 
     @NotNull
     @Schema(description = "제목")
-    @Column(name = "title", nullable = false)
+    @Column(name = "title", nullable = false, columnDefinition = "TEXT")
     private String title;
 
     @NotNull
     @Schema(description = "내용")
-    @Column(name = "subject", nullable = false)
+    @Column(name = "subject", nullable = false, columnDefinition = "TEXT")
     @Lob
     private String subject;
 
