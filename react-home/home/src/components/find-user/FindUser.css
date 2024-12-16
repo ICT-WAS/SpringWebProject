@@ -5,7 +5,7 @@
   height: auto; /* 화면 전체 높이 */
 }
 
-.form-container {
+.info-container {
   /* Form Contact */
   box-sizing: border-box;
 
@@ -21,7 +21,7 @@
   max-width: 375px;
   min-height: auto;
 
-  background: #f8f9fa;
+  background: #ffffff;
 
   /* Inside auto layout */
   flex: none;
@@ -30,69 +30,100 @@
 
   margin: 10px;
 
+  border: 1px solid #f0f0f0;
   border-radius: 8px;
 }
 
-.form-container-signin {
-  /* Add styling specific to the sign-in section */
+.info-container-area {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  gap: 10px; /* Adjust gap between form groups */
+  gap: 10px;
 }
 
-.form-container-signin h2 {
-  text-align: center; /* 부모 기준으로 가운데 정렬 */
-  font-weight: bold; /* 글씨를 굵게 설정 */
+.info-container-area h2 {
+  text-align: center;
+  font-weight: bold;
   font-size: 24px;
   width: 100%;
 }
 
-.form-container-signin .find-links {
-  display: flex; /* 플렉스 컨테이너 활성화 */
-  justify-content: center; /* 가로 중앙 정렬 */
-  align-items: center; /* 세로 중앙 정렬 (필요 시) */
+.info-container-area h3 {
+  color: #666;
+  text-align: center;
+  font-size: 16px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.info-container-area .find-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   font-size: 14px;
   color: #666;
   width: 100%;
 }
 
-.form-container-signin .find-link {
+.info-container-area .find-link {
   color: #333;
   text-decoration: none;
-  margin: 0 5px; /* 링크 사이 간격 추가 */
+  margin: 0 5px;
   text-decoration: underline;
 }
 
-.form-container-signin .find-link:hover {
+.info-container-area .find-link:hover {
   color: #1e90ff;
 }
 
-.form-group {
+.info-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 100%;
 }
 
-.form-group label {
+.info-group label {
   font-weight: bold;
   color: #333;
   font-size: 14px;
 }
 
-.form-group input {
+.info-group input {
   padding: 8px;
-  background-color: #ffffff;
-  border: 1px solid #ffffff;
+  background-color: #f8f9fa;
+  border: 1px solid #f8f9fa;
   border-radius: 4px;
   width: 100%;
   box-sizing: border-box;
 }
 
-.form-group input::placeholder {
+.info-group input::placeholder {
   font-size: small;
+}
+
+.info-group div {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.verification-message {
+  font-size: 12px;
+  margin-bottom: 30px;
+}
+
+.verification-message .highlight-link {
+  color: #333;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.verification-message .highlight-link:hover {
+  color: #1e90ff;
 }
 
 .input-group input:focus {
@@ -118,50 +149,49 @@
   background-color: #424649;
 }
 
-.form-group .error-message {
+.info-group .error-message {
   color: red;
   font-size: 12px;
   font-weight: 600;
   margin-left: 5px;
 }
 
-/* 휴대전화 */
-.form-group-phone {
+.info-group-verify {
   display: flex;
   flex-direction: column;
   width: 100%;
 }
 
-.form-group-phone label {
+.info-group-verify label {
   font-weight: bold;
   color: #333;
   margin-bottom: 8px;
   font-size: 14px;
 }
 
-.form-group-phone .input-group {
+.info-group-verify .input-group {
   display: flex;
   align-items: center;
-  gap: 8px; /* 입력 필드와 버튼 간 간격 */
+  gap: 8px;
   width: 100%;
 }
 
-.form-group-phone input {
+.info-group-verify input {
   padding: 8px;
-  background-color: #ffffff;
-  border: 1px solid #ffffff;
-  flex: 1; /* 입력 필드가 남은 공간 채우도록*/
+  background-color: #f8f9fa;
+  border: 1px solid #f8f9fa;
+  flex: 1;
   box-sizing: border-box;
   border-radius: 4px;
   border-top-right-radius: 4px !important;
   border-bottom-right-radius: 4px !important;
 }
 
-.form-group-phone input::placeholder {
+.info-group-verify input::placeholder {
   font-size: small;
 }
 
-.form-group-phone button {
+.info-group-verify button {
   padding: 10px;
   color: #000;
   font-size: small;
@@ -174,30 +204,28 @@
   height: 100%;
 }
 
-.form-group-phone button:hover {
+.info-group-verify button:hover {
   color: #000;
   border: 1px solid #d3d4d5;
   background-color: #d3d4d5;
 }
 
-.form-group-phone .error-message {
+.info-group-verify .error-message {
   color: red;
   font-size: 12px;
   font-weight: 600;
-  margin-top: 8px; /* 입력 그룹과의 간격 */
+  margin-top: 8px;
   margin-left: 5px;
 }
 
-/* 비활성화 상태: 색상 진하게, 커서 해제*/
-.form-group-phone button:disabled {
+.info-group-verify button:disabled {
   color: #000;
   border: 1px solid #d3d4d5;
   background-color: #d3d4d5;
-  cursor: not-allowed; /* 마우스 포인터 변경 */
+  cursor: not-allowed;
 }
 
-/* 비활성화 상태: 호버 스타일 비활성화 */
-.form-group-phone button:disabled:hover {
-  background-color: #d3d4d5; /* 동일한 색상 유지 */
+.info-group-verify button:disabled:hover {
+  background-color: #d3d4d5;
   transform: none;
 }

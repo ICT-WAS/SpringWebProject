@@ -9,6 +9,7 @@ const Phone = ({
   setIsVerified,
   code,
   setCode,
+  setVerificationType,
 }) => {
   const [error, setError] = useState(""); //오류 메시지
   const [isValid, setIsValid] = useState(true); //유효성
@@ -25,6 +26,7 @@ const Phone = ({
     setPhoneNumber(e.target.value);
     setIsValid(true);
     setError("");
+    setVerificationType("PHONE");
     //형식 체크
     const formattedNumber = formatPhoneNumber(e.target.value);
     setPhoneNumber(formattedNumber);

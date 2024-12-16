@@ -113,6 +113,16 @@ const Login = () => {
               </button>
               <KakaoLogin />
               <NaverLogin />
+
+              <div className="find-links">
+                <a href="/find-email" className="find-link">
+                  계정 찾기
+                </a>
+                <span className="divider"> </span>
+                <a href="/find-password" className="find-link">
+                  비밀번호 찾기
+                </a>
+              </div>
               {isModal && (
                 <Modal
                   title={loginErrorTitle}
