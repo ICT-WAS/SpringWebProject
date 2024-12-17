@@ -1,5 +1,5 @@
 import { Container, Stack } from "react-bootstrap";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
 import Modal from "../components/modal/Modal";
@@ -9,21 +9,13 @@ import RecoveryResult from "../components/find-user/RecoveryResult";
 const EmailRecoveryResult = () => {
   //모달 상태 관리
   const [isModal, setIsModal] = useState(false);
-  //포커스 상태 관리
-  const confirmModalRef = useRef(null);
-  const emailRef = useRef(null);
   //에러관리
-  const [loginError, setError] = useState("");
-  const [loginErrorTitle, setErrorTitle] = useState("");
+  const [error, setError] = useState("");
+  const [errorTitle, setErrorTitle] = useState("");
 
   //모달 닫을 때
   const closeModal = () => {
     setIsModal(false);
-    setTimeout(() => {
-      if (emailRef.current) {
-        emailRef.current.focus();
-      }
-    }, 100);
   };
 
   return (
@@ -44,10 +36,9 @@ const EmailRecoveryResult = () => {
                 </button>
                 {isModal && (
                   <Modal
-                    title={loginErrorTitle}
-                    message={loginError}
+                    title={errorTitle}
+                    message={error}
                     onClose={closeModal}
-                    ref={confirmModalRef}
                   />
                 )}
               </div>

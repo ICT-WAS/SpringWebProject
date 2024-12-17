@@ -1,5 +1,6 @@
 package com.ict.home.login.auth.dto;
 
+import com.ict.home.user.enums.UserVerify;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,8 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PostVerificationRes {
-
-    private String email;
-    private Long userId;
+public class PostVerifiedUserRes {
+    private String verifiedData;
+    private String userVerify;
 }

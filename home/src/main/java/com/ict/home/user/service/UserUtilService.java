@@ -17,18 +17,22 @@ public class UserUtilService {
     private final UserRepository userRepository;
 
     public User findByEmailWithValidation(String email) {
-        return userRepository.findByEmail(email).orElseThrow(()-> new BaseException(POST_USERS_NONE_EXISTS_EMAIL));
+        return userRepository.findByEmail(email).orElseThrow(() -> new BaseException(POST_USERS_NONE_EXISTS_EMAIL));
     }
 
     public User findByIdWithValidation(Long userId) {
-        return userRepository.findById(userId).orElseThrow(()-> new BaseException(POST_USERS_NONE_EXISTS_ID));
+        return userRepository.findById(userId).orElseThrow(() -> new BaseException(POST_USERS_NONE_EXISTS_ID));
     }
 
     public User findByPhoneNumberValidation(String phoneNumber) {
-        return userRepository.findByPhoneNumber(phoneNumber).orElseThrow(()-> new BaseException(USERS_NONE_EXISTS_PHONE));
+        return userRepository.findByPhoneNumber(phoneNumber).orElseThrow(() -> new BaseException(USERS_NONE_EXISTS_PHONE));
     }
 
-    public Boolean findByUserId(Long userId) {
+    public User findByUserIdValidation(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new BaseException(USERS_EMPTY_USER_ID));
+    }
+
+    public Boolean existsByIdValidation(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new BaseException(POST_USERS_NONE_EXISTS_ID);
         }

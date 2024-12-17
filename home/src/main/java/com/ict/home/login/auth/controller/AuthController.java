@@ -108,8 +108,11 @@ public class AuthController {
         }
 
         User user = userUtilService.findByEmailWithValidation(postEmailVerificationReq.getEmail());
+        PostVerificationRes postVerificationRes = new PostVerificationRes();
+        postVerificationRes.setUserId(user.getId());
+        postVerificationRes.setEmail(user.getEmail());
 
-        return new BaseResponse<>(user.getId());
+        return new BaseResponse<>(postVerificationRes);
     }
 
     @PostMapping("/verify/mobile")  //본인확인용

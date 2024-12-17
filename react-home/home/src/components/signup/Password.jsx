@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./Signup.css";
 
-const Password = ({ password, setPassword }) => {
+const Password = ({ password, setPassword, bgColor = "#ffffff" }) => {
   const [error, setError] = useState(""); //오류 메시지
   const [checkError, setCheckError] = useState("");
   const [isValid, setIsValid] = useState(true); //유효성
@@ -20,8 +20,6 @@ const Password = ({ password, setPassword }) => {
 
   const checkPassword = async () => {
     if (passwordCheck !== password) {
-      console.log(password);
-      console.log(passwordCheck);
       setCheckError("비밀번호가 다릅니다. ");
       return;
     } else if (passwordCheck === password) {
@@ -55,6 +53,7 @@ const Password = ({ password, setPassword }) => {
     <div className="form-group">
       <label htmlFor="password">비밀번호</label>
       <input
+        style={{ backgroundColor: bgColor }}
         type="password"
         id="signup-password"
         name="signup-password"
@@ -67,6 +66,7 @@ const Password = ({ password, setPassword }) => {
       <div className="form-group" style={{ marginTop: "6px" }}>
         <label htmlFor="password-check">비밀번호 확인</label>
         <input
+          style={{ backgroundColor: bgColor }}
           type="password"
           id="password-check"
           name="password-check"
