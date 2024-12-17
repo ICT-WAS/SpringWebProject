@@ -15,8 +15,10 @@ export default function UpdatePostContent() {
         fetch(`http://localhost:8989/community/${postId}`)
             .then((res) => res.json())
             .then((data) => {
+                const temp = data.subject;
+                const changedSubject = temp.replaceAll('<br>', '\n');
                 setTitle(data.title);  // 제목을 상태에 설정
-                setSubject(data.subject);  // 내용을 상태에 설정
+                setSubject(changedSubject);  // 내용을 상태에 설정
                 setLoading(false);  // 데이터 로딩 완료
             })
             .catch((err) => {
