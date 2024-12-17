@@ -28,6 +28,13 @@ public class NationalPolicyValue {
     public final static Integer AVERAGE_MONTHLY_INCOME_8 = 11139704;
 
     public static Integer getAverageMonthlyIncome(int count){
+
+        // 9인 이상 가구는 한 명당 788,211원 추가
+        if (count >= 9) {
+            count = count - 8;
+            return AVERAGE_MONTHLY_INCOME_8 + count * 788211;
+        }
+
         return switch (count){
             case 1 -> AVERAGE_MONTHLY_INCOME_1;
             case 2 -> AVERAGE_MONTHLY_INCOME_2;
@@ -39,5 +46,7 @@ public class NationalPolicyValue {
             case 8 -> AVERAGE_MONTHLY_INCOME_8;
             default -> AVERAGE_MONTHLY_INCOME_1;
         };
+
+
     }
 }
