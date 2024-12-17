@@ -2,9 +2,9 @@ package com.ict.home.user.controller;
 
 import com.ict.home.exception.BaseException;
 import com.ict.home.exception.BaseResponse;
+import com.ict.home.login.auth.dto.PostVerifiedUserRes;
 import com.ict.home.user.dto.*;
 
-import com.ict.home.user.enums.UserVerify;
 import com.ict.home.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -99,6 +99,30 @@ public class UserController {
             String phoneNumber = postFindEmailReq.getPhoneNumber();
             return new BaseResponse <>(userService.findEmailByPhoneNumber(phoneNumber));
         } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * email 로 인증 정보 찾기
+     */
+    @PostMapping("/find/verification")
+    public BaseResponse<PostVerifiedUserRes> findVerifiedUserByEmail(@RequestBody String email) {
+        try {
+            return new BaseResponse<>(userService.getVerifiedUserByEmail(email));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 비밀번호 재설정
+     */
+    @PostMapping("/reset/password")
+    public BaseResponse<?> resetPassword(@RequestBody @Valid PostResetPasswordReq postResetPasswordReq) {
+        try{
+            return new BaseResponse<>(userService.resetPassword(postResetPasswordReq));
+        }catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
     }

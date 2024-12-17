@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./FindUser.css";
 import axios from "axios";
 
-const FindEmailByMobile = () => {
+const FindEmailByMobile = forwardRef((_, ref) => {
   const [error, setError] = useState(""); //오류 메시지
   const [isValid, setIsValid] = useState(true); //유효성
 
@@ -183,6 +183,7 @@ const FindEmailByMobile = () => {
           name="phoneNumber"
           value={phoneNumber}
           onChange={handlePhoneChange}
+          ref={ref}
           placeholder="휴대폰 번호를 입력해주세요."
         />
         <button
@@ -231,6 +232,6 @@ const FindEmailByMobile = () => {
         )}
     </div>
   );
-};
+});
 
 export default FindEmailByMobile;

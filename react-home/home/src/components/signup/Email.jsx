@@ -26,7 +26,7 @@ const Email = ({
     setEmail(e.target.value);
     setIsValid(true);
     setError("");
-    setVerificationType("EMAIL");
+    setVerificationType("");
   };
 
   //인증 요청을 보내는 함수
@@ -83,6 +83,7 @@ const Email = ({
           setIsVerified(true); //인증 성공
           setError(""); //오류 메시지 제거
           setIsTimerActive(false); //타이머 종료
+          setVerificationType("EMAIL");
           return response.data.result;
         }
       } catch (error) {
