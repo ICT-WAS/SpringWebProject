@@ -1,5 +1,6 @@
 package com.ict.home.house.repository;
 
+import com.ict.home.condition.enumeration.AccountType;
 import com.ict.home.condition.model.Account;
 import com.ict.home.condition.model.Condition01;
 import com.ict.home.condition.model.Condition03;
@@ -8,6 +9,7 @@ import com.ict.home.condition.repository.AccountRepository;
 import com.ict.home.house.model.House;
 import com.ict.home.house.model.QDetail;
 import com.ict.home.house.model.QDetail04;
+import com.ict.home.house.utility.NationalPolicyValue;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -15,6 +17,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.ict.home.house.model.QDetail.*;
@@ -25,7 +29,7 @@ import static com.ict.home.house.model.QHouse.*;
 
 @Repository
 @AllArgsConstructor
-public class HouseCustomRepositoryImpl implements HouseCustomRepository{
+public class HouseCustomRepositoryImpl implements HouseCustomRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
@@ -44,7 +48,128 @@ public class HouseCustomRepositoryImpl implements HouseCustomRepository{
         // 쿼리 생성
         BooleanBuilder builder = new BooleanBuilder();
 
-        // accounts/condition01/condition03/families 필터링 추가 예정
+        // 개인 조건에 맞는 공고: accounts/condition01/condition03/families 필터링
+        if (accounts != null && !accounts.isEmpty()) {
+            BooleanBuilder myAccountBuilder = new BooleanBuilder();
+
+            Account myAccount = accounts.get(0);
+            if (myAccount.getType() == AccountType.SAVINGS_ACCOUNT) {
+                // 청약예금 통장일 때
+                // 민영주택을 분양 받기 위한 통장
+                myAccountBuilder.or(detail01.houseDtlSecd.eq("01"));
+            } else if (myAccount.getType() == AccountType.SAVINGS_PLAN) {
+                // 청약부금 통장일 때
+                // 주거전용면적 85제곱미터 이하 민영주택을 분양받기 위한 통장
+                myAccountBuilder.or(detail01.houseDtlSecd.eq("01")
+                        .and(detail.suplyAr.lt(85.00)));
+            } else if (myAccount.getType() == AccountType.SAVINGS_DEPOSIT) {
+                // 청약저축 통장일 때
+                // 국민주택을 분양받기 위한 통장
+                myAccountBuilder.or(detail01.houseDtlSecd.eq("03"));
+            } else if (myAccount.getType() == AccountType.COMBINED_SAVINGS) {
+                // 주택청약종합저축 일 때
+                // 모두 가능
+            }
+            builder.and(myAccountBuilder);
+
+            // 지원 가능한 특별공급 방식 판별
+            BooleanBuilder supplyByConditionBuilder = new BooleanBuilder();
+
+            // 신혼부부 신청자격
+            boolean isNewMarriedCouple = false;
+
+            if (condition01.getMarried() == 1) { // 기혼이라면
+                // 결혼 날짜를 가져옴
+                LocalDate marriedDate = condition01.getMarriedDate();
+
+                // 현재 날짜를 가져옴
+                LocalDate currentDate = LocalDate.now();
+
+                // 결혼 날짜와 현재 날짜 사이의 차이를 계산
+                long yearsBetween = ChronoUnit.YEARS.between(marriedDate, currentDate);
+
+                // 7년 이내인지 확인
+                if (yearsBetween <= 7) {
+                    isNewMarriedCouple = true;
+                }
+
+            } else if (condition01.getMarried() == 2) { // 예비 신혼부부라면
+                isNewMarriedCouple = true;
+            }
+
+            if (isNewMarriedCouple) {
+                Family spouse = null;
+                List<Family> children = new ArrayList<>();
+
+                int countOfLivingTogetherFamily = 0;
+
+                for (Family family : families) {
+
+                    if (family.getLivingTogether() == 1){
+                       countOfLivingTogetherFamily++;
+                    }
+
+                    if (family.getRelationship() == 2) {
+                        spouse = family;
+                    } else if (family.getRelationship() == 9 || family.getRelationship() == 10) {
+                        children.add(family);
+                    }
+                }
+
+                boolean canSupply = false;
+
+                double averageMonthlyIncome140or160 = 0.0;
+
+                if(condition03.getSpouseAverageMonthlyIncome() == null
+                        ||
+                        condition03.getSpouseAverageMonthlyIncome() == 0){
+                    // 배우자의 소득이 없을 경우
+                    // 전년도 도시근로자 가구당 월평균 소득의 140%(배우자가 소득이 있는 경우에는 160%) 이하일 것
+                    Integer averageMonthlyIncome = // 도시근로자 가구당 월평균 소득 100%
+                            NationalPolicyValue.getAverageMonthlyIncome(countOfLivingTogetherFamily);
+                    averageMonthlyIncome140or160 = averageMonthlyIncome * 1.4;
+
+                }else{
+                    // 배우자의 소득이 있을 경우
+                    Integer averageMonthlyIncome = // 도시근로자 가구당 월평균 소득 100%
+                            NationalPolicyValue.getAverageMonthlyIncome(countOfLivingTogetherFamily);
+                    averageMonthlyIncome140or160 = averageMonthlyIncome * 1.6;
+                }
+                Integer familyAverageMonthlyIncome = condition03.getFamilyAverageMonthlyIncome();
+
+                if (averageMonthlyIncome140or160 >= familyAverageMonthlyIncome) {
+                    canSupply = true;
+                }else{
+                        /*전년도 도시근로자 가구당 월평균 소득의 140%(배우자가 소득이 있는 경우에는 160%)를 초과하는 경우로서
+                        세대원이 소유하는 부동산의 가액의 합계가 「국민건강보험법 시행령」 별표 4 제3호에 따른
+                        재산등급 중 29등급에 해당하는 재산금액의 하한과 상한을 산술평균한 금액 이하일 것*/
+                    // 29등급 31,300 초과 ~ 34,900 이하
+                    // 하한과 상한의 산술평균한 금액 ( 31300 + 34900 ) / 2 = 33100
+                    // 즉 세대원이 소유하는 부동산의 가액 합계가 33,100 보다 적을 것
+                    if (condition03.getPropertyPrice() < 33100) {
+                        canSupply = true;
+                    }
+                }
+
+                if (canSupply) {
+                    supplyByConditionBuilder.or(detail.nwwdsHshldco.gt(0));
+                }
+            }
+
+            if (condition01.getMarried() != 0 && condition01.getMarried() != 3) {
+                Family spouse = null;
+                List<Family> children = new ArrayList<>();
+
+                for (Family family : families) {
+                    if (family.getRelationship() == 2) {
+                        spouse = family;
+                    } else if (family.getRelationship() == 9 || family.getRelationship() == 10) {
+                        children.add(family);
+                    }
+                }
+            }
+
+        }
 
         // houseTypes 조건 추가 (국민주택, 민영주택, 무순위)
         if (houseTypes != null && !houseTypes.isEmpty()) {
@@ -98,7 +223,7 @@ public class HouseCustomRepositoryImpl implements HouseCustomRepository{
         }
 
         // prices 조건 추가 (가격별 필터링)
-        if (prices != null && prices.size()==2){
+        if (prices != null && prices.size() == 2) {
             BooleanBuilder priceBuilder = new BooleanBuilder();
 
             Integer start = prices.get(0);
@@ -110,7 +235,7 @@ public class HouseCustomRepositoryImpl implements HouseCustomRepository{
         }
 
         // supplies 조건 추가 (공급 조건 필터링)
-        if (supplies != null && !supplies.isEmpty()){
+        if (supplies != null && !supplies.isEmpty()) {
             BooleanBuilder supplyBuilder = new BooleanBuilder();
 
             if (supplies.contains("다자녀가구")) {
