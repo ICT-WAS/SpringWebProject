@@ -26,6 +26,11 @@ import CommunityPosting from "./community/CommunityPosting";
 import MyPage from "./mypage/MyPage";
 import PostDetail from "./community/PostDetail";
 import UpdatePost from "./community/UpdatePost";
+import FindEmail from "./pages/FindEmail";
+import EmailRecoveryResult from "./pages/EmailRecoveryResult";
+import FindPassword from "./pages/find-password/FindPassword";
+import SendVerification from "./pages/find-password/SendVerification";
+import ResetPassword from "./pages/find-password/ResetPassword";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -40,11 +45,14 @@ root.render(
             </React.StrictMode>
           }
         />
+        {/* 회원가입 */}
         <Route path="/signup" element={<Signup />} />
+
+        {/* 청약 */}
         <Route path="/subscriptions" element={<ApplyAnnouncementList />} />
         <Route path="/subscriptions/info" element={<ApplyAnnouncement />} />
 
-         {/* 조건등록 */}
+        {/* 조건등록 */}
         <Route path="/conditions" element={<Conditions />} />
         <Route path="/condition-1" element={<Condition01 />} />
         <Route path="/condition-2" element={<Condition02 />} />
@@ -52,12 +60,33 @@ root.render(
 
         {/* 마이페이지 */}
         <Route path="/mypage" element={<MyPage />} />
-        
+
         {/* 커뮤니티 */}
-        <Route exact path="/community" element={<CommunityPostList/>} />
-        <Route exact path="/community/posting" element={<CommunityPosting/>} />
+        <Route exact path="/community" element={<CommunityPostList />} />
+        <Route exact path="/community/posting" element={<CommunityPosting />} />
         <Route exact path="/community/:postId" element={<PostDetail />} />
-        <Route exact path="/community/posting/:postId" element={<UpdatePost/>} />
+        <Route
+          exact
+          path="/community/posting/:postId"
+          element={<UpdatePost />}
+        />
+
+        {/* 이메일 찾기 */}
+        <Route exact path="/find-email" element={<FindEmail />} />
+        <Route
+          exact
+          path="/find-email/verify"
+          element={<EmailRecoveryResult />}
+        />
+
+        {/* 비밀번호 찾기 */}
+        <Route exact path="/find-password" element={<FindPassword />} />
+        <Route
+          exact
+          path="/find-password/verify"
+          element={<SendVerification />}
+        />
+        <Route exact path="/find-password/reset" element={<ResetPassword />} />
 
         {/* 소셜 로그인 리다이렉트 경로 */}
         <Route exact path="/kakao/callback" element={<KakaoRedirection />} />
@@ -65,6 +94,7 @@ root.render(
 
         {/* 로그인한 사용자는 접근할 수 없음 - LoginRoute 컴포넌트로 감싸면 보호 설정 됨 */}
         {/* 로그인한 사용자가 login 페이지 접근 시 메인 페이지("/")로 리다이렉트 */}
+        {/* 로그인 */}
         <Route
           path="/login"
           element={

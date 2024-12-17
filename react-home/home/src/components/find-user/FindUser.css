@@ -1,0 +1,285 @@
+.body-container {
+  display: flex;
+  justify-content: center; /* 수평 중앙 정렬 */
+  align-items: center; /* 수직 중앙 정렬 */
+  height: auto; /* 화면 전체 높이 */
+}
+
+.info-container {
+  /* Form Contact */
+  box-sizing: border-box;
+
+  /* Auto layout */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24px;
+  gap: 24px;
+
+  width: 100%;
+  min-width: 320px;
+  max-width: 375px;
+  min-height: auto;
+
+  background: #ffffff;
+
+  /* Inside auto layout */
+  flex: none;
+  order: 1;
+  flex-grow: 0;
+
+  margin: 10px;
+
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+}
+
+.info-container-area {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: 10px;
+}
+
+.info-container-area h2 {
+  text-align: center;
+  font-weight: bold;
+  font-size: 24px;
+  width: 100%;
+}
+
+.info-container-area h3 {
+  color: #666;
+  text-align: center;
+  font-size: 16px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.info-container-area .find-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  color: #666;
+  width: 100%;
+}
+
+.info-container-area .find-link {
+  color: #333;
+  text-decoration: none;
+  margin: 0 5px;
+  text-decoration: underline;
+}
+
+.info-container-area .find-link:hover {
+  color: #1e90ff;
+}
+
+.info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.info-group label {
+  font-weight: bold;
+  color: #333;
+  font-size: 14px;
+}
+
+.info-group input {
+  padding: 8px;
+  background-color: #f8f9fa;
+  border: 1px solid #f8f9fa;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.info-group input::placeholder {
+  font-size: small;
+}
+
+.info-group div {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.info-group .description {
+  text-align: center;
+  font-size: 15px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.verification-message {
+  font-size: 12px;
+  margin-bottom: 30px;
+}
+
+.verification-message .highlight-link {
+  color: #333;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.verification-message .highlight-link:hover {
+  color: #1e90ff;
+}
+
+.input-group input:focus {
+  border: 0.5px solid #697077;
+}
+
+.input-group .verify {
+  margin-top: 5px;
+}
+
+.submit-button {
+  margin-top: 8px;
+  padding: 12px 16px;
+  background-color: #212529;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background-color: #424649;
+}
+
+.submit-button:disabled {
+  cursor: not-allowed;
+}
+
+.submit-button:disabled:hover {
+  background-color: #424649;
+  transform: none;
+}
+
+.next-button {
+  padding: 12px 16px;
+  background-color: #212529;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.next-button:hover {
+  background-color: #424649;
+}
+
+.next-button:disabled {
+  cursor: not-allowed;
+}
+
+.next-button:disabled:hover {
+  background-color: #212529;
+  transform: none;
+}
+
+.info-group .error-message {
+  color: red;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 5px;
+}
+
+.info-group .error-message-small {
+  color: red;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 0px;
+  margin-left: 5px;
+  text-align: left;
+  display: none;
+}
+
+.info-group .error-message-small.visible {
+  display: block;
+}
+
+.info-group-verify {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.info-group-verify label {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.info-group-verify .input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.info-group-verify input {
+  padding: 8px;
+  background-color: #f8f9fa;
+  border: 1px solid #f8f9fa;
+  flex: 1;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border-top-right-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+}
+
+.info-group-verify input::placeholder {
+  font-size: small;
+}
+
+.info-group-verify button {
+  padding: 10px;
+  color: #000;
+  font-size: small;
+  border: 1px solid #f0f0f0;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  border-radius: 4px;
+  border-top-left-radius: 4px !important;
+  border-bottom-left-radius: 4px !important;
+  height: 100%;
+}
+
+.info-group-verify button:hover {
+  color: #000;
+  border: 1px solid #d3d4d5;
+  background-color: #d3d4d5;
+}
+
+.info-group-verify .error-message {
+  color: red;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+  margin-left: 5px;
+}
+
+.info-group-verify button:disabled {
+  color: #000;
+  border: 1px solid #d3d4d5;
+  background-color: #d3d4d5;
+  cursor: not-allowed;
+}
+
+.info-group-verify button:disabled:hover {
+  background-color: #d3d4d5;
+  transform: none;
+}

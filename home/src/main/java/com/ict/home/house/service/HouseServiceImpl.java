@@ -49,8 +49,7 @@ public class HouseServiceImpl implements HouseService {
         Condition03 condition03 = c03r.findByUser_Id(userId);
         List<Family> families = fr.findByUser_Id(userId);
 
-        List<House> filteredHouseList = hr.findFilteredHouseList(regions, houseTypes, area, prices, supplies, statuses,
-                accounts, condition01, condition03, families, orderBy);
+        List<House> filteredHouseList = hr.findFilteredHouseList(regions, houseTypes, area, prices, supplies, statuses, accounts, condition01, condition03, families, orderBy);
 
         List<HouseInfo> filteredHouseInfos = getHouseInfoListByRegionsFilter(filteredHouseList, regions);
 

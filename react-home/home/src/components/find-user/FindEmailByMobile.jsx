@@ -1,36 +1,33 @@
-import { useState, useEffect } from "react";
-import "./Signup.css";
+import { useState, useEffect, forwardRef } from "react";
+import { useNavigate } from "react-router-dom";
+import "./FindUser.css";
 import axios from "axios";
 
-const Phone = ({
-  phoneNumber,
-  setPhoneNumber,
-  isVerified,
-  setIsVerified,
-  code,
-  setCode,
-  setVerificationType,
-}) => {
+const FindEmailByMobile = forwardRef((_, ref) => {
   const [error, setError] = useState(""); //오류 메시지
   const [isValid, setIsValid] = useState(true); //유효성
-  const [isChecking, setIsChecking] = useState(false); //중복
 
   //인증관련
   const [verificationCode, setVerificationCode] = useState(""); //사용자가 입력하는 인증 코드
   const [timer, setTimer] = useState(60 * 10); // 10분 타이머
   const [isTimerActive, setIsTimerActive] = useState(false); //타이머 활성화 상태
   const [isCodeSent, setIsCodeSent] = useState(false); //인증 코드 전송 여부
+  const [isVerified, setIsVerified] = useState(false);
+  const [code, setCode] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
-  const handleChange = (e) => {
-    //초기화 함수
-    setPhoneNumber(e.target.value);
-    setIsValid(true);
+  //인증 후 받아오는 유저 이메일
+  const [email, setEmail] = useState("");
+
+  //네비게이트
+  const navigate = useNavigate();
+
+  //초기화 함수
+  useEffect(() => {
+    // 초기 렌더링 시 버튼이 비활성화 되어야 하므로 상태 초기화
+    setIsValid(false);
     setError("");
-    setVerificationType("");
-    //형식 체크
-    const formattedNumber = formatPhoneNumber(e.target.value);
-    setPhoneNumber(formattedNumber);
-  };
+  }, []); // 빈 배열로 설정하여 첫 렌더링 시 한 번만 실행
 
   //인증 요청을 보내는 함수
   const sendVerification = async (email, phoneNumber, verificationType) => {
@@ -74,21 +71,24 @@ const Phone = ({
     //사용자가 입력한 6자리 인증 코드가 서버에서 받아온 코드와 일치하는지 확인
     if (inputCode === code) {
       try {
-        const response = await axios.post("http://localhost:8989/auth/verify", {
-          verificationCode: inputCode, //사용자가 입력한 코드
-          email: "",
-          phoneNumber,
-          verificationType: "PHONE",
-        });
+        const response = await axios.post(
+          "http://localhost:8989/auth/verify/mobile",
+          {
+            phoneNumber,
+            verificationCode: inputCode, //사용자가 입력한 코드
+          }
+        );
 
         //성공 응답 처리
         if (response.data.isSuccess) {
           setIsVerified(true); //인증 성공
           setError(""); //오류 메시지 제거
           setIsTimerActive(false); //타이머 종료
-          setVerificationType("PHONE");
-          return response.data.result;
+          setEmail(response.data.result.email);
         }
+
+        localStorage.setItem("email", response.data.result.email);
+        navigate("/find-email/verify");
       } catch (error) {
         console.error("인증 요청 실패:", error);
       }
@@ -97,43 +97,37 @@ const Phone = ({
     }
   };
 
-  const check = async () => {
+  //휴대폰 유효성 검사
+  const check = (formattedPhoneNumber) => {
     //null 체크
-    if (phoneNumber === "") {
+    if (formattedPhoneNumber === "") {
       setError("휴대폰 번호는 필수 항목입니다.");
       setIsValid(false);
-      return;
+      return false;
     }
 
     //형식 검사
-    const isValidType = /^01([0-9])-([0-9]{3,4})-([0-9]{4})$/.test(phoneNumber);
+    const isValidType = /^01([0-9])-([0-9]{3,4})-([0-9]{4})$/.test(
+      formattedPhoneNumber
+    );
     if (!isValidType) {
       setError("휴대폰 번호를 정확히 입력해주세요.");
       setIsValid(false);
-      return;
+      return false;
     }
 
-    //중복체크
-    setIsChecking(true); //중복 체크 시작
-    if (phoneNumber) {
-      axios
-        .get(`http://localhost:8989/users/check/phone?phone=${phoneNumber}`)
-        .then((response) => {
-          if (response.data) {
-            //response.date=true or false
-            setError("이미 사용 중인 휴대폰 번호입니다.");
-          } else {
-            setError("");
-          }
-        })
-        .catch((error) => console.error(error))
-        .finally(() => {
-          setIsChecking(false);
-        });
-    } else {
-      setError("");
-      setIsChecking(false);
-    }
+    // 유효한 경우
+    setError("");
+    setIsValid(true);
+    return true; // 유효성 검사를 통과
+  };
+
+  // 실시간으로 값이 변할 때마다 체크
+  const handlePhoneChange = (e) => {
+    const value = e.target.value;
+    const formattedPhoneNumber = formatPhoneNumber(value); // 입력값 포맷팅
+    setPhoneNumber(formattedPhoneNumber); // 포맷팅된 값 설정
+    check(formattedPhoneNumber); // 유효성 검사
   };
 
   //휴대폰 번호(000-0000-0000) 형식 맞추기
@@ -153,6 +147,16 @@ const Phone = ({
     }
   };
 
+  // 00:00 시간 형식으로 변환하는 함수
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = timeInSeconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+      2,
+      "0"
+    )}`;
+  };
+
   // 타이머 업데이트
   useEffect(() => {
     let interval;
@@ -169,33 +173,23 @@ const Phone = ({
     return () => clearInterval(interval);
   }, [isTimerActive, timer]);
 
-  // 00:00 시간 형식으로 변환하는 함수
-  const formatTime = (timeInSeconds) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = timeInSeconds % 60;
-    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
-      2,
-      "0"
-    )}`;
-  };
-
   return (
-    <div className="form-group-phone">
+    <div className="info-group-verify">
       <label htmlFor="phoneNumber">휴대폰 번호</label>
       <div className="input-group">
         <input
-          type="phoneNumber"
+          type="text"
           id="phoneNumber"
           name="phoneNumber"
           value={phoneNumber}
-          onBlur={check}
-          onChange={handleChange}
+          onChange={handlePhoneChange}
+          ref={ref}
           placeholder="휴대폰 번호를 입력해주세요."
         />
         <button
           type="button"
           onClick={handleClick}
-          disabled={isVerified || isTimerActive}
+          disabled={!isValid || isVerified || isTimerActive}
         >
           {isVerified ? "인증 완료" : isTimerActive ? "인증 중" : "인증하기"}
         </button>
@@ -204,7 +198,7 @@ const Phone = ({
 
       {isCodeSent &&
         !isVerified && ( //인증 완료 시 입력 필드 숨김
-          <div className="form-group">
+          <div className="info-group">
             <div className="input-group">
               <input
                 className="verify"
@@ -238,6 +232,6 @@ const Phone = ({
         )}
     </div>
   );
-};
+});
 
-export default Phone;
+export default FindEmailByMobile;

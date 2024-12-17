@@ -41,7 +41,7 @@ public class Family {
     @Column(name = "living_together", nullable = false)
     private Integer livingTogether;
 
-    @Schema(description = "동거기간 (0: 1년 미만, 1: 1년 이상 3년 미만, 2: 3년 이상)")
+    @Schema(description = "동거기간 (1: 1년 미만, 2: 1년 이상 3년 미만, 3: 3년 이상)")
     @Column(name = "living_together_date", nullable = true)
     private Integer livingTogetherDate;
 

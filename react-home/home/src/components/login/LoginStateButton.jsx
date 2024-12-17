@@ -31,6 +31,11 @@ const LoginStateButton = () => {
     navigate("/signup");
   };
 
+  //마이페이지로 이동
+  const handleMyPageClick = () => {
+    navigate("/mypage");
+  };
+
   //에러 메시지가 변할 시 모달 출력
   useEffect(() => {
     if (logoutError) {
@@ -82,8 +87,15 @@ const LoginStateButton = () => {
         <>
           <Col md="auto">
             <p className="nav-bar-links">
-              <Button variant="dark" onClick={handleLogout}>
+              <Button variant="light" onClick={handleLogout}>
                 {loading ? "로그아웃 중..." : "로그아웃"}
+              </Button>
+            </p>
+          </Col>
+          <Col md="auto">
+            <p className="nav-bar-links">
+              <Button variant="dark" onClick={handleMyPageClick}>
+                마이페이지
               </Button>
             </p>
           </Col>

@@ -30,6 +30,7 @@ const Signup = () => {
   //인증 상태 관리
   const [isVerified, setIsVerified] = useState(false); // 인증 여부
   const [code, setCode] = useState(""); //서버에서 넘어온 인증 코드
+  const [verificationType, setVerificationType] = useState(""); //인증타입
 
   //로그인 상태를 관리하는 전역 변수
   const { setIsLogin } = useGlobalContext();
@@ -74,6 +75,7 @@ const Signup = () => {
       phoneNumber,
       username,
       verificationCode: code,
+      verificationType,
     };
 
     try {
@@ -147,6 +149,7 @@ const Signup = () => {
                 setIsVerified={setIsVerified}
                 code={code}
                 setCode={setCode}
+                setVerificationType={setVerificationType}
               />
               <Password password={password} setPassword={setPassword} />
               <Username username={username} setUsername={setUsername} />
@@ -157,6 +160,7 @@ const Signup = () => {
                 setIsVerified={setIsVerified}
                 code={code}
                 setCode={setCode}
+                setVerificationType={setVerificationType}
               />
               <button
                 type="submit"

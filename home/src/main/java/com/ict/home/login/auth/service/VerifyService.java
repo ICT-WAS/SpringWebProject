@@ -33,15 +33,10 @@ public class VerifyService {
     @Value("${mail.username}")
     private String username;
 
-    //인증 코드 생성
-    String verificationCode = createVerificationCode();
-
-    //인증 코드 만료시간 설정(10분)
-    LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(10);
-
     public String sendVerificationCode(String email, String phoneNumber, VerificationType verificationType) throws MessagingException {
 
         Verification verification = new Verification();
+        String verificationCode = createVerificationCode();
 
         if (verificationType == VerificationType.EMAIL) {
             Verification existingVerification = verificationRepository.findByEmailAndVerificationCode(email, verificationCode).orElse(null);
@@ -63,7 +58,7 @@ public class VerifyService {
         //인증 정보 테이블 저장
         verification.setVerificationCode(verificationCode);
         verification.setVerificationType(verificationType);
-        verification.setExpirationDate(expiresAt);
+        verification.setExpirationDate(LocalDateTime.now().plusMinutes(10));
 
         verificationRepository.save(verification);  //인증 정보 저장
 
@@ -147,6 +142,7 @@ public class VerifyService {
     public String sendVerificationCodeByEmail(String email) throws MessagingException {
 
         Verification verification = new Verification();
+        String verificationCode = createVerificationCode();
 
         Verification existingVerification = verificationRepository.findByEmailAndVerificationCode(email, verificationCode).orElse(null);
 
@@ -161,7 +157,7 @@ public class VerifyService {
         //인증 정보 테이블 저장
         verification.setEmail(email);
         verification.setVerificationCode(verificationCode);
-        verification.setExpirationDate(expiresAt);
+        verification.setExpirationDate(LocalDateTime.now().plusMinutes(10));
 
         verificationRepository.save(verification);  //인증 정보 저장
 
@@ -177,6 +173,7 @@ public class VerifyService {
     public String sendVerificationCodeByMobile(String phoneNumber) throws MessagingException {
 
         Verification verification = new Verification();
+        String verificationCode = createVerificationCode();
 
         Verification existingVerification = verificationRepository.findByPhoneNumberAndVerificationCode(phoneNumber, verificationCode).orElse(null);
 
@@ -191,7 +188,7 @@ public class VerifyService {
         //인증 정보 테이블 저장
         verification.setPhoneNumber(phoneNumber);
         verification.setVerificationCode(verificationCode);
-        verification.setExpirationDate(expiresAt);
+        verification.setExpirationDate(LocalDateTime.now().plusMinutes(10));
 
         verificationRepository.save(verification);  //인증 정보 저장
 

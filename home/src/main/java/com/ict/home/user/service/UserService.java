@@ -3,19 +3,17 @@ package com.ict.home.user.service;
 import com.ict.home.exception.BaseException;
 import com.ict.home.exception.BaseResponse;
 import com.ict.home.exception.BaseResponseStatus;
+import com.ict.home.login.auth.dto.PostVerifiedUserRes;
 import com.ict.home.login.auth.model.Verification;
 import com.ict.home.login.auth.repository.VerificationRepository;
 import com.ict.home.login.jwt.JwtProvider;
 import com.ict.home.login.jwt.Secret;
 import com.ict.home.login.jwt.Token;
 import com.ict.home.login.jwt.TokenRepository;
+import com.ict.home.user.dto.*;
 import com.ict.home.user.enums.UserVerify;
 import com.ict.home.user.repository.UserRepository;
-import com.ict.home.user.dto.PostLoginReq;
-import com.ict.home.user.dto.PostLoginRes;
 
-import com.ict.home.user.dto.PostUserReq;
-import com.ict.home.user.dto.PostUserRes;
 import com.ict.home.user.User;
 import com.ict.home.util.AES128;
 import jakarta.servlet.http.Cookie;
@@ -57,13 +55,7 @@ public class UserService {
             throw new BaseException(POST_USERS_EXISTS_EMAIL);
         }
 
-        //비밀번호 암호화
-        String password;
-        try {
-            password = new AES128(Secret.USER_INFO_PASSWORD_KEY).encrypt(postUserReq.getPassword());
-        } catch (Exception exception) {  //암호화 실패 시 에러
-            throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
-        }
+        String password = encryptPassword(postUserReq.getPassword());
 
         //인증 테이블(Verification) 상태 확인 - 이메일 혹은 휴대전화 인증정보가 있는지 확인
         if (postUserReq.getVerificationCode() != null) {
@@ -78,27 +70,20 @@ public class UserService {
         //사용자 정보 생성
         User user = new User();
         user.createUser(postUserReq.getUsername(), postUserReq.getEmail(), password, postUserReq.getPhoneNumber());
+        switch (postUserReq.getVerificationType()) {
+            case "EMAIL":
+                user.setUserVerify(UserVerify.EMAIL_VERIFIED);
+                break;
+            case "PHONE":
+                user.setUserVerify(UserVerify.PHONE_VERIFIED);
+                break;
+            default:
+                //인증 타입이 잘못되었을 시 예외
+                throw new BaseException(INVALID_VERIFICATION_TYPE);
+        }
         userRepository.save(user);
 
         return new PostUserRes(user);
-    }
-
-    //인증 테이블 생성 확인
-    private Verification checkVerification(String email, String phoneNumber, String verificationCode) {
-        //인증여부 확인
-        Verification verification = verificationRepository.findByEmailAndVerificationCode(email, verificationCode).orElse(null);
-
-        //이메일 인증이 없을 경우 핸드폰 인증 확인
-        if (verification == null || !verification.isVerified()) {
-            verification = verificationRepository.findByPhoneNumberAndVerificationCode(phoneNumber, verificationCode).orElse(null);
-        }
-
-        //핸드폰 인증까지 확인한 후에도 null 이거나 인증 완료 여부가 false일 시
-        if (verification == null || !verification.isVerified()) {
-            return null;
-        }
-        //휴대폰 인증 확인 시 반환
-        return verification;
     }
 
     /**
@@ -130,7 +115,7 @@ public class UserService {
                 Token token = tokenRepository.findByUserId(user.getId());
                 //리프레시 토큰의 만료 확인 후 반환 or 발급
                 refreshToken = checkRefreshTokenExpire(token, user);  //현재 유저의 리프레시 토큰
-            }else {
+            } else {
                 //리프레시 토큰이 없는 경우 - 리프레시 토큰 발급 후 디비 저장
                 refreshToken = createAndSaveRefreshToken(user);
             }
@@ -175,7 +160,7 @@ public class UserService {
 
             //로그아웃 성공 후 클라이언트 상태 갱신
             return "logoutSuccess";
-        } else{
+        } else {
             throw new BaseException(FAILED_TO_LOGOUT);
         }
     }
@@ -194,6 +179,45 @@ public class UserService {
 
         //핸드폰 인증 회원일 경우
         return user.getEmail();
+    }
+
+    /**
+     * email 로 인증 정보 찾기
+     */
+    public PostVerifiedUserRes getVerifiedUserByEmail(String email) {
+        User user = userUtilService.findByEmailWithValidation(email);
+        PostVerifiedUserRes postVerifiedUserRes = new PostVerifiedUserRes();
+
+        switch (user.getUserVerify()) {
+            case EMAIL_VERIFIED -> {
+                postVerifiedUserRes.setVerifiedData(user.getEmail());
+            }
+            case PHONE_VERIFIED -> {
+                postVerifiedUserRes.setVerifiedData(user.getPhoneNumber());
+            }
+            default -> throw new BaseException(POST_USERS_NONE_EXISTS_EMAIL);
+        }
+
+        postVerifiedUserRes.setUserVerify(user.getUserVerify().getUserVerifyInKorea());
+        return postVerifiedUserRes;
+    }
+
+    /**
+     * 비밀번호 재설정
+     */
+    @Transactional
+    public String resetPassword(PostResetPasswordReq postResetPasswordReq) {
+        User user = userUtilService.findByUserIdValidation(postResetPasswordReq.getUserId());
+        String encryptedPassword = encryptPassword(postResetPasswordReq.getPassword());
+
+        if (user.getPassword().equals(encryptedPassword)) {
+            throw new BaseException(SAME_AS_OLD_PASSWORD_ERROR);
+        }
+
+        user.setPassword(encryptedPassword);
+        userRepository.save(user);
+
+        return "비밀번호가 성공적으로 변경되었습니다.";
     }
 
     /**
@@ -228,7 +252,7 @@ public class UserService {
 
             //1-2. 리프레시 토큰을 재발급 후 저장 및 반환
             return createAndSaveRefreshToken(user);
-        } else{
+        } else {
             //2. 만료되지 않았을 시 - 기존 리프레시 토큰을 반환
             return token.getRefreshToken();
         }
@@ -268,5 +292,51 @@ public class UserService {
                 .build();
         tokenRepository.save(token);
         return refreshToken;
+    }
+
+    //비밀번호 암호화
+    private static String encryptPassword(String password) {
+
+        try {
+            return new AES128(Secret.USER_INFO_PASSWORD_KEY).encrypt(password);
+        } catch (Exception exception) {  //암호화 실패 시 에러
+            throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
+        }
+    }
+
+    //인증 테이블 생성 확인
+    private Verification checkVerification(String email, String phoneNumber, String verificationCode) {
+        //인증여부 확인
+        Verification verification = verificationRepository.findByEmailAndVerificationCode(email, verificationCode).orElse(null);
+
+        //이메일 인증이 없을 경우 핸드폰 인증 확인
+        if (verification == null || !verification.isVerified()) {
+            verification = verificationRepository.findByPhoneNumberAndVerificationCode(phoneNumber, verificationCode).orElse(null);
+        }
+
+        //핸드폰 인증까지 확인한 후에도 null 이거나 인증 완료 여부가 false일 시
+        if (verification == null || !verification.isVerified()) {
+            return null;
+        }
+        //휴대폰 인증 확인 시 반환
+        return verification;
+    }
+
+    //이메일 가리기
+    private String maskEmail(String email) {
+        int atIndex = email.indexOf('@');
+        if (atIndex > 2) {
+            return email.substring(0, 2) + "**" + email.substring(atIndex);
+        }
+        return email;
+    }
+
+    //핸드폰 번호 가리기
+    private String maskPhoneNumber(String phoneNumber) {
+        String[] parts = phoneNumber.split("-"); // "-"로 분리
+        if (parts.length == 3) {
+            return parts[0] + "-" + parts[1].substring(0, 2) + "**" + "-" + parts[2].substring(0, 2) + "**";
+        }
+        return phoneNumber;
     }
 }

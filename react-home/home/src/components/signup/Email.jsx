@@ -9,6 +9,7 @@ const Email = ({
   setIsVerified,
   code,
   setCode,
+  setVerificationType,
 }) => {
   const [error, setError] = useState(""); //오류 메시지
   const [isValid, setIsValid] = useState(true); //유효성
@@ -25,6 +26,7 @@ const Email = ({
     setEmail(e.target.value);
     setIsValid(true);
     setError("");
+    setVerificationType("");
   };
 
   //인증 요청을 보내는 함수
@@ -81,6 +83,7 @@ const Email = ({
           setIsVerified(true); //인증 성공
           setError(""); //오류 메시지 제거
           setIsTimerActive(false); //타이머 종료
+          setVerificationType("EMAIL");
           return response.data.result;
         }
       } catch (error) {
