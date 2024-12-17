@@ -60,6 +60,23 @@ public class HouseServiceImpl implements HouseService {
         return filteredHouseInfos;
     }
 
+    @Override
+    public List<HouseInfo> getHouseInfoListByName(String keyword) {
+        List<House> houseList = hr.findByName(keyword);
+        List<HouseInfo> houseInfoList = new ArrayList<>();
+
+        for (House house : houseList) {
+            HouseInfo houseInfo = makeHouseInfo(house);
+            houseInfoList.add(houseInfo);
+        }
+
+        houseInfoList.sort((houseInfo1, houseInfo2) ->
+                houseInfo2.getRcritPblancDe().compareTo(houseInfo1.getRcritPblancDe())
+        );
+
+        return houseInfoList;
+    }
+
     private List<HouseInfo> getHouseInfoListByRegionsFilter(List<House> filteredHouseList, List<String> regions) {
         List<HouseInfo> list = new ArrayList<>();
 

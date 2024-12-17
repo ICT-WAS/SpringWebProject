@@ -28,6 +28,7 @@ import PostDetail from "./community/PostDetail";
 import UpdatePost from "./community/UpdatePost";
 import FindEmail from "./pages/FindEmail";
 import EmailRecoveryResult from "./pages/EmailRecoveryResult";
+import SearchAnnouncementByName from "./apply_announcement/SearchAnnouncementByName";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -48,6 +49,7 @@ root.render(
         {/* 청약 */}
         <Route path="/subscriptions" element={<ApplyAnnouncementList />} />
         <Route path="/subscriptions/info" element={<ApplyAnnouncement />} />
+        <Route path="/subscriptions/search/:keyword" element={<SearchAnnouncementByName />} />
 
         {/* 조건등록 */}
         <Route path="/conditions" element={<Conditions />} />
@@ -62,11 +64,7 @@ root.render(
         <Route exact path="/community" element={<CommunityPostList />} />
         <Route exact path="/community/posting" element={<CommunityPosting />} />
         <Route exact path="/community/:postId" element={<PostDetail />} />
-        <Route
-          exact
-          path="/community/posting/:postId"
-          element={<UpdatePost />}
-        />
+        <Route exact path="/community/posting/:postId" element={<UpdatePost />} />
 
         {/* 이메일 찾기 */}
         <Route exact path="/find-email" element={<FindEmail />} />

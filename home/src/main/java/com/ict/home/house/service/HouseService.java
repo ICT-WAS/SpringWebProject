@@ -14,4 +14,6 @@ public interface HouseService {
                                              List<String> statuses,
                                              Long userId,
                                              String orderBy);
+
+    List<HouseInfo> getHouseInfoListByName(String keyword);
 }
