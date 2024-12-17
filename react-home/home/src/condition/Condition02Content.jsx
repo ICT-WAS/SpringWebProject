@@ -9,21 +9,17 @@ export default function Condition02Content() {
 
     const navigate = useNavigate();
 
-    const [validated, setValidated] = useState(false);
-
     /* 제출용 데이터 */
     const [formData1, setFormData1] = useState({});
     const [accountDTOList, setAccountDTOList] = useState({});
     const [familyDataList, setFamilyDataList] = useState([]);
     const [spouseFamilyDataList, setSpouseFamilyDataList] = useState([]);
 
-    const [myData, setMyData] = useState([{ relationship: 1, livingTogether: 1 }]);
     const [spouseData, setSpouseData] = useState([]);
 
     const [married, setMarried] = useState(0);
 
     const [hasSeperateHouseSpouse, setHasSeperateHouseSpouse] = useState(false);
-    const [userBirth, setUserBirth] = useState(null);
 
     useEffect(() => {
         /* 이전 폼 데이터 읽어오기 */
@@ -46,9 +42,6 @@ export default function Condition02Content() {
 
         const prevMarried = Number(userData.married);
         setMarried(prevMarried);
-        setUserBirth(userData.birthday);
-
-        setMyData([{ relationship: 1, livingTogether: 1 }]);
 
         if (prevMarried === 0) {
             return;
@@ -61,11 +54,9 @@ export default function Condition02Content() {
             setSpouseData({ relationship: 2, livingTogether: 1 });
         }
 
-    }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행
+    }, []);
 
     function handlePrevButtonClick(e) {
-
-        sessionStorage.removeItem('formData1');
         navigate("/condition-1");
     }
 
@@ -82,13 +73,14 @@ export default function Condition02Content() {
     function handleSubmit(event) {
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
+
+            alert('관계, 동거 기간은 필수 항목입니다.');
             event.preventDefault();
             event.stopPropagation();
-            setValidated(true);
             return;
         }
 
-        let finalFamilyData = [...familyDataList, ...myData];
+        let finalFamilyData = [...familyDataList];
         if (spouseData.length > 0) {
             finalFamilyData = [...finalFamilyData, ...spouseData];
         }
@@ -109,11 +101,11 @@ export default function Condition02Content() {
                 조건 등록 (2/3) - 세대구성원 정보 입력
             </p>
 
-            <Form noValidate validated={validated} onSubmit={handleSubmit}>
+            <Form noValidate onSubmit={handleSubmit}>
                 <Stack direction='vertical' gap={5} >
 
                     {/* 본인 세대의 세대원 */}
-                    <FamilyForm married={married} handleChange={handleFamilyRowChange} userBirth={userBirth} hasSeperateHouseSpouse={hasSeperateHouseSpouse} />
+                    <FamilyForm married={married} handleChange={handleFamilyRowChange} userBirth={formData1.birthday} hasSeperateHouseSpouse={hasSeperateHouseSpouse} />
 
                     {/* 배우자 세대의 세대원 */}
                     {hasSeperateHouseSpouse && <SpouseFamilyForm married={married} handleChange={handleSpouseFamilyRowChange} />}
@@ -157,8 +149,8 @@ function FamilyRelationshipDropdown({ married, handleChange, value }) {
     let familyList = familyOptinList[married];
 
     const relationshipList = () => {
-        return familyList.map((relationship) => (
-            <option value={relationship}>
+        return familyList.map((relationship, index) => (
+            <option value={relationship} key={index} >
                 {familyMemberNames[relationship]}
             </option>
         ));
@@ -170,7 +162,7 @@ function FamilyRelationshipDropdown({ married, handleChange, value }) {
     }
 
     return (
-        <Form.Select required value={value} onChange={handleChanged}>
+        <Form.Select required value={value || ''} onChange={handleChanged}>
             <option value="">선택</option>
             {relationshipList()}
         </Form.Select>
@@ -198,7 +190,7 @@ function LivingTogetherDateDropdown({ handleChange, required, disabled, value })
     }
 
     return (
-        <Form.Select required={required} disabled={disabled} onChange={handleChanged} value={value} >
+        <Form.Select required={required} disabled={disabled} onChange={handleChanged} value={value || ''} >
             <option value="" >선택</option>
             {livingTogetherDataList()}
         </Form.Select>
@@ -212,9 +204,9 @@ function FamilyForm({ married, handleChange, userBirth, hasSeperateHouseSpouse }
     const hasSpouse = !hasSeperateHouseSpouse && (married === 1 || married === 2);
     const isMarried = married > 0;
     const initFamilyList = hasSpouse
-        ? [{ index: 0, livingTogether: 1, relationship: 1, birthday: userBirth, isMarried: isMarried },
-        { index: 1, livingTogether: 1, relationship: 2, isMarried: isMarried }]
-        : [{ index: 0, livingTogether: 1, relationship: 1, birthday: userBirth, isMarried: isMarried }];
+        ? [{ index: 0, livingTogether: 1, relationship: 1, birthday: userBirth, isMarried: isMarried, houseCount: 0 },
+        { index: 1, livingTogether: 1, relationship: 2, isMarried: isMarried, houseCount: 0 }]
+        : [{ index: 0, livingTogether: 1, relationship: 1, birthday: userBirth, isMarried: isMarried, houseCount : 0 }];
 
     const [familyDataList, setFamilyDataList] = useState(initFamilyList);
 
@@ -238,7 +230,7 @@ function FamilyForm({ married, handleChange, userBirth, hasSeperateHouseSpouse }
     function handleAdd() {
         setFamilyDataList((prev) => ([
             ...prev,
-            { index: sequence, relationship: null, livingTogether: 1, birthday: null, houseCount: null, houseSoldDate: null, isMarried: null }
+            { index: sequence, relationship: null, livingTogether: 1, houseCount: 0, birthday: null, houseCount: null, houseSoldDate: null, isMarried: null }
         ]));
         setSequence(seq => seq + 1);
     }
@@ -253,7 +245,7 @@ function FamilyForm({ married, handleChange, userBirth, hasSeperateHouseSpouse }
     function handleResetData(index, relationship) {
         const updatedFamilyData = familyDataList.map((row) =>
             row.index === index
-                ? { index: row.index, relationship: relationship, livingTogether: 1, birthday: null, houseCount: null, houseSoldDate: null, isMarried: null }
+                ? { index: row.index, relationship: relationship, livingTogether: 1, houseCount: 0, birthday: null, houseCount: null, houseSoldDate: null, isMarried: null }
                 : row
         );
 
@@ -268,7 +260,7 @@ function FamilyForm({ married, handleChange, userBirth, hasSeperateHouseSpouse }
                     <FamilyFormHead />
                 </thead>
                 <tbody>
-                    <SelfFormRow handleChange={handleFamilyRowChange} rowData={familyDataList[0]} />
+                    <SelfFormRow handleChange={handleFamilyRowChange} rowData={familyDataList[0]} userBirth={userBirth} />
                     {hasSpouse && <SpouseFormRow index={1} livingTogether={1} handleChange={handleFamilyRowChange} value={familyDataList[1]} />}
 
                     {familyDataList
@@ -388,11 +380,12 @@ function FamilyFormRow({ married, handleChange, resetData, handleRemove, rowData
     // 폼 Input 타입 관리
     function handleInputChanged(e) {
         const name = e.target.getAttribute('data-name');
-        let value = Number(e.target.value);
+        handleChangeFormValue({ key: name, value: e.target.value });
+    }
 
-        if (value < 0) {
-            value = 0;
-        }
+    function handleBlur(e) {
+        const name = e.target.getAttribute('data-name');
+        let value = Math.max(0, e.target.value);
 
         handleChangeFormValue({ key: name, value: value });
     }
@@ -415,7 +408,7 @@ function FamilyFormRow({ married, handleChange, resetData, handleRemove, rowData
             {/* 관계 */}
             <td>
                 <FamilyRelationshipDropdown married={married} handleChange={handleChangeRelation}
-                    value={rowData.relationship || ''} />
+                    value={rowData.relationship} />
             </td>
 
             {/* 동거기간 */}
@@ -423,7 +416,7 @@ function FamilyFormRow({ married, handleChange, resetData, handleRemove, rowData
                 <LivingTogetherDateDropdown handleChange={handleChangeLivingTogetherDate}
                     required={isRequireLivingTogetherDate}
                     disabled={!isRequireLivingTogetherDate}
-                    value={rowData.livingTogetherDate || ''} />
+                    value={rowData.livingTogetherDate} />
             </td>
 
             {/* 생년월일 */}
@@ -452,12 +445,13 @@ function FamilyFormRow({ married, handleChange, resetData, handleRemove, rowData
             {/* 주택/분양권 소유 수 */}
             <td>
                 <Form.Control
-                    type="number"
+                    type="text"
                     placeholder={placeholderText.houseCountType}
                     name={`house-${rowData.index}-${rowData.livingTogether}`}
                     data-name={'houseCount'}
                     onChange={handleInputChanged}
-                    value={rowData.houseCount || ''}
+                    onBlur={handleBlur}
+                    value={rowData.houseCount || 0}
                     required={rowData.relationship !== FamilyMember.UNBORN_CHILD}
                     disabled={rowData.relationship === FamilyMember.UNBORN_CHILD}
                 />
@@ -478,7 +472,7 @@ function FamilyFormRow({ married, handleChange, resetData, handleRemove, rowData
     );
 }
 
-function SelfFormRow({ handleChange, rowData }) {
+function SelfFormRow({ handleChange, rowData, userBirth }) {
 
     const [hasError, setHasError] = useState(false);
 
@@ -490,26 +484,33 @@ function SelfFormRow({ handleChange, rowData }) {
 
     function handleInputChanged(e) {
         const name = e.target.getAttribute('data-name');
-        let value = Number(e.target.value);
+        handleRowChange({ key: name, value: e.target.value });
+    }
 
-        if (value < 0) {
-            value = 0;
-        }
+    function handleBlur(e) {
+        const name = e.target.getAttribute('data-name');
+
+        const value = Math.max(0, e.target.value);
 
         handleRowChange({ key: name, value: value });
     }
 
-    // 폼 Input date 타입 관리
-    function handleDateInputChanged(e) {
+    function handleChanged(e) {
         const name = e.target.getAttribute('data-name');
-        const value = formatDateToCustomFormat(e.target.value.toString());
-        if (e.target.value.length > 0 && value == null) {
+        handleRowChange({ key: name, value: e.target.value });
+    }
+
+    // 폼 Input date 타입 관리
+    function handleBlurDate(e) {
+        const name = e.target.getAttribute('data-name');
+
+        const value = formatDateToCustomFormat(e.target.value);
+        if (e.target.value.length > 0 && value === null) {
             setHasError(true);
         } else {
+            handleRowChange({ key: name, value: value });
             setHasError(false);
         }
-
-        handleChange({ key: name, value: value });
     }
 
     return (
@@ -526,8 +527,8 @@ function SelfFormRow({ handleChange, rowData }) {
                 {/* 생년월일 */}
                 <td>
                     <Form.Control
-                        type="number"
-                        value={rowData.birthday}
+                        type="text"
+                        value={userBirth || ''}
                         disabled
                         readOnly
                     />
@@ -541,25 +542,28 @@ function SelfFormRow({ handleChange, rowData }) {
                 {/* 주택/분양권 소유 수 */}
                 <td>
                     <Form.Control
-                        type="number"
+                        type="text"
                         placeholder={placeholderText.houseCountType}
                         name={`house`}
                         data-name={'houseCount'}
                         required
                         onChange={handleInputChanged}
-                        value={rowData.houseCount}
+                        onBlur={handleBlur}
+                        value={rowData.houseCount || 0}
                     />
                 </td>
 
                 {/* 주택 처분 날짜 */}
                 <td>
                     <Form.Control
-                        type="number"
+                        type="text"
                         placeholder={placeholderText.dateType}
                         name={`houseSold`}
                         data-name={'houseSoldDate'}
-                        onChange={handleDateInputChanged}
-                        value={rowData.houseSoldDate}
+                        onChange={handleChanged}
+                        onBlur={handleBlurDate}
+                        value={rowData.houseSoldDate || ''}
+                        maxLength={8}
                     />
                     {hasError && <p className="inputTypeError">올바르지 않은 형식입니다.</p>}
                 </td>
@@ -569,12 +573,12 @@ function SelfFormRow({ handleChange, rowData }) {
     );
 }
 
-function SpouseFormRow({ index, livingTogether, handleChange, value }) {
+function SpouseFormRow({ index, livingTogether, handleChange }) {
 
     const [hasError, setHasError] = useState(false);
     const [rowData, setRowData] = useState({
         index: index, relationship: 2,
-        livingTogether: livingTogether, isMarried: true
+        livingTogether: livingTogether, houseCount: 0, isMarried: true
     });
 
     function handleRowChange({ key, value }) {
@@ -586,26 +590,33 @@ function SpouseFormRow({ index, livingTogether, handleChange, value }) {
 
     function handleInputChanged(e) {
         const name = e.target.getAttribute('data-name');
-        let value = Number(e.target.value);
+        handleRowChange({ key: name, value: e.target.value });
+    }
 
-        if (value < 0) {
-            value = 0;
-        }
+    function handleBlur(e) {
+        const name = e.target.getAttribute('data-name');
+
+        const value = Math.max(0, e.target.value);
 
         handleRowChange({ key: name, value: value });
     }
 
-    // 폼 Input date 타입 관리
-    function handleDateInputChanged(e) {
+    function handleChanged(e) {
         const name = e.target.getAttribute('data-name');
-        const value = formatDateToCustomFormat(e.target.value.toString());
-        if (e.target.value.length > 0 && value == null) {
+        handleRowChange({ key: name, value: e.target.value });
+    }
+
+    // 폼 Input date 타입 관리
+    function handleBlurDate(e) {
+
+        const name = e.target.getAttribute('data-name');
+        const value = formatDateToCustomFormat(e.target.value);
+        if (e.target.value.length > 0 && value === null) {
             setHasError(true);
         } else {
+            handleRowChange({ key: name, value: value });
             setHasError(false);
         }
-
-        handleRowChange({ key: name, value: value });
     }
 
     return (
@@ -627,7 +638,6 @@ function SpouseFormRow({ index, livingTogether, handleChange, value }) {
                         placeholder={placeholderText.dateType}
                         name={`birth-`}
                         disabled
-                        onBlur={handleInputChanged}
                     />
                 </td>
 
@@ -639,12 +649,14 @@ function SpouseFormRow({ index, livingTogether, handleChange, value }) {
                 {/* 주택/분양권 소유 수 */}
                 <td>
                     <Form.Control
-                        type="number"
+                        type="text"
                         placeholder={placeholderText.houseCountType}
                         name={`house-`}
                         data-name={'houseCount'}
+                        value={rowData.houseCount || 0}
                         required
-                        onBlur={handleDateInputChanged}
+                        onBlur={handleBlur}
+                        onChange={handleInputChanged}
                     />
                 </td>
 
@@ -655,6 +667,9 @@ function SpouseFormRow({ index, livingTogether, handleChange, value }) {
                         placeholder={placeholderText.dateType}
                         data-name={'houseSoldDate'}
                         name={`houseSold-`}
+                        value={rowData.houseSoldDate}
+                        onChange={handleChanged}
+                        onBlur={handleBlurDate}
                     />
                     {hasError && <p className="inputTypeError">올바르지 않은 형식입니다.</p>}
                 </td>
@@ -668,16 +683,20 @@ function InputDateType({name, dataName, onChange, required, disabled, value}) {
 
     const [hasError, setHasError] = useState(false);
 
+    function handleChanged(e) {
+        onChange({ key: dataName, value: e.target.value });
+    }
+
     // 폼 Input date 타입 관리
-    function handleDateInputChanged(e) {
+    function handleBlur(e) {
+
         const value = formatDateToCustomFormat(e.target.value);
-        if (e.target.value.length > 0 && value == null) {
+        if (e.target.value.length > 0 && value === null) {
             setHasError(true);
         } else {
+            onChange({ key: dataName, value: value });
             setHasError(false);
         }
-
-        onChange({ key: dataName, value: value });
     }
 
     return (
@@ -686,10 +705,13 @@ function InputDateType({name, dataName, onChange, required, disabled, value}) {
                 type="text"
                 placeholder={placeholderText.dateType}
                 name={name}
-                onChange={handleDateInputChanged}
-                value={value}
+                onChange={handleChanged}
+                onBlur={handleBlur}
+                value={value || ''}
                 required={required}
                 disabled={disabled}
+                minLength={required ? 0 : 8}
+                maxLength={8}
             />
             {(hasError && !disabled) && <p className="inputTypeError">올바르지 않은 형식입니다.</p>}
         </>

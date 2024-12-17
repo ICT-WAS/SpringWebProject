@@ -14,17 +14,32 @@ export default function Condition03Content() {
 
     const navigate = useNavigate();
 
-    const [validated, setValidated] = useState(false);
-
     const totalPropertyValueButtons = { name: 'propertyPrice', values: [{ data: '미보유 혹은 2억 1,150만원 이하', value: 0 }, { data: '2억 1,150만원 초과 3억 3,100만원 이하', value: 1 }, { data: '3억 3,100만원 초과', value: 2 }] }
     const incomeActivityTypeButtons = { name: 'incomeActivity', values: [{ data: '외벌이', value: 0 }, { data: '맞벌이', value: 1, hasFollowUpQuestion: true }] }
-    const winningHistoryButtons = { name: 'lastWinned', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: null }] }
-    const wasDisqualifiedButtons = { name: 'ineligible', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: null }] }
+    const winningHistoryButtons = { name: 'lastWinned', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
+    const wasDisqualifiedButtons = { name: 'ineligible', values: [{ data: '예', value: 'Y', hasFollowUpQuestion: true }, { data: '아니오', value: 'N' }] }
 
     /* 제출용 데이터 */
     const [formData1, setFormData1] = useState({});
     const [accountDTOList, setAccountDTOList] = useState({});
-    const [formData3, setFormData3] = useState({});
+    const [formData3, setFormData3] = useState({
+        carPrice: null,
+        propertyPrice: null,
+        totalAsset: null,
+        myAsset: null,
+        spouseAsset: null,
+        familyAverageMonthlyIncome: null,
+        previousYearAverageMonthlyIncome: null,
+        incomeTaxPaymentPeriod: null,
+        incomeActivity: null,
+        lastWinned: null,
+        ineligible: null
+    });
+
+    const [formDateData, setFormDateData] = useState({
+        lastWinned: null,
+        ineligible: null,
+    });
     const [spouseAverageMonthlyIncome, setSpouseAverageMonthlyIncome] = useState({});
     const [familyDataList, setFamilyDataList] = useState([]);
 
@@ -93,7 +108,7 @@ export default function Condition03Content() {
         event.stopPropagation();
         if (form.checkValidity() === false) {
 
-            setValidated(true);
+            alert('모든 항목을 입력해주세요.');
             return;
         }
 
@@ -137,6 +152,10 @@ export default function Condition03Content() {
         });
     }
 
+    function onChangedDateRadioValue({ name, value }) {
+        setFormDateData(prevFormData => ({...prevFormData, [name]: value}));
+    }
+
     function onChangedSpouseMonthlyIncomValue({ name, value }) {
         setSpouseAverageMonthlyIncome({ [name]: value });
     }
@@ -164,7 +183,7 @@ export default function Condition03Content() {
                 조건 등록 (3/3) - 재산 정보 입력
             </p>
 
-            <Form noValidate validated={validated} onSubmit={handleSubmit}>
+            <Form noValidate onSubmit={handleSubmit}>
                 <Stack direction='vertical' gap={5} >
 
                     {/* 차량가액을 입력해주세요 */}
@@ -172,60 +191,64 @@ export default function Condition03Content() {
                     <HasVehicle handleFollowUpQuestion={handleFollowUpQuestion} onChangedInputValue={onChangedInputValue} />
 
                     {/* ![꼬리질문] 차량가액 */}
-                    <VehicleValueQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['vehicleValue']} />
+                    <VehicleValueQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['vehicleValue']} value={formData3.carPrice}/>
 
                     {/* 소유하신 부동산(건축물 + 토지)총 가액을 선택해주세요 */}
                     <RadioButtonItem question={'소유하신 부동산(건축물 + 토지)총 가액을 선택해주세요'}
-                        buttons={totalPropertyValueButtons} onChange={onChangedInputValue} />
+                        buttons={totalPropertyValueButtons} onChange={onChangedInputValue} value={formData3.propertyPrice}/>
 
                     {/* 세대구성원 전원의 총 자산을 입력해주세요 */}
-                    <InputNumberItem question={'세대구성원 전원의 총 자산을 입력해주세요'}
+                    <InputNumberItem question={'세대구성원 전원의 총 자산을 입력해주세요'} value={formData3.totalAsset}
                         name={'totalAsset'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
 
                     {/* 본인의 총 자산을 입력해주세요 */}
-                    <InputNumberItem question={'본인의 총 자산을 입력해주세요'}
+                    <InputNumberItem question={'본인의 총 자산을 입력해주세요'} value={formData3.myAsset}
                         name={'myAsset'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
 
                     {/* 배우자의 총 자산을 입력해주세요 */}
                     {hasSpouse === true && (<InputNumberItem question={'배우자의 총 자산을 입력해주세요'}
-                        name={'spouseAsset'} onChange={onChangedInputValue}
+                        name={'spouseAsset'} onChange={onChangedInputValue} value={formData3.spouseAsset}
                         placeholder={placeholderText.largeMoneyUnitType} />)}
 
                     {/* 세대구성원 중 만 19세 이상 세대원 전원의 전년도 월 평균소득을 모두 합산한 금액 */}
                     <InputNumberItem question={'세대구성원 중 만 19세 이상 세대원 전원의 전년도 월 평균소득을 모두 합산한 금액'}
-                        name={'familyAverageMonthlyIncome'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
+                        name={'familyAverageMonthlyIncome'} onChange={onChangedInputValue} 
+                        placeholder={placeholderText.moneyUnitType} value={formData3.familyAverageMonthlyIncome} />
 
                     {/* 본인의 전년도 월 평균소득을 입력해주세요 */}
-                    <InputNumberItem question={'본인의 전년도 월 평균소득을 입력해주세요'}
+                    <InputNumberItem question={'본인의 전년도 월 평균소득을 입력해주세요'} value={formData3.previousYearAverageMonthlyIncome} 
                         name={'previousYearAverageMonthlyIncome'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
 
                     {/* 소득활동 여부를 선택해주세요 */}
-                    {hasSpouse === true && <RadioButtonItem question={'소득활동 여부를 선택해주세요'}
+                    {hasSpouse === true && <RadioButtonItem question={'소득활동 여부를 선택해주세요'} 
                         buttons={incomeActivityTypeButtons} direction={'horizontal'} onChange={onChangedInputValue}
-                        handleFollowUpQuestion={handleFollowUpQuestion} />}
+                        handleFollowUpQuestion={handleFollowUpQuestion} value={formData3.incomeActivity} />}
 
                     {/* [꼬리질문] 배우자의 월평균소득을 입력해주세요 */}
-                    <SpouseIncomeQuestion onChangedInputValue={onChangedSpouseMonthlyIncomValue} visibility={visibility['spouseIncome']} />
+                    <SpouseIncomeQuestion onChangedInputValue={onChangedSpouseMonthlyIncomValue} 
+                        value={spouseAverageMonthlyIncome.spouseIncome} visibility={visibility['spouseIncome']} />
 
                     {/* 소득세 납부 기간 */}
-                    <InputNumberItem question={'소득세 납부 기간'}
+                    <InputNumberItem question={'소득세 납부 기간'} value={formData3.incomeTaxPaymentPeriod}
                         name={'incomeTaxPaymentPeriod'} onChange={onChangedInputValue} placeholder={placeholderText.yearCountType} />
 
                     {/* 신청자 및 세대구성원이 과거 주택 청약에 당첨된 적 있나요? */}
                     <RadioButtonItem question={'신청자 및 세대구성원이 과거 주택 청약에 당첨된 적 있나요?'}
-                        buttons={winningHistoryButtons} direction={'horizontal'} onChange={onChangedInputValue}
-                        handleFollowUpQuestion={handleFollowUpQuestion} />
+                        buttons={winningHistoryButtons} direction={'horizontal'} onChange={onChangedDateRadioValue}
+                        handleFollowUpQuestion={handleFollowUpQuestion} value={formDateData.lastWinned} />
 
                     {/* [꼬리질문] 가장 최근에 당첨된 날짜를 입력해주세요 */}
-                    <WinningDateQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['winningDate']} />
+                    <WinningDateQuestion onChangedInputValue={onChangedInputValue} 
+                        value={formData3.lastWinned} visibility={visibility['winningDate']} />
 
                     {/* 신청자 본인이 주택청약에 당첨되고 부적격자 판정을 받은 적 있나요? */}
                     <RadioButtonItem number={15} question={'신청자 본인이 주택청약에 당첨되고 부적격자 판정을 받은 적 있나요?'}
-                        buttons={wasDisqualifiedButtons} direction={'horizontal'} onChange={onChangedInputValue}
-                        handleFollowUpQuestion={handleFollowUpQuestion} />
+                        buttons={wasDisqualifiedButtons} direction={'horizontal'} onChange={onChangedDateRadioValue}
+                        handleFollowUpQuestion={handleFollowUpQuestion} value={formDateData.ineligible} />
 
                     {/* [꼬리질문] 부적격자 판정된 날짜가 언제인가요? */}
-                    <DisqualifiedDate onChangedInputValue={onChangedInputValue} visibility={visibility['disqualifiedDate']} />
+                    <DisqualifiedDate onChangedInputValue={onChangedInputValue} 
+                        value={formData3.ineligible} visibility={visibility['disqualifiedDate']} />
 
                     {/* 폼 제출 */}
                     <Stack direction="horizontal" gap={2}>
@@ -271,49 +294,49 @@ function HasVehicle({ handleFollowUpQuestion, onChangedInputValue }) {
 }
 
 {/* 차량가액 - 차량가액을 입력해주세요 */ }
-function VehicleValueQuestion({ onChangedInputValue, visibility }) {
+function VehicleValueQuestion({ onChangedInputValue, visibility, value }) {
     if (!visibility) {
         return;
     }
 
     return (
-        <InputNumberSubItem question={'차량가액을 입력해주세요'} depth={3}
+        <InputNumberSubItem question={'차량가액을 입력해주세요'} depth={3} value={value}
             name={'carPrice'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
     );
 }
 
 {/* 배우자 소득활동 - 배우자의 월평균소득을 입력해주세요 */ }
-function SpouseIncomeQuestion({ onChangedInputValue, visibility }) {
+function SpouseIncomeQuestion({ onChangedInputValue, visibility, value }) {
     if (!visibility) {
         return;
     }
 
     return (
-        <InputNumberSubItem question={'배우자의 월평균소득을 입력해주세요'} depth={3}
+        <InputNumberSubItem question={'배우자의 월평균소득을 입력해주세요'} depth={3} value={value}
             name={'spouseAverageMonthlyIncome'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
     );
 }
 
 {/* 당첨이력 - 가장 최근에 당첨된 날짜를 입력해주세요 */ }
-function WinningDateQuestion({ onChangedInputValue, visibility }) {
+function WinningDateQuestion({ onChangedInputValue, visibility, value }) {
     if (!visibility) {
         return;
     }
 
     return (
-        <InputNumberSubItem question={'가장 최근에 당첨된 날짜를 입력해주세요'} depth={3}
+        <InputNumberSubItem question={'가장 최근에 당첨된 날짜를 입력해주세요'} depth={3} value={value}
             name={'lastWinned'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
     );
 }
 
 {/* 당첨이력 - 부적격자 판정된 날짜가 언제인가요? */ }
-function DisqualifiedDate({ onChangedInputValue, visibility }) {
+function DisqualifiedDate({ onChangedInputValue, visibility, value }) {
     if (!visibility) {
         return;
     }
 
     return (
-        <InputNumberSubItem question={'부적격자 판정된 날짜가 언제인가요?'} depth={3}
+        <InputNumberSubItem question={'부적격자 판정된 날짜가 언제인가요?'} depth={3} value={value}
             name={'ineligible'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
     );
 }

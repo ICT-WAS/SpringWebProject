@@ -48,6 +48,19 @@ public class ConditionController {
         return ResponseEntity.ok("조회 성공");
     }
 
+    @PostMapping("/test")
+    @Operation(summary = "조건 등록", description = "조건을 등록합니다.")
+    public ResponseEntity<String> addConditionTest(@Valid @RequestBody ConditionDTO conditionDTO, @PathVariable(required = false) Long userId) {
+        // 저장하는 로직 (예: repository 사용)
+        System.out.println("conditionDTO.getCondition01DTO() = " + conditionDTO.getCondition01DTO());
+        System.out.println("conditionDTO.getCondition03DTO() = " + conditionDTO.getCondition03DTO());
+        System.out.println("conditionDTO.getAccountDTOList() = " + conditionDTO.getAccountDTOList());
+        System.out.println("conditionDTO.getFamilyDTOList() = " + conditionDTO.getFamilyDTOList());
+
+
+        return ResponseEntity.ok("등록 성공");
+    }
+
     @PostMapping("/{userId}")
     @Operation(summary = "조건 등록", description = "조건을 등록합니다.")
     public ResponseEntity<String> addCondition(@Valid @RequestBody ConditionDTO conditionDTO, @PathVariable Long userId) {

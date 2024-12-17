@@ -11,8 +11,6 @@ export default function Condition01Content() {
 
     const navigate = useNavigate();
 
-    const [hasError, setHasError] = useState(false);
-
     const houseHolderButtons = { name: 'isHouseHolder', values: [{ data: '세대원', value: false, }, { data: '세대주', value: true, }] }
     const marriedButtons = { name: 'married', values: [{ data: '미혼', value: 0 }, { data: '기혼', value: 1, hasFollowUpQuestion: true }, { data: '예비신혼부부', value: 2 }, { data: '한부모', value: 3 }] }
     const accountTypeButtons = {
@@ -27,92 +25,105 @@ export default function Condition01Content() {
 
     /* 제출용 데이터 */
     const [formData, setFormData] = useState({
-        birthday: 19991210,
-        gunGu: "영동군",
-        siDo: "360",
-        transferDate: 19991210,
-        regionMoveInDate: 19991208,
-        isHouseHolder: false,
-        married: 1,
-        marriedDate: 19991210
-
+        birthday: null,
+        gunGu: null,
+        siDo: null,
+        transferDate: null,
+        regionMoveInDate: null,
+        isHouseHolder: null,
+        married: null,
+        marriedDate: null
     });
 
     const [spouseFormData, setSpouseFormData] = useState({
-        spouse: "Y",
-        spouseHasAccount: "Y"
+        spouse: null,
+        spouseHasAccount: null
     });
 
     const [accountData, setAccountData] = useState({
-        type: "SAVINGS_ACCOUNT",
-        createdAt: "19991210",
-        paymentCount: 12,
-        totalAmount: 120,
-        recognizedAmount: 120
+        type: null,
+        createdAt: null,
+        paymentCount: null,
+        totalAmount: null,
+        recognizedAmount: null
     });
 
-    const [spouseAccountData, setSpouseAccountData] = useState({});
+    const [spouseAccountData, setSpouseAccountData] = useState({
+        createdAt: null
+    });
+
+    // const [formData, setFormData] = useState({
+    //     "birthday": "1999-12-10",
+    //     "gunGu": "관악구",
+    //     "siDo": "100",
+    //     "transferDate": "1999-12-10",
+    //     "regionMoveInDate": null,
+    //     "isHouseHolder": false,
+    //     "married": 2,
+    //     "marriedDate": null,
+    //     "metropolitanAreaDate": "2000-01-01"
+
+    // });
+
+    // const [spouseFormData, setSpouseFormData] = useState({
+    //     spouse: null,
+    //     spouseHasAccount: null
+    // });
+
+    // const [accountData, setAccountData] = useState({
+    //     "type": "SAVINGS_ACCOUNT",
+    //     "createdAt": "2000-01-01",
+    //     "paymentCount": 2,
+    //     "totalAmount": 12,
+    //     "recognizedAmount": 12,
+    //     "relationship": 1
+
+    // });
+
+    // const [spouseAccountData, setSpouseAccountData] = useState({
+    //     "createdAt": "1989-01-01",
+    //     "relationship": 2
+
+    // });
+
+    
 
     /* 꼬리질문 가시성 */
-    const [hasSpouse, setHasSpouse] = useState(false);
-    const followUpQuestions = {
-        married: [{ value: 1, subQuestionId: 'marriedDate' }],
-        moveInDate: [{ value: 1, subQuestionId: 'metropolitanAreaDate' }, { value: 2, subQuestionId: 'regionMoveInDate' }],
-        type: [{ value: 'SAVINGS_ACCOUNT', subQuestionId: 'accountInfo' },
-        { value: 'SAVINGS_PLAN', subQuestionId: 'accountInfo' },
-        { value: 'SAVINGS_DEPOSIT', subQuestionId: 'accountInfo' },
-        { value: 'COMBINED_SAVINGS', subQuestionId: 'accountInfo' }],
-        spouseHasAccount: [{ value: 'Y', subQuestionId: 'spouseAccountDate' }],
-    };
-
-    const [visibility, setVisibility] = useState({
-        marriedDate: false, metropolitanAreaDate: false, regionMoveInDate: false,
-        accountInfo: false, spouseAccountDate: false,
-    });
+    const [hasSpouse, setHasSpouse] = useState(false); // 기혼, 예비신혼부부부
 
     useEffect(() => {
-        const keysToRemove = Object.keys(visibility).filter(
-            (key) => visibility[key] === false
-        );
+            /* 이전 폼 데이터 읽어오기 */
+            const sessionData = sessionStorage.getItem('formData1');
+            const accountData = sessionStorage.getItem('accountDTOList');
 
-        if (keysToRemove.length > 0) {
-            setFormData((prev) => {
-                const updatedFormData = { ...prev };
-                keysToRemove.forEach((key) => {
-                    delete updatedFormData[key]; // false인 키를 삭제
-                });
-                return updatedFormData;
-            });
-        }
-    }, [visibility]);
+            let spouseData = {livingWithSpouse: sessionStorage.getItem('livingWithSpouse')};
+            
+            if (!sessionData) return;
+    
+            let userData = null;
+            try {
+                userData = JSON.parse(sessionData);
+                setFormData(userData);
+    
+                const account = JSON.parse(accountData);
+                setAccountData(account[0]);
+                if(account.length > 1) {
+                    setSpouseAccountData(account[1]);
+                    spouseData = {...spouseData, spouseHasAccount: 'Y'};
+                }
+
+                setSpouseFormData(spouseData);
+                
+            } catch (error) { }
+    
+        }, []);
 
     useEffect(() => {
         setHasSpouse(formData['married'] === 1 || formData['married'] === 2);
-
-        const compareSidoCode = Number(formData.siDo);
-
-         // 서울, 인천, 경기?
-         const trueCondition = compareSidoCode === Sido.서울 || compareSidoCode === Sido.인천 || compareSidoCode === Sido.경기;
-         changeVisibility({ condition: trueCondition, name: 'metropolitanAreaDate' });
- 
-         // 경기/충북/충남/전북/전남/경북/경남/강원
-         const regionMoveinSidoList = [Sido.경기, Sido.충북, Sido.충남, Sido.전북, Sido.전남, Sido.경북, Sido.경남, Sido.강원];
-         const regionMoveinCondition = regionMoveinSidoList.includes(compareSidoCode);
-         changeVisibility({ condition: regionMoveinCondition, name: 'regionMoveInDate' });
-  
     }, [formData]);
 
     function onChangedInputValue({ name, value }) {
-        const questionName = followUpQuestions[name];
-
-        setFormData(prevFormData => {
-            const { [questionName]: _, ...filteredData } = prevFormData;
-
-            return {
-                ...filteredData,
-                [name]: value
-            };
-        });
+        setFormData((prev) => ({ ...prev, [name]: value }));
     }
 
     function onChangedAccount({ name, value }) {
@@ -120,87 +131,44 @@ export default function Condition01Content() {
     }
 
     function onSpouseChangedInputValue({ name, value }) {
-        const questionName = followUpQuestions[name];
-
-        setSpouseFormData(prevFormData => {
-            const { [questionName]: _, ...filteredData } = prevFormData;
-
-            return {
-                ...filteredData,
-                [name]: value
-            };
-        });
+        setSpouseFormData(prevFormData => ({ ...prevFormData, [name]: value }));
     }
 
     function onSpouseChangedAccount({ name, value }) {
         setSpouseAccountData({ [name]: value, relationship: 2 });
     }
 
-    function changeVisibility({ condition, name }) {
-        setVisibility((prev) => {
-            if (condition) {
-                return { ...prev, [name]: true };
-            } else {
-                return { ...prev, [name]: false };
-            }
-        });
-        setFormData((prev) => {
-            if (condition) {
-                return prev;
-            } else {
-                const { [name]: _, ...rest } = prev;
-                return rest;
-            }
-        })
-    }
-
-    // value는 상위 질문 옵션값임
-    function handleFollowUpQuestion({ name, value, visible }) {
-        const matchedItem = followUpQuestions[name];
-
-        if (!matchedItem || matchedItem.length < 1) {
-            return;
-        }
-
-        matchedItem.forEach((item) => {
-            const questionName = item.subQuestionId;
-
-            setVisibility((prevVisibility) => ({
-                ...prevVisibility,
-                [questionName]: visible,
-            }));
-        });
-    }
-
     function handleSubmit(event) {
 
         console.log(formData);
+        console.log(accountData);
+        console.log(spouseAccountData);
 
-        const form = event.currentTarget;
-        if (form.checkValidity() === false || hasError) {
-            event.preventDefault();
-            event.stopPropagation();
-            return;
-        } 
+        // const form = event.target;
+        // if (form.checkValidity() === false) {
+
+        //     alert('모든 항목을 입력해주세요.');
+        //     event.preventDefault();
+        //     event.stopPropagation();
+        //     return;
+        // }
 
         let accountDTOList = { accountDTOList: [{ ...accountData }]};
-        if (hasSpouse && spouseAccountData.createdAt) {
+        if (hasSpouse && spouseAccountData.createdAt) { // (기혼 || 예비신혼) && 배우자 계좌 정보
             accountDTOList = { accountDTOList: [{...accountData,}, {...spouseAccountData}] };
         }
 
-        // // 폼 데이터 저장
-        // sessionStorage.setItem('formData1', JSON.stringify(formData));
-        // sessionStorage.setItem('accountDTOList', JSON.stringify(accountDTOList));
-        // sessionStorage.setItem('livingWithSpouse', spouseFormData.spouse);
+        // 폼 데이터 저장
+        sessionStorage.setItem('formData1', JSON.stringify(formData));
+        sessionStorage.setItem('accountDTOList', JSON.stringify(accountDTOList));
+        sessionStorage.setItem('livingWithSpouse', spouseFormData.spouse);
 
-        // navigate("/condition-2");
+        console.log(formData);
+        console.log(accountDTOList);
+
+        navigate("/condition-2");
     }
 
-    function setError(error) {
-        setHasError((err) => err & error);
-    }
-
-    
 
     return (
         <>
@@ -214,55 +182,51 @@ export default function Condition01Content() {
                 {/* 신청자 생년월일 */}
                 <InputNumberItem question={'신청자 생년월일'}
                     name={'birthday'} onChange={onChangedInputValue} type='date' value={formData.birthday}
-                    placeholder={placeholderText.dateType} hasError={setError}/>
+                    placeholder={placeholderText.dateType} />
 
                 {/* 현재 거주지 */}
-                <MoveInDate onChangedInputValue={onChangedInputValue} changeVisibility={changeVisibility} siDoValue={formData.siDo} gunGuValue={formData.gunGu} />
+                <MoveInDate onChangedInputValue={onChangedInputValue} siDoValue={formData.siDo} gunGuValue={formData.gunGu} />
 
                 {/* 현재 거주지에 입주한 날 */}
                 <InputNumberItem question={`${formData.gunGu || 'OOO'}에 입주한 날(주민등록표등본에 있는 전입일자)`}
                     name={'transferDate'} onChange={onChangedInputValue} type='date' 
-                    placeholder={placeholderText.dateType} hasError={setError} value={formData.transferDate}/>
+                    placeholder={placeholderText.dateType} value={formData.transferDate}/>
 
                 {/* [꼬리질문] 현재 지역(시/도)에 거주하기 시작한 날 */}
                 <MoveInFollwUpQuestion1 onChangedInputValue={onChangedInputValue}
-                    siDo={formData.siDo} setError={setError}
+                    siDo={formData.siDo} 
                     value={formData.regionMoveInDate}/>
 
                 {/* [꼬리질문] 서울, 경기, 인천에 거주하기 시작한 날 */}
                 <MoveInFollwUpQuestion2 onChangedInputValue={onChangedInputValue}
                     siDo={formData.siDo} type='date' placeholder={placeholderText.dateType}
-                     setError={setError} value={formData.metropolitanAreaDate}/>
+                      value={formData.metropolitanAreaDate}/>
 
                 {/* 세대주 여부 */}
                 <RadioButtonItem question={'세대주 여부'} value={formData.isHouseHolder} 
                     buttons={houseHolderButtons} direction={'horizontal'} onChange={onChangedInputValue} />
 
                 {/* 결혼 여부 */}
-                <RadioButtonItem question={'결혼을 하셨습니까?'} value={formData.married}
-                    buttons={marriedButtons} direction={'vertical'} onChange={onChangedInputValue}
-                    handleFollowUpQuestion={handleFollowUpQuestion} />
+                <Married value={formData.married} buttons={marriedButtons} onChange={onChangedInputValue}/>
 
                 {/* [꼬리질문] 혼인신고일 */}
-                <MarriedFollwUpQuestion onChangedInputValue={onChangedInputValue} married={formData.married}
-                setError={setError} value={formData.marriedDate} />
+                {formData?.married === 1 && <MarriedFollwUpQuestion onChangedInputValue={onChangedInputValue} 
+                value={formData?.marriedDate} />}
 
                 {/* [꼬리질문] 배우자 동거 여부 */}
                 {hasSpouse && <RadioButtonSubItem question={'배우자와 같이 살고 계신가요?'} depth={3}
                     buttons={livingWithSpouseButtons} direction={'horizontal'} onChange={onSpouseChangedInputValue}
-                    handleFollowUpQuestion={handleFollowUpQuestion} 
                     value={spouseFormData.spouse} />}
 
                 {/* 소유하신 청약 통장의 종류를 선택해주세요 */}
                 <RadioButtonItem question={'소유하신 청약 통장의 종류를 선택해주세요'}
                     buttons={accountTypeButtons} direction={'horizontal'} 
-                    value={accountData.type}
-                    onChange={onChangedAccount}
-                    handleFollowUpQuestion={handleFollowUpQuestion} />
+                    value={accountData?.type}
+                    onChange={onChangedAccount} />
 
                 {/* [꼬리질문] 청약 통장 정보 */}
-                <AccountInfoQuestion onChangedInputValue={onChangedAccount}
-                    value={accountData} setError={setError}/>
+                {accountData?.type !== null && <AccountInfoQuestion onChangedInputValue={onChangedAccount}
+                    value={accountData} />}
 
                 {/* 배우자도 청약 통장이 있으신가요? */}
                 {hasSpouse && (
@@ -271,13 +235,13 @@ export default function Condition01Content() {
                         buttons={spouseHasAccountButtons}
                         direction={'horizontal'}
                         onChange={onSpouseChangedInputValue}
-                        value={spouseFormData.spouseHasAccount}
-                        handleFollowUpQuestion={handleFollowUpQuestion}
+                        value={spouseFormData?.spouseHasAccount}
                     />
                 )}
                 {/* [꼬리질문] 배우자의 청약 통장 정보 */}
-                {(visibility['spouseAccountDate'] && hasSpouse) && 
-                <SpouseAccountInfoQuestion onChangedInputValue={onSpouseChangedAccount} setError={setError}/>}
+                {(hasSpouse && spouseFormData?.spouseHasAccount === "Y") && 
+                <SpouseAccountInfoQuestion onChangedInputValue={onSpouseChangedAccount} 
+                    value={spouseAccountData?.createdAt}/>}
 
                 {/* 다음으로 */}
                 <Button variant="dark" type="submit" >다음</Button>
@@ -293,6 +257,7 @@ function MoveInDate({ onChangedInputValue, siDoValue, gunGuValue }) {
 
     const sidoData = conditionInfo.wishRegion.subcategories;
     const [gunguData, setGunguData] = useState([]);
+    const [initialized, setInitialized] = useState(false);
 
     useEffect(() => {
 
@@ -300,9 +265,27 @@ function MoveInDate({ onChangedInputValue, siDoValue, gunGuValue }) {
         const compareSidoCode = Number(siDoValue);
 
         if(compareSidoCode !== Sido.NONE) {
-            nextGunguData =  sidoData.find((prev) => prev.code === siDoValue).values;
+            nextGunguData =  sidoData.find((prev) => prev.code === siDoValue)?.values;
 
-            setGunguData(nextGunguData);
+            setGunguData(nextGunguData || []);
+        }
+
+        if(!initialized) {
+            setInitialized(true);
+            return;
+        }
+
+        // 경기/충북/충남/전북/전남/경북/경남/강원
+        const regionMoveinSidoList = [Sido.경기, Sido.충북, Sido.충남, Sido.전북, Sido.전남, Sido.경북, Sido.경남, Sido.강원];
+        const regionMoveinCondition = regionMoveinSidoList.includes(compareSidoCode);
+        if(!regionMoveinCondition) {
+            onChangedInputValue({ name: 'regionMoveInDate', value: null });
+        }
+
+        // 서울/경기/인천
+        const matropolitanCondition = compareSidoCode === Sido.서울 || compareSidoCode === Sido.인천 || compareSidoCode === Sido.경기;
+        if (!matropolitanCondition) {
+            onChangedInputValue({ name: 'metropolitanAreaDate', value: null });
         }
 
         const findValue = nextGunguData.find((nextGunGu) => nextGunGu.value === gunGuValue);
@@ -336,11 +319,11 @@ function MoveInDate({ onChangedInputValue, siDoValue, gunGuValue }) {
             <div>
                 <p className="card-header-text">현재 거주지</p>
                 <Stack direction='horizontal' gap={2} >
-                    <Form.Select required value={siDoValue} onChange={handleChangedSido}>
+                    <Form.Select required value={siDoValue || ''} onChange={handleChangedSido}>
                         <option value="" >시/군 선택</option>
                         {sidoList()}
                     </Form.Select>
-                    <Form.Select required value={gunGuValue} onChange={handleChangedGungu}>
+                    <Form.Select required value={gunGuValue || ''} onChange={handleChangedGungu}>
                         <option value="" >군/구 선택</option>
                         {gunguList()}
                     </Form.Select>
@@ -352,7 +335,7 @@ function MoveInDate({ onChangedInputValue, siDoValue, gunGuValue }) {
 }
 
 /* 거주지역 - 특정 지역()에 거주하기 시작한 날 */
-function MoveInFollwUpQuestion1({ siDo, onChangedInputValue, setError, value }) {
+function MoveInFollwUpQuestion1({ siDo, onChangedInputValue, value }) {
 
     // 경기/충북/충남/전북/전남/경북/경남/강원
     const compareSidoCode = Number(siDo);
@@ -363,14 +346,14 @@ function MoveInFollwUpQuestion1({ siDo, onChangedInputValue, setError, value }) 
     }
 
     return (
-        <InputNumberSubItem question={`${Sido[siDo]}에 거주하기 시작한 날`} depth={3} hasError={setError}
+        <InputNumberSubItem question={`${Sido[siDo]}에 거주하기 시작한 날`} depth={3} 
             value={value}
             name={'regionMoveInDate'} onChange={onChangedInputValue} type='date' placeholder={placeholderText.dateType} />
     );
 }
 
 /* 거주지역 - 서울, 경기, 인천에 거주하기 시작한 날 */
-function MoveInFollwUpQuestion2({ onChangedInputValue, setError, value, siDo }) {
+function MoveInFollwUpQuestion2({ onChangedInputValue, value, siDo }) {
 
     const compareSidoCode = Number(siDo);
     const matropolitanCondition = compareSidoCode === Sido.서울 || compareSidoCode === Sido.인천 || compareSidoCode === Sido.경기;
@@ -382,50 +365,56 @@ function MoveInFollwUpQuestion2({ onChangedInputValue, setError, value, siDo }) 
         <InputNumberSubItem question={'서울, 경기, 인천에 거주하기 시작한 날'} depth={3}
             value={value}
             name={'metropolitanAreaDate'} onChange={onChangedInputValue} type='date' 
-            placeholder={placeholderText.dateType} hasError={setError} />
+            placeholder={placeholderText.dateType}   />
+    );
+}
+
+/* 결혼 여부 */
+function Married({value, buttons, onChange }) {
+
+    function onChangeValue({ name, value }) {
+        onChange({ name, value });
+        onChange({ name: 'marriedDate', value: null });
+    }
+
+    return(
+        <RadioButtonItem question={'결혼을 하셨습니까?'} value={value}
+        buttons={buttons} direction={'vertical'} onChange={onChangeValue} />
     );
 }
 
 /* 결혼 여부 - 혼인신고일 */
-function MarriedFollwUpQuestion({ onChangedInputValue, setError, value, married }) {
-
-    if (married !== 1) {
-        return;
-    }
+function MarriedFollwUpQuestion({ onChangedInputValue, value }) {
 
     return (
         <InputNumberSubItem question={'혼인신고일'} depth={3}
             name={'marriedDate'} onChange={onChangedInputValue} type='date' 
-            placeholder={placeholderText.dateType} hasError={setError} value={value} />
+            placeholder={placeholderText.dateType}   value={value} />
     );
 }
 
 /* 청약 통장 - 청약 통장 정보 */
-function AccountInfoQuestion({ onChangedInputValue, setError, value }) {
-
-    if (value.type === null) {
-        return;
-    }
+function AccountInfoQuestion({ onChangedInputValue, value }) {
 
     return (
         <div>
-            <InputNumberSubItem question={'가입일자 입력'} depth={3} hasError={setError} value={value.createdAt}
+            <InputNumberSubItem question={'가입일자 입력'} depth={3}   value={value?.createdAt}
                 name={'createdAt'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
-            <InputNumberSubItem question={'납입 횟수 입력'} depth={3} hasError={setError} value={value.paymentCount}
+            <InputNumberSubItem question={'납입 횟수 입력'} depth={3}   value={value?.paymentCount}
                 name={'paymentCount'} onChange={onChangedInputValue} placeholder={placeholderText.countType} />
-            <InputNumberSubItem question={'총 납입 금액 입력'} depth={3} hasError={setError} value={value.totalAmount}
+            <InputNumberSubItem question={'총 납입 금액 입력'} depth={3}   value={value?.totalAmount}
                 name={'totalAmount'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
-            <InputNumberSubItem question={'납입 인정 금액 입력'} depth={3} hasError={setError} value={value.recognizedAmount}
+            <InputNumberSubItem question={'납입 인정 금액 입력'} depth={3}   value={value?.recognizedAmount}
                 name={'recognizedAmount'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
         </div>
     );
 }
 
 /* 배우자 청약통장 - 가입일자 */
-function SpouseAccountInfoQuestion({ onChangedInputValue, setError, value }) {
+function SpouseAccountInfoQuestion({ onChangedInputValue, value }) {
 
     return (
-        <InputNumberSubItem question={'가입일자 입력'} depth={3} hasError={setError} value={value}
+        <InputNumberSubItem question={'가입일자 입력'} depth={3}   value={value}
             name={'createdAt'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />
     );
 }

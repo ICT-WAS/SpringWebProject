@@ -26,9 +26,9 @@ export function InputNumberSubItem({ question, depth = 1, name, onChange, type, 
     );
 }
 
-export function InputText({ name, onChange, type='normal', placeholder, value, hasError }) {
+export function InputText({ name, onChange, type='normal', placeholder, value }) {
 
-    const [error, setError] = useState(null);
+    const [error, setError] = useState('');
 
     function handleChange(e) {
         const name = e.target.getAttribute('name');
@@ -48,29 +48,35 @@ export function InputText({ name, onChange, type='normal', placeholder, value, h
             value = formatDateToCustomFormat(e.target.value.toString());
             if(value === null) {
                 e.target.value = '';
-                nextError = "올바르지 않은 형식입니다.";
-            } 
+                nextError = "올바르지 않은 값입니다.";
+            } else {
+                onChange({name: name, value: value});
+            }
         } else {
-            e.target.value = Math.max(0, e.target.value);
-            value = Number(e.target.value);
+            let value = parseFloat(e.target.value);
+            value = isNaN(value) || value < 0 ? 0 : value;
+            
+            onChange({name: name, value: value});
         }
 
         setError(nextError);
-        hasError(nextError === null);
     }
 
     return (
         <>
             <Form.Control
-                    type="number"
+                    type="text"
                     placeholder={placeholder}
                     name={name}
                     onBlur={handleBlur}
                     onChange={handleChange}
                     required
                     value={value || ''}
+                    isInvalid={!!error}
                 />
-            <p className="inputTypeError">{error}</p>
+            <Form.Control.Feedback type="invalid">
+            {error}
+            </Form.Control.Feedback>
         </>
     );
 }
@@ -85,6 +91,14 @@ export function formatDateToCustomFormat(dateString) {
     const year = dateString.substring(0, 4); // yyyy
     const month = dateString.substring(4, 6); // MM
     const day = dateString.substring(6, 8); // dd
+
+    if (month < 1 || month > 12) {
+        return null;
+      }
+      const daysInMonth = new Date(year, month, 0).getDate();
+      if (day < 1 || day > daysInMonth) {
+        return null;
+      }
 
     const formattedValue = `${year}-${month}-${day}`;
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, Stack } from "react-bootstrap";
 
 export function RadioButtonItem({ question, buttons, direction, depth, flexAuto, onChange, handleFollowUpQuestion, value }) {
@@ -73,7 +73,7 @@ function StackedRadioButtons({ buttons, direction = 'vertical', flexAuto, onChan
         <>
             <Stack direction={direction} gap={2} >
                 <RadioButtons buttons={buttons} flexAuto={flexAuto} value={value}
-                    onChange={onChange} handleFollowUpQuestion={handleFollowUpQuestion} />
+                    onChange={onChange} handleFollowUpQuestion={handleFollowUpQuestion}/>
             </Stack>
         </>
     );
