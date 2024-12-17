@@ -1,20 +1,20 @@
 import React from "react";
 import { Form, Stack } from "react-bootstrap";
 
-export function RadioButtonItem({ question, buttons, direction, depth, flexAuto, onChange, handleFollowUpQuestion }) {
+export function RadioButtonItem({ question, buttons, direction, depth, flexAuto, onChange, handleFollowUpQuestion, value }) {
 
     return (
         <>
             <div key={`${question}`}>
                 <p className="card-header-text">{question}</p>
                 <StackedRadioButtons buttons={buttons} direction={direction} depth={depth} flexAuto={flexAuto} onChange={onChange}
-                    handleFollowUpQuestion={handleFollowUpQuestion} />
+                    handleFollowUpQuestion={handleFollowUpQuestion} value={value} />
             </div>
         </>
     );
 }
 
-export function RadioButtonSubItem({ question, buttons, direction, depth = 1, flexAuto, onChange, handleFollowUpQuestion}) {
+export function RadioButtonSubItem({ question, buttons, direction, depth = 1, flexAuto, onChange, handleFollowUpQuestion, value }) {
 
     const marginClass = `ms-${depth}`;
 
@@ -23,14 +23,14 @@ export function RadioButtonSubItem({ question, buttons, direction, depth = 1, fl
             <div key={`${question}`} style={{ backgroundColor: '#F6F6F6'}} className={marginClass}>
                 <p className="card-header-text">{question}</p>
                 <StackedRadioButtons buttons={buttons} direction={direction} flexAuto={flexAuto} onChange={onChange}
-                    handleFollowUpQuestion={handleFollowUpQuestion} />
+                    handleFollowUpQuestion={handleFollowUpQuestion} value={value} />
             </div>
         </>
     );
     
 }
 
-function RadioButtons({ buttons, flexAuto = true, onChange, handleFollowUpQuestion }) {
+function RadioButtons({ buttons, flexAuto = true, onChange, handleFollowUpQuestion, value }) {
 
     const flexValue = flexAuto ? 1 : 'none';
 
@@ -58,6 +58,7 @@ function RadioButtons({ buttons, flexAuto = true, onChange, handleFollowUpQuesti
                 name={buttons.name}
                 label={button.data}
                 value={index}
+                checked={button.value === value}
                 id={`${buttons.name}-${index}`}
                 style={{ flex: `${flexValue}` }}
                 onChange={handleRadioChange}
@@ -66,12 +67,12 @@ function RadioButtons({ buttons, flexAuto = true, onChange, handleFollowUpQuesti
     );
 }
 
-function StackedRadioButtons({ buttons, direction = 'vertical', flexAuto, onChange, handleFollowUpQuestion }) {
+function StackedRadioButtons({ buttons, direction = 'vertical', flexAuto, onChange, handleFollowUpQuestion, value }) {
 
     return (
         <>
             <Stack direction={direction} gap={2} >
-                <RadioButtons buttons={buttons} flexAuto={flexAuto}
+                <RadioButtons buttons={buttons} flexAuto={flexAuto} value={value}
                     onChange={onChange} handleFollowUpQuestion={handleFollowUpQuestion} />
             </Stack>
         </>
