@@ -36,6 +36,18 @@ public class HouseCustomRepositoryImpl implements HouseCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
+    public List<House> findByName(String keyword) {
+        // 키워드가 null 또는 비어있는 경우 빈 리스트 반환
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return List.of();
+        }
+
+        return jpaQueryFactory.selectFrom(house)
+                .where(house.houseNm.contains(keyword))
+                .fetch();
+    }
+
+    @Override
     public List<House> findFilteredHouseList(List<String> regions,
                                              List<String> houseTypes,
                                              List<String> area,
@@ -930,4 +942,5 @@ public class HouseCustomRepositoryImpl implements HouseCustomRepository {
         LocalDate sixYearsAgo = LocalDate.now().minusYears(5);
         return localDate.isAfter(sixYearsAgo) && localDate.isBefore(LocalDate.now());
     }
+
 }

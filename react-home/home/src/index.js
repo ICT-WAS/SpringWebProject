@@ -31,6 +31,7 @@ import EmailRecoveryResult from "./pages/EmailRecoveryResult";
 import FindPassword from "./pages/find-password/FindPassword";
 import SendVerification from "./pages/find-password/SendVerification";
 import ResetPassword from "./pages/find-password/ResetPassword";
+import SearchAnnouncementByName from "./apply_announcement/SearchAnnouncementByName";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -51,6 +52,7 @@ root.render(
         {/* 청약 */}
         <Route path="/subscriptions" element={<ApplyAnnouncementList />} />
         <Route path="/subscriptions/info" element={<ApplyAnnouncement />} />
+        <Route path="/subscriptions/search/:keyword" element={<SearchAnnouncementByName />} />
 
         {/* 조건등록 */}
         <Route path="/conditions" element={<Conditions />} />
@@ -65,27 +67,15 @@ root.render(
         <Route exact path="/community" element={<CommunityPostList />} />
         <Route exact path="/community/posting" element={<CommunityPosting />} />
         <Route exact path="/community/:postId" element={<PostDetail />} />
-        <Route
-          exact
-          path="/community/posting/:postId"
-          element={<UpdatePost />}
-        />
+        <Route exact path="/community/posting/:postId" element={<UpdatePost />} />
 
         {/* 이메일 찾기 */}
         <Route exact path="/find-email" element={<FindEmail />} />
-        <Route
-          exact
-          path="/find-email/verify"
-          element={<EmailRecoveryResult />}
-        />
+        <Route exact path="/find-email/verify" element={<EmailRecoveryResult />} />
 
         {/* 비밀번호 찾기 */}
         <Route exact path="/find-password" element={<FindPassword />} />
-        <Route
-          exact
-          path="/find-password/verify"
-          element={<SendVerification />}
-        />
+        <Route exact path="/find-password/verify" element={<SendVerification />} />
         <Route exact path="/find-password/reset" element={<ResetPassword />} />
 
         {/* 소셜 로그인 리다이렉트 경로 */}

@@ -3,6 +3,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import { Container, Row, Col, Button, Card, CardBody } from "react-bootstrap";
 import LoginStateButton from "../components/login/LoginStateButton";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 function Logo() {
   const navigate = useNavigate();
@@ -35,11 +36,25 @@ function Logo() {
 }
 
 function SearchField() {
+  const [keyword, setKeyword] = useState('');  
+  const navigate = useNavigate(); 
+
+  const handleSearch = () => {
+    if (keyword) {
+      navigate(`/subscriptions/search/${keyword}`);  
+    }
+  };
+
   return (
     <>
       <InputGroup>
-        <Form.Control placeholder="공고 제목으로 검색" aria-label="Search" />
-        <Button variant="light">
+        <Form.Control 
+        placeholder="공고 제목으로 검색" 
+        aria-label="Search" 
+        value={keyword}
+        onChange={(e) => setKeyword(e.target.value)}
+        />
+        <Button variant="light" onClick={handleSearch}>
           <i className="bi bi-search" />
         </Button>
       </InputGroup>
