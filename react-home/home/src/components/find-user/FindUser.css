@@ -111,6 +111,14 @@
   margin-bottom: 10px;
 }
 
+.info-group .description {
+  text-align: center;
+  font-size: 15px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
 .verification-message {
   font-size: 12px;
   margin-bottom: 30px;
@@ -149,11 +157,57 @@
   background-color: #424649;
 }
 
+.submit-button:disabled {
+  cursor: not-allowed;
+}
+
+.submit-button:disabled:hover {
+  background-color: #424649;
+  transform: none;
+}
+
+.next-button {
+  padding: 12px 16px;
+  background-color: #212529;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.next-button:hover {
+  background-color: #424649;
+}
+
+.next-button:disabled {
+  cursor: not-allowed;
+}
+
+.next-button:disabled:hover {
+  background-color: #212529;
+  transform: none;
+}
+
 .info-group .error-message {
   color: red;
   font-size: 12px;
   font-weight: 600;
   margin-left: 5px;
+}
+
+.info-group .error-message-small {
+  color: red;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 0px;
+  margin-left: 5px;
+  text-align: left;
+  display: none;
+}
+
+.info-group .error-message-small.visible {
+  display: block;
 }
 
 .info-group-verify {

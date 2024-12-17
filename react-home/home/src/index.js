@@ -28,7 +28,9 @@ import PostDetail from "./community/PostDetail";
 import UpdatePost from "./community/UpdatePost";
 import FindEmail from "./pages/FindEmail";
 import EmailRecoveryResult from "./pages/EmailRecoveryResult";
-import SearchAnnouncementByName from "./apply_announcement/SearchAnnouncementByName";
+import FindPassword from "./pages/find-password/FindPassword";
+import SendVerification from "./pages/find-password/SendVerification";
+import ResetPassword from "./pages/find-password/ResetPassword";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -64,7 +66,11 @@ root.render(
         <Route exact path="/community" element={<CommunityPostList />} />
         <Route exact path="/community/posting" element={<CommunityPosting />} />
         <Route exact path="/community/:postId" element={<PostDetail />} />
-        <Route exact path="/community/posting/:postId" element={<UpdatePost />} />
+        <Route
+          exact
+          path="/community/posting/:postId"
+          element={<UpdatePost />}
+        />
 
         {/* 이메일 찾기 */}
         <Route exact path="/find-email" element={<FindEmail />} />
@@ -73,6 +79,15 @@ root.render(
           path="/find-email/verify"
           element={<EmailRecoveryResult />}
         />
+
+        {/* 비밀번호 찾기 */}
+        <Route exact path="/find-password" element={<FindPassword />} />
+        <Route
+          exact
+          path="/find-password/verify"
+          element={<SendVerification />}
+        />
+        <Route exact path="/find-password/reset" element={<ResetPassword />} />
 
         {/* 소셜 로그인 리다이렉트 경로 */}
         <Route exact path="/kakao/callback" element={<KakaoRedirection />} />

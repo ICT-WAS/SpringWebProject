@@ -30,7 +30,6 @@ public enum BaseResponseStatus {
     CODE_EXPIRED(false, 2021, "인증 코드가 만료되었습니다."),
     INVALID_VERIFICATION_TYPE(false, 2022, "잘못된 인증 타입입니다."),
 
-
     /**
      * 3000: Response 오류
      */
@@ -42,11 +41,13 @@ public enum BaseResponseStatus {
      */
     PASSWORD_ENCRYPTION_ERROR(false, 4001, "비밀번호 암호화에 실패하였습니다."),
     PASSWORD_DECRYPTION_ERROR(false, 4002, "비밀번호 복호화에 실패하였습니다."),
+    SAME_AS_OLD_PASSWORD_ERROR(false, 4003, "현재 비밀번호와 같은 비밀번호는 사용하실 수 없습니다."),
     // email-verify
     EMAIL_SENDING_FAILED(false, 4010, "이메일 발송에 실패했습니다."),
     EMAIL_VERIFICATION_FAILED(false, 4011, "이메일로 사용자 인증을 확인할 수 없습니다."),  // 이메일 인증 실패
     PHONE_VERIFICATION_FAILED(false, 4012, "핸드폰 번호로 사용자 인증을 확인할 수 없습니다."),  // 핸드폰 인증 실패
-    VERIFICATION_FAILED(false, 4012, "사용자 인증을 확인할 수 없습니다."),
+    VERIFICATION_FAILED(false, 4013, "사용자 인증을 확인할 수 없습니다."),
+
 
     /**
      * 5000: 토큰 오류

@@ -1,5 +1,5 @@
 import { Container, Stack } from "react-bootstrap";
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
 import Modal from "../components/modal/Modal";
@@ -11,7 +11,7 @@ const FindEmail = () => {
   const [isModal, setIsModal] = useState(false);
   //포커스 상태 관리
   const confirmModalRef = useRef(null);
-  const emailRef = useRef(null);
+  const phoneRef = useRef(null);
   //에러관리
   const [loginError, setLoginError] = useState("");
   const [loginErrorTitle, setLoginErrorTitle] = useState("");
@@ -20,8 +20,8 @@ const FindEmail = () => {
   const closeModal = () => {
     setIsModal(false);
     setTimeout(() => {
-      if (emailRef.current) {
-        emailRef.current.focus();
+      if (phoneRef.current) {
+        phoneRef.current.focus();
       }
     }, 100);
   };
@@ -35,7 +35,7 @@ const FindEmail = () => {
             <div className="info-container">
               <div className="info-container-area">
                 <h2>계정 찾기</h2>
-                <FindEmailByMobile />
+                <FindEmailByMobile ref={phoneRef} />
                 {isModal && (
                   <Modal
                     title={loginErrorTitle}

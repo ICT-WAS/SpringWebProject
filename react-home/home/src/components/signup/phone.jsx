@@ -26,7 +26,7 @@ const Phone = ({
     setPhoneNumber(e.target.value);
     setIsValid(true);
     setError("");
-    setVerificationType("PHONE");
+    setVerificationType("");
     //형식 체크
     const formattedNumber = formatPhoneNumber(e.target.value);
     setPhoneNumber(formattedNumber);
@@ -86,6 +86,7 @@ const Phone = ({
           setIsVerified(true); //인증 성공
           setError(""); //오류 메시지 제거
           setIsTimerActive(false); //타이머 종료
+          setVerificationType("PHONE");
           return response.data.result;
         }
       } catch (error) {
