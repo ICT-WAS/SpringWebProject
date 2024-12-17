@@ -2,10 +2,7 @@ package com.ict.home.login.auth.controller;
 
 import com.ict.home.exception.BaseException;
 import com.ict.home.exception.BaseResponse;
-import com.ict.home.login.auth.dto.PostEmailVerificationReq;
-import com.ict.home.login.auth.dto.PostMobileVerificationReq;
-import com.ict.home.login.auth.dto.PostSignupAuthReq;
-import com.ict.home.login.auth.dto.PostVerifyAuthReq;
+import com.ict.home.login.auth.dto.*;
 import com.ict.home.login.auth.model.Verification;
 import com.ict.home.login.auth.enums.VerificationType;
 import com.ict.home.login.auth.repository.VerificationRepository;
@@ -112,7 +109,7 @@ public class AuthController {
 
         User user = userUtilService.findByEmailWithValidation(postEmailVerificationReq.getEmail());
 
-        return new BaseResponse<>(user);
+        return new BaseResponse<>(user.getId());
     }
 
     @PostMapping("/verify/mobile")  //본인확인용
@@ -138,8 +135,11 @@ public class AuthController {
             verificationRepository.save(verification);
         }
 
-        User user = userUtilService.findByEmailWithValidation(postMobileVerificationReq.getPhoneNumber());
+        User user = userUtilService.findByPhoneNumberValidation(postMobileVerificationReq.getPhoneNumber());
+        PostVerificationRes postVerificationRes = new PostVerificationRes();
+        postVerificationRes.setUserId(user.getId());
+        postVerificationRes.setEmail(user.getEmail());
 
-        return new BaseResponse<>(user);
+        return new BaseResponse<>(postVerificationRes);
     }
 }

@@ -25,9 +25,11 @@ public enum BaseResponseStatus {
     PASSWORD_CANNOT_BE_NULL(false, 2012, "비밀번호를 입력해주세요."),
     USERS_NONE_EXISTS_PHONE(false, 2013, "등록되지 않은 핸드폰 번호입니다."),
 
-    // email-verify
+    // verify
     INVALID_EMAIL_CODE(false, 2020, "이메일 인증 코드가 일치하지 않습니다."),
     CODE_EXPIRED(false, 2021, "인증 코드가 만료되었습니다."),
+    INVALID_VERIFICATION_TYPE(false, 2022, "잘못된 인증 타입입니다."),
+
 
     /**
      * 3000: Response 오류

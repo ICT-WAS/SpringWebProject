@@ -78,6 +78,17 @@ public class UserService {
         //사용자 정보 생성
         User user = new User();
         user.createUser(postUserReq.getUsername(), postUserReq.getEmail(), password, postUserReq.getPhoneNumber());
+        switch (postUserReq.getVerificationType()) {
+            case "EMAIL":
+                user.setUserVerify(UserVerify.EMAIL_VERIFIED);
+                break;
+            case "PHONE":
+                user.setUserVerify(UserVerify.PHONE_VERIFIED);
+                break;
+            default:
+                //인증 타입이 잘못되었을 시 예외
+                throw new BaseException(INVALID_VERIFICATION_TYPE);
+        }
         userRepository.save(user);
 
         return new PostUserRes(user);
