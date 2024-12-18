@@ -25,3 +25,9 @@ export enum AccountType {
     "SAVINGS_DEPOSIT" = "청약저축",
     "COMBINED_SAVINGS" = "주택청약종합저축",
 }
+
+export enum LivingTogetherDate {
+    "1년 미만" = 1,
+    "1년 이상 3년 미만" = 2,
+    "3년 이상" = 3
+}

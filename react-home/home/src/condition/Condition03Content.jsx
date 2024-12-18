@@ -23,7 +23,7 @@ export default function Condition03Content() {
     const [formData1, setFormData1] = useState({});
     const [accountDTOList, setAccountDTOList] = useState({});
     const [formData3, setFormData3] = useState({
-        carPrice: null,
+        carPrice: 0,
         propertyPrice: null,
         totalAsset: null,
         myAsset: null,
@@ -59,15 +59,13 @@ export default function Condition03Content() {
         //폼3데이터
         const sessionFormData3 = sessionStorage.getItem('formData3');
 
-        if(!sessionFormData3) {
-            return;
+        if(sessionFormData3) {
+            try{
+                const storedFormData3 = JSON.parse(sessionFormData3);
+                setFormData3(storedFormData3);
+                setFormDateData({noVehicle: storedFormData3.carPrice <= 0, lastWinned: storedFormData3.lastWinned ? "Y" : "N", ineligible: storedFormData3.ineligible ? "Y" : "N"});
+            } catch (error) { }
         }
-
-        try{
-            const storedFormData3 = JSON.parse(sessionFormData3);
-            setFormData3(storedFormData3);
-            setFormDateData({noVehicle: storedFormData3.carPrice <= 0, lastWinned: storedFormData3.lastWinned ? "Y" : "N", ineligible: storedFormData3.ineligible ? "Y" : "N"});
-        } catch (error) { }
 
         const sessionFormData1 = sessionStorage.getItem('formData1');
         const sessionAccountData = sessionStorage.getItem('accountDTOList');
@@ -113,7 +111,7 @@ export default function Condition03Content() {
 
 
         let finalFormData3 = formData3;
-        if(formDateData.noVehicle === true) {
+        if(formData3.carPrice === null) {
             finalFormData3 = {...formData3, carPrice: 0};
         }
 
@@ -221,7 +219,7 @@ export default function Condition03Content() {
 
                     {/* [꼬리질문] 배우자의 월평균소득을 입력해주세요 */}
                     {formData3?.incomeActivity === 1 && <SpouseIncomeQuestion onChangedInputValue={onChangedInputValue} 
-                        value={formData3?.spouseIncome} />}
+                        value={formData3?.spouseAverageMonthlyIncome} />}
 
                     {/* 소득세 납부 기간 */}
                     <InputNumberItem question={'소득세 납부 기간'} value={formData3?.incomeTaxPaymentPeriod}

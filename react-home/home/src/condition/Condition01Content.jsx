@@ -166,9 +166,6 @@ export default function Condition01Content() {
         sessionStorage.setItem('accountDTOList', JSON.stringify(accountDTOList));
         sessionStorage.setItem('livingWithSpouse', spouseFormData.spouse);
 
-        console.log(formData);
-        console.log(accountDTOList);
-
         navigate("/condition-2");
     }
 
