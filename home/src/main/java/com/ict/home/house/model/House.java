@@ -21,11 +21,11 @@ public class House {
     private Long houseId;
 
     @Schema(description = "주택관리번호")
-    @Column(name = "HOUSE_MANAGE_NO")
+    @Column(name = "HOUSE_MANAGE_NO", unique = true)
     private Long houseManageNo;
 
     @Schema(description = "공고번호")
-    @Column(name = "PBLANC_NO")
+    @Column(name = "PBLANC_NO", unique = true)
     private Long pblancNo;
 
     @Schema(description = "주택명")

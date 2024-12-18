@@ -2,8 +2,11 @@ package com.ict.home.house.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 
@@ -20,9 +23,11 @@ public class Detail {
     @Column(name = "detail_id")
     private Long detailId;
 
+    @NotNull
     @Schema(description = "주택청약 공고 고유 pk")
     @ManyToOne
     @JoinColumn(name = "house_id", referencedColumnName = "house_id", insertable = false, updatable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private House house;
 
     @Schema(description = "모델번호")
