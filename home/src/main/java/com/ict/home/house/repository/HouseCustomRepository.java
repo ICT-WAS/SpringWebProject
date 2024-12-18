@@ -23,4 +23,6 @@ public interface HouseCustomRepository {
                                       String orderBy);
 
     List<House> findByName(String keyword);
+
+    House findById(Long houseId);
 }

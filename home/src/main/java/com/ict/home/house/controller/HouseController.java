@@ -1,5 +1,6 @@
 package com.ict.home.house.controller;
 
+import com.ict.home.house.dto.HouseDetailDTO;
 import com.ict.home.house.dto.HouseInfo;
 import com.ict.home.house.service.HouseService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,18 @@ import java.util.List;
 public class HouseController {
 
     private final HouseService hs;
+
+    @GetMapping("/{houseId}")
+    @Operation(summary = "공고 상세 정보 조회", description = "공고의 상세 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공고의 상세 정보를 조회합니다.",
+                    content = @Content(schema = @Schema(implementation = HouseDetailDTO.class)))
+    })
+    public ResponseEntity<?> getHouseDetail(@PathVariable Long houseId) {
+        HouseDetailDTO houseDetail = hs.getHouseDetail(houseId);
+
+        return ResponseEntity.ok(houseDetail);
+    }
 
     @GetMapping("")
     @Operation(summary = "공고 목록 조회", description = "공고를 조회합니다.")
