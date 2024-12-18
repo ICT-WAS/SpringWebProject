@@ -2,9 +2,9 @@ import axios from 'axios';
 import { Image, Stack } from 'react-bootstrap';
 import { Container, Row, Col } from 'react-bootstrap';
 import { SubscriptionCards } from '../apply_announcement/SubscriptionCards';
-import CommunityCard from '../community/CommunityCard';
 import Spinners from '../common/Spinners';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import MainPostCard from './MainPostCard';
 
 function CommunityCards() {
 
@@ -33,26 +33,56 @@ function CommunityCards() {
       });
   }, []);
 
+  const scrollContainerRef = useRef(null);
+
+  const handleMouseDown = (e) => {
+    const startX = e.clientX;
+    const scrollLeft = scrollContainerRef.current.scrollLeft;
+
+    const handleMouseMove = (e) => {
+      const distance = e.clientX - startX;
+      scrollContainerRef.current.scrollLeft = scrollLeft - distance;
+    };
+
+    const handleMouseUp = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  }
+
   return (
     <>
       <p className='heading-text'>
-        <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
+        <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0'>
           커뮤니티 질문 &gt;
         </a>
       </p>
       {loading && <Spinners />}
       {posts.length < 1 && <p className='filter-values'>게시물이 없습니다.</p>}
-      <Stack direction='horizontal' gap={3}>
-        {/* {communityCardList} */}
-        {posts.map((post, index) => {
-          return (
-            <div key={index} >
-              <CommunityCard post={post} />
-            </div>
-          );
-        })}
-      </Stack>
 
+      {/* 가로 스크롤을 위한 컨테이너 추가 */}
+      <div
+        ref={scrollContainerRef}
+        style={{
+          overflowX: 'hidden', // 스크롤바 숨기기
+          cursor: 'grab', // 클릭 시 드래그할 수 있는 커서
+          display: 'flex',
+        }}
+        onMouseDown={handleMouseDown}
+      >
+        <Stack direction='horizontal' gap={3}>
+          {posts.map((post, index) => {
+            return (
+              <div key={index}>
+                <MainPostCard post={post} />
+              </div>
+            );
+          })}
+        </Stack>
+      </div>
     </>
   );
 }
