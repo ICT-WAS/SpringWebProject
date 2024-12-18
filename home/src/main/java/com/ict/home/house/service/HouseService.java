@@ -1,5 +1,6 @@
 package com.ict.home.house.service;
 
+import com.ict.home.house.dto.HouseDetailDTO;
 import com.ict.home.house.dto.HouseInfo;
 
 import java.util.List;
@@ -14,4 +15,8 @@ public interface HouseService {
                                              List<String> statuses,
                                              Long userId,
                                              String orderBy);
+
+    List<HouseInfo> getHouseInfoListByName(String keyword);
+
+    HouseDetailDTO getHouseDetail(Long houseId);
 }

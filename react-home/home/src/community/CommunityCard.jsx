@@ -13,7 +13,7 @@ export default function CommunityCard({post}) {
                             .replace(",", "")
                             .replace("T", "")
                             .replaceAll(". ", "-")
-                            .slice(0, 17);
+                            .slice(0, 18);
     const modifiedDate = formattedDate.slice(0, formattedDate.lastIndexOf("-")) + " " + formattedDate.slice(formattedDate.lastIndexOf("-") + 1);
 
     return (

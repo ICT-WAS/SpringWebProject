@@ -66,7 +66,7 @@ function SubscriptionCard({ subscription, index }) {
               <Container >
                 <Row>
                   <Col><p className='card-header-text'>
-                    <a href={`subscriptions/info/${subscription.houseId}`} className='link-body-emphasis link-underline link-underline-opacity-0' >
+                    <a href={`/subscriptions/info/${subscription.houseId}`} className='link-body-emphasis link-underline link-underline-opacity-0' >
                       {subscription.houseNm}
                     </a>
                   </p>

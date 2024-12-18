@@ -26,7 +26,6 @@ const Phone = ({
     setPhoneNumber(e.target.value);
     setIsValid(true);
     setError("");
-    setVerificationType("");
     //형식 체크
     const formattedNumber = formatPhoneNumber(e.target.value);
     setPhoneNumber(formattedNumber);
