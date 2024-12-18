@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Button, Card, Container, Stack } from "react-bootstrap";
+import { Accordion, Button, Card, Container, Stack } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
@@ -57,15 +57,7 @@ export default function Conditions() {
                 <Stack direction="vertical" gap={5}>
                     <Header />
 
-                    <Card body>
-                        <p className='filter-values'>내 조건</p>
-                        <hr />
-                        <ConditionInfo />
-                    </Card>
-
-                    <Button variant="dark" onClick={handleClick1}>{hasCondition ? "조건1 수정" : "조건1 등록"}</Button>
-                    <Button variant="dark" onClick={handleClick2}>{hasCondition ? "조건2 수정" : "조건2 등록"}</Button>
-                    <Button variant="dark" onClick={handleClick3}>{hasCondition ? "조건3 수정" : "조건3 등록"}</Button>
+                    <ConditionInfo />
 
                     <Footer />
                 </Stack>
@@ -73,7 +65,6 @@ export default function Conditions() {
         </>
     );
 }
-
 
 function ConditionInfo() {
 
@@ -114,13 +105,62 @@ function ConditionInfo() {
         fetchCondition();
     }, []);
 
+    const navigate = useNavigate();
+
+    function handleClick1(e) {
+        navigate("/condition-1");
+    }
+
+    function handleClick2(e) {
+        navigate("/condition-2");
+    }
+
+    function handleClick3(e) {
+        navigate("/condition-3");
+    }
+
+    useEffect(() => {
+        fetchCondition();
+    }, []);
+
+
     return (
         <>
-            <FamilyData hasCondition={hasCondition} family={family} />
+            <p className='heading-text'>조건 확인</p>
 
-            {hasCondition &&
-                <DisplayConditions accountData={accountData} family={family}
-                    form1Data={form1Data} form3Data={form3Data} />}
+            <Accordion defaultActiveKey={['0']} alwaysOpen>
+                <Accordion.Item eventKey="0">
+                    <Accordion.Header>신청자 정보</Accordion.Header>
+                    <Accordion.Body>
+                        <span className='filter-values'>{hasCondition &&
+                            <DisplayCondition01 accountData={accountData} family={family}
+                                form1Data={form1Data} />
+                        }</span>
+                        <br />
+                        <Button variant="dark" onClick={handleClick1}>신청자 정보{hasCondition ? " 수정" : " 등록"}</Button>
+                    </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="1">
+                    <Accordion.Header>세대구성원 정보</Accordion.Header>
+                    <Accordion.Body>
+                        <span className='filter-values'>
+                            {hasCondition && <FamilyData family={family} />}
+                        </span>
+                        <br />
+                        <Button variant="dark" onClick={handleClick2}>세대구성원 정보{hasCondition ? " 수정" : " 등록"}</Button>
+                    </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="2">
+                    <Accordion.Header>재산 정보</Accordion.Header>
+                    <Accordion.Body>
+                        <span className='filter-values'>
+                            {hasCondition && <DisplayCondition03 form3Data={form3Data} family={family} />}
+                        </span>
+                        <br />
+                        <Button variant="dark" onClick={handleClick3}>재산 정보 {hasCondition ? " 수정" : " 등록"}</Button>
+                    </Accordion.Body>
+                </Accordion.Item>
+            </Accordion>
 
             {!hasCondition && !loading &&
                 <p className='heading-text'>등록된 조건이 없습니다.</p>
@@ -130,65 +170,90 @@ function ConditionInfo() {
     );
 }
 
-function FamilyData({ hasCondition, family }) {
+function FamilyData({ family }) {
 
     const hasBirthDay = (member) => (member.relationship === FamilyMember.MOTHER || member.relationship === FamilyMember.FATHER
         || member.relationship === FamilyMember.SELF || member.relationship === FamilyMember.CHILD);
 
+    const familyList = () => {
+        return family.map((member, index) => (
+            <React.Fragment key={member.seqIndex}>
+                {getFamilyMemberName(member.relationship)}
+                {index < family.length - 1 && <>,&nbsp;</>}
+            </React.Fragment>
+        ));
+    }
+
+    const familyDataList = () => {
+        return family.map((member, index) => (
+            <React.Fragment key={member.seqIndex}>
+                <b>[{getFamilyMemberName(member.relationship)}]</b> <br />
+                소유한 부동산 : {member.houseCount} 채<br />
+                {member.houseSoldDate && (
+                    <span>과거 주택 처분한 날짜 : {member.houseSoldDate}<br /></span>
+                )}
+                {member.livingTogetherDate && (
+                    <span>동거 기간 : {LivingTogetherDate[member.livingTogetherDate]}<br /></span>
+                )}
+                {member.relationship === FamilyMember.CHILD && (
+                    <span>{member.isMarried ? "기혼" : "미혼"}<br /></span>
+                )}
+                {hasBirthDay(member) && (
+                    <span>생년월일 : {member.birthday}<br /></span>
+                )}
+
+                {index < family.length - 1 && <hr />}
+            </React.Fragment>
+        ));
+    }
+
     return (
         <>
-            [세대원 정보] <br />
-            세대구성원 : {hasCondition && family.length || 0}명<br />
-            {family.map((member, index) => {
-                return (
-                    <>
-                        <React.Fragment key={`${member.seqIndex}-${index}`} >
-                            {getFamilyMemberName(member.relationship)}
-
-                            {hasBirthDay(member) &&
-                                <>({member.birthday})</>}
-
-                            {index < family.length - 1 && <>,&nbsp;</>}
-                        </React.Fragment>
-                    </>
-                );
-
-            })}
+            <b>세대구성원 :</b> {family.length || 0}<br />
+            {familyList()}<br /><hr />
+            {familyDataList()}
             <br />
         </>
     );
 }
 
 
-function DisplayConditions({ accountData, form1Data, form3Data, family }) {
+function DisplayCondition01({ accountData, form1Data }) {
 
-    const totalHouseCount = family.reduce((sum, member) => sum + (member.houseCount || 0), 0);
     const marriedState = ['미혼', '기혼', '예비신혼부부', '한부모'];
 
     return (
         <>
-            <br />
-            [신청자 정보] <br />
             생년월일 : {form1Data.birthday}<br />
             거주 지역 : {`${Sido[form1Data.siDo]} ${form1Data.gunGu}`}<br />
             현재 거주지 입주일 : {form1Data.transferDate}<br />
             {Sido[form1Data.siDo]} 입주일 : {form1Data.regionMoveInDate}<br />
             수도권 입주일 : {form1Data.metropolitanAreaDate}<br />
             세대주 {form1Data.isHouseHolder ? "O" : "X"} <br />
+
+
             {marriedState[form1Data.married]}
             {form1Data.married === 1 && <span>, 결혼기념일 : {form1Data.marriedDate}</span>}
-            <br />
 
+            <hr />
+            청약통장 : {AccountType[accountData.type]} <br />
+            가입 : {accountData.createdAt}  <br />
+            총 {accountData.totalAmount} 만원 {accountData.paymentCount}회 납입<br />
+            납입 인정 금액 : {accountData.recognizedAmount} 만원<br />
+        </>
+    );
+}
+
+function DisplayCondition03({ form3Data, family }) {
+
+    const totalHouseCount = family.reduce((sum, member) => sum + (member.houseCount || 0), 0);
+
+    return (
+        <>
             차량 가액 : {form3Data.carPrice} 만원<br />
             세대구성원 전원의 총 자산 : {form3Data.totalAsset} 만원<br />
             세대구성원의 총 부동산 수 : {totalHouseCount}채<br />
             본인의 총 자산 : {form3Data.myAsset} 만원<br />
-
-            <br />
-            [{AccountType[accountData.type]}] <br />
-            가입 : {accountData.createdAt}  <br />
-            총 {accountData.totalAmount} 만원 {accountData.paymentCount}회 납입<br />
-            납입 인정 금액 : {accountData.recognizedAmount} 만원<br />
         </>
     );
 }

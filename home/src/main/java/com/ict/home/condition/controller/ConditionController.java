@@ -83,6 +83,17 @@ public class ConditionController {
         return ResponseEntity.ok("등록 성공");
     }
 
+    @PatchMapping("/1/{userId}")
+    @Operation(summary = "조건1 수정", description = "조건을 수정합니다.")
+    public ResponseEntity<String> updateCondition1(@Valid @RequestBody Condition01DTO condition01DTO,
+                                                   @Valid @RequestBody List<AccountDTO> accountDTOList,
+                                                   @PathVariable Long userId) {
+        // 저장하는 로직 (예: repository 사용)
+        cs.updateCondition1(condition01DTO, accountDTOList, userId);
+
+        return ResponseEntity.ok("등록 성공");
+    }
+
     @PutMapping("/{userId}")
     @Operation(summary = "조건 수정", description = "조건을 수정합니다.")
     @ApiResponses(value = {

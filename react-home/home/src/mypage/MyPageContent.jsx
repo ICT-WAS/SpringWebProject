@@ -1,14 +1,12 @@
 import axios from 'axios';
 import React, { useEffect, useState } from "react";
 import { Button, Card, CardBody, Col, Container, Row, Stack } from "react-bootstrap";
-import { AccountType, LivingTogetherDate, Sido } from '../common/Enums.ts';
-import { FamilyMember, getFamilyMemberName } from '../condition/family.ts';
 import { getUserIdFromToken } from '../api/TokenUtils';
 import { useNavigate } from "react-router-dom";
 
 export default function MyPageContent() {
 
-     const navigate = useNavigate();
+    const navigate = useNavigate();
 
     function onConditionButtonClick() {
         navigate("/conditions");
@@ -23,8 +21,7 @@ export default function MyPageContent() {
                 <Card body>
                     <p className='filter-values'>내 조건</p>
                     <hr />
-                    <ConditionButton onClick={onConditionButtonClick}/>
-
+                    <ConditionButton onClick={onConditionButtonClick} />
                     <hr />
                     <p className='filter-values'>내 정보</p>
                     <hr />
@@ -73,7 +70,7 @@ function MyMenuCard({ name, total, iClassName }) {
     );
 }
 
-function ConditionButton({onClick}) {
+function ConditionButton({ onClick }) {
 
     const [hasCondition, setHasCondition] = useState(false);
 

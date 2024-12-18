@@ -54,6 +54,8 @@ export default function Condition01Content() {
         createdAt: null
     });
 
+    const [updateMode, setUpdateMode] = useState(false);
+
     /* 꼬리질문 가시성 */
     const [hasSpouse, setHasSpouse] = useState(false); // 기혼, 예비신혼부부부
 
@@ -66,6 +68,8 @@ export default function Condition01Content() {
             .get(`http://localhost:8989/condition/${userId}`)
             .then((response) => {
                 if(response.data.hasCondition === true) {
+                    setUpdateMode(true);
+
                     setFormData(response.data.form1Data);
                     setSpouseFormData(response.data.spouseFormData);
                     setAccountData(response.data.accountData);
@@ -78,6 +82,17 @@ export default function Condition01Content() {
                     sessionStorage.setItem('spouseFamilyDataList', JSON.stringify(response.data.spouseFamilyList));
                 }
                 
+            })
+            .catch((error) => {
+                console.error("데이터 요청 실패:", error);
+            });
+    };
+
+    const updateCondition = (condition01Data) => {
+        axios
+            .patch(`http://localhost:8989/condition/1/${userId}`, condition01Data)
+            .then((response) => {
+                console.log('업데이트 성공:', response.data); 
             })
             .catch((error) => {
                 console.error("데이터 요청 실패:", error);
@@ -142,10 +157,6 @@ export default function Condition01Content() {
 
     function handleSubmit(event) {
 
-        console.log(formData);
-        console.log(accountData);
-        console.log(spouseAccountData);
-
         const form = event.target;
         if (form.checkValidity() === false) {
 
@@ -158,6 +169,13 @@ export default function Condition01Content() {
         let accountDTOList = { accountDTOList: [{ ...accountData }] };
         if (hasSpouse && spouseAccountData.createdAt) { // (기혼 || 예비신혼) && 배우자 계좌 정보
             accountDTOList = { accountDTOList: [{ ...accountData, }, { ...spouseAccountData }] };
+        }
+
+        // 수정
+        if(updateMode) {
+            updateCondition({condition01DTO: formData, accountDTOList: accountDTOList});
+            navigate("/conditions");
+            return;
         }
 
         // 폼 데이터 저장
@@ -173,7 +191,7 @@ export default function Condition01Content() {
     return (
         <>
             <p className='heading-text'>
-                조건 등록 (1/3) - 신청자/배우자 정보 입력
+                조건 등록 (1/3) - 신청자/배우자 정보{updateMode ? " 수정" : " 입력" }
             </p>
 
             <Form noValidate onSubmit={handleSubmit}>
@@ -244,7 +262,9 @@ export default function Condition01Content() {
                             value={spouseAccountData?.createdAt} />}
 
                     {/* 다음으로 */}
-                    <Button variant="dark" type="submit" >다음</Button>
+                    <Button variant="dark" type="submit" >{updateMode ? "수정" : "다음" }</Button>
+
+                    
                 </Stack>
 
             </Form>

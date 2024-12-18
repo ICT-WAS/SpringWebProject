@@ -235,3 +235,12 @@ table tr:hover {
 .nav-link.active  {
   color: black !important;
 }
+
+.accordion-button {
+  transition: background-color 0.3s ease !important;
+}
+
+.accordion-button.active {
+  background-color: #000000 !important;
+  color: white !important;
+}

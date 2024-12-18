@@ -48,10 +48,10 @@ public class ConditionServiceImpl implements ConditionService{
 
         User user = ur.getReferenceById(userId);
 
-        saveCondition01(conditionDTO, user);
-        saveAccountList(conditionDTO, user);
-        saveCondition03(conditionDTO, user);
-        saveFamilyList(conditionDTO, user);
+        saveCondition01(conditionDTO.getCondition01DTO(), user);
+        saveAccountList(conditionDTO.getAccountDTOList(), user);
+        saveCondition03(conditionDTO.getCondition03DTO(), user);
+        saveFamilyList(conditionDTO.getFamilyDTOList(), user);
     }
 
     @Override
@@ -97,8 +97,64 @@ public class ConditionServiceImpl implements ConditionService{
         return getConditionDTO;
     }
 
-    private void saveFamilyList(ConditionDTO conditionDTO, User user) {
-        List<FamilyDTO> familyDTOList = conditionDTO.getFamilyDTOList();
+    @Override
+    public void updateCondition1(Condition01DTO condition01DTO, List<AccountDTO> accountDTOList, Long userId) {
+        updateCondition01(userId, condition01DTO);
+        updateAccountList(userId, accountDTOList);
+    }
+
+    private void updateCondition01(Long userId, Condition01DTO condition01DTO) {
+        Condition01 condition01 = c01r.findByUser_Id(userId);
+
+        condition01.setBirthday(condition01DTO.getBirthday());
+        condition01.setSiDo(condition01DTO.getSiDo());
+        condition01.setGunGu(condition01DTO.getGunGu());
+        condition01.setTransferDate(condition01DTO.getTransferDate());
+        condition01.setRegionMoveInDate(condition01DTO.getRegionMoveInDate());
+        condition01.setMetropolitanAreaDate(condition01DTO.getMetropolitanAreaDate());
+        condition01.setIsHouseHolder(condition01DTO.getIsHouseHolder());
+        condition01.setMarried(condition01DTO.getMarried());
+        condition01.setMarriedDate(condition01DTO.getMarriedDate());
+
+        c01r.save(condition01);
+    }
+
+    private void updateAccountList(Long userId, List<AccountDTO> accountDTOList) {
+        List<Account> accountList = ar.findByUser_Id(userId);
+        User user = ur.getReferenceById(userId);
+
+        for (Account account : accountList) {
+            ar.delete(account);
+        }
+
+        saveAccountList(accountDTOList, user);
+    }
+
+    @Override
+    public void updateCondition2(List<FamilyDTO> familyDTOList, Long userId) {
+
+        updateFamilyList(familyDTOList, userId);
+    }
+
+    void updateFamilyList(List<FamilyDTO> familyDTOList, Long userId) {
+        List<Family> familyList = fr.findByUser_Id(userId);
+        User user = ur.getReferenceById(userId);
+
+        for (Family family : familyList) {
+            fr.delete(family);
+        }
+
+        saveFamilyList(familyDTOList, user);
+    }
+
+    @Override
+    public void updateCondition3(Condition03DTO condition03DTO, Long userId) {
+        User user = ur.getReferenceById(userId);
+
+        saveCondition03(condition03DTO, user);
+    }
+
+    private void saveFamilyList(List<FamilyDTO> familyDTOList, User user) {
         List<Family> familyList = new ArrayList<>();
 
         for (FamilyDTO familyDTO : familyDTOList) {
@@ -124,9 +180,9 @@ public class ConditionServiceImpl implements ConditionService{
         }
     }
 
-    private void saveCondition03(ConditionDTO conditionDTO, User user) {
+    private void saveCondition03(Condition03DTO condition03DTO, User user) {
         Condition03 condition03 = new Condition03();
-        Condition03DTO condition03DTO = conditionDTO.getCondition03DTO();
+
         condition03.setUser(user);
         condition03.setCarPrice(condition03DTO.getCarPrice());
         condition03.setPropertyPrice(condition03DTO.getPropertyPrice());
@@ -147,8 +203,7 @@ public class ConditionServiceImpl implements ConditionService{
         }
     }
 
-    private void saveAccountList(ConditionDTO conditionDTO, User user) {
-        List<AccountDTO> accountDTOList = conditionDTO.getAccountDTOList(); // DTO에서 AccountDTO 리스트 가져오기
+    private void saveAccountList(List<AccountDTO> accountDTOList, User user) {
         List<Account> accountList = new ArrayList<>();
 
         for (AccountDTO accountDTO : accountDTOList) {
@@ -172,10 +227,9 @@ public class ConditionServiceImpl implements ConditionService{
         }
     }
 
-    private void saveCondition01(ConditionDTO conditionDTO, User user) {
+    private void saveCondition01(Condition01DTO condition01DTO, User user) {
         // DTO에서 데이터를 꺼내 JPA 엔티티로 변환 후 저장
         Condition01 condition01 = new Condition01();
-        Condition01DTO condition01DTO = conditionDTO.getCondition01DTO();
 
         condition01.setUser(user);
         condition01.setBirthday(condition01DTO.getBirthday());
