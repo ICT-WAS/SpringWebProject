@@ -6,8 +6,9 @@ import com.ict.home.user.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 
@@ -27,9 +28,11 @@ public class Account {
     @Column(name = "account_id")
     private Long accountId;
 
+    @NotNull
     @Schema(description = "회원 고유 pk")
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @Schema(description = "청약통장종류")
