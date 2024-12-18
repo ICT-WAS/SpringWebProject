@@ -110,6 +110,16 @@ public class HouseServiceImpl implements HouseService {
         return houseDetailDTO;
     }
 
+    @Override
+    public List<HouseInfo> getHouseInfoByInterest(List<House> houses) {
+        List<HouseInfo> houseInfoList = new ArrayList<>();
+        for (House house : houses) {
+            HouseInfo houseInfo = makeHouseInfo(house);
+            houseInfoList.add(houseInfo);
+        }
+        return houseInfoList;
+    }
+
     private HouseDetailDTO makeHouseDetailDTO(House house, Detail01 detail01, Detail04 detail04, List<Detail> details) {
         HouseDetailDTO houseDetailDTO = new HouseDetailDTO();
         houseDetailDTO.setHouse(house);

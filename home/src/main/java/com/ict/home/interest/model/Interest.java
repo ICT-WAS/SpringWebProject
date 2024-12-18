@@ -36,14 +36,8 @@ public class Interest {
     @NotNull
     @Schema(description = "주택청약 공고 고유 pk")
     @ManyToOne
-    @JoinColumn(name = "house_id", referencedColumnName = "house_id", insertable = false, updatable = false)
+    @JoinColumn(name = "house_id", referencedColumnName = "house_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private House house;
-
-    @NotNull
-    @Schema(description = "알림 여부")
-    @Column(name = "alarm", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'Y'")
-    @Convert(converter = YesNoConverter.class)
-    private Boolean alarm = true;
 
 }
