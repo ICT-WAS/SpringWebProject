@@ -30,7 +30,6 @@ export default function InterestButton({ houseId }) {
           `http://localhost:8989/interest/check/${userId}/${houseId}`
         );
         setInterestId(response.data); // 응답 받은 값을 상태에 저장
-        console.log(response);
       } catch (error) {
         console.error("관심 여부 조회 실패", error);
       }
