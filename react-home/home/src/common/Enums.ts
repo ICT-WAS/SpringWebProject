@@ -18,3 +18,10 @@ export enum Sido {
     대구 = 700, // 대구
     경북 = 712, // 경북
 }
+
+export enum AccountType {
+    "SAVINGS_ACCOUNT" = "청약예금",
+    "SAVINGS_PLAN" = "청약부금",
+    "SAVINGS_DEPOSIT" = "청약저축",
+    "COMBINED_SAVINGS" = "주택청약종합저축",
+}
