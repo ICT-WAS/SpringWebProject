@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Accordion, Button, Card, Container, Stack } from "react-bootstrap";
+import { Accordion, Button, Container, Modal, Stack } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
@@ -10,46 +10,6 @@ import { AccountType, LivingTogetherDate, Sido } from '../common/Enums.ts';
 import { FamilyMember, getFamilyMemberName } from '../condition/family.ts';
 
 export default function Conditions() {
-
-    const [loading, setLoading] = useState(false);
-    const [hasCondition, setHasCondition] = useState(false);
-
-
-    const token = localStorage.getItem("accessToken");
-    const userId = getUserIdFromToken(token);
-
-    const fetchCondition = () => {
-        setLoading(true);
-        axios
-            .get(`http://localhost:8989/condition/${userId}`)
-            .then((response) => {
-                setHasCondition(response.data.hasCondition);
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error("데이터 요청 실패:", error);
-                setLoading(false);
-            });
-    };
-
-
-    const navigate = useNavigate();
-
-    function handleClick1(e) {
-        navigate("/condition-1");
-    }
-
-    function handleClick2(e) {
-        navigate("/condition-2");
-    }
-
-    function handleClick3(e) {
-        navigate("/condition-3");
-    }
-
-    useEffect(() => {
-        fetchCondition();
-    }, []);
 
     return (
         <>
@@ -101,6 +61,20 @@ function ConditionInfo() {
             });
     };
 
+    const clearCondition = () => {
+        setLoading(true);
+        axios
+            .delete(`http://localhost:8989/condition/${userId}`)
+            .then((response) => {
+                console.error("데이터 삭제 성공");
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error("데이터 요청 실패:", error);
+                setLoading(false);
+            });
+    };
+
     useEffect(() => {
         fetchCondition();
     }, []);
@@ -119,6 +93,23 @@ function ConditionInfo() {
         navigate("/condition-3");
     }
 
+    const [showModal, setShowModal] = useState(false);
+
+    const handleConfirm = () => {
+        clearCondition();
+
+        setShowModal(false);
+        alert('삭제되었습니다.');
+
+        // 정보 새로고침
+        fetchCondition();
+    };
+
+    function handleClearCondition(e) {
+
+        setShowModal(true);
+    }
+
     useEffect(() => {
         fetchCondition();
     }, []);
@@ -128,6 +119,15 @@ function ConditionInfo() {
         <>
             <p className='heading-text'>조건 확인</p>
 
+            {!hasCondition && !loading &&
+                <>
+                    <p className='heading-text'>등록된 조건이 없습니다.</p>
+                    <Button variant="dark" onClick={handleClick1}>조건 등록</Button>
+                </>
+            }
+
+            {hasCondition && 
+            <>
             <Accordion defaultActiveKey={['0']} alwaysOpen>
                 <Accordion.Item eventKey="0">
                     <Accordion.Header>신청자 정보</Accordion.Header>
@@ -162,11 +162,32 @@ function ConditionInfo() {
                 </Accordion.Item>
             </Accordion>
 
-            {!hasCondition && !loading &&
-                <p className='heading-text'>등록된 조건이 없습니다.</p>
+            <Button variant='dark' onClick={handleClearCondition}>조건 삭제</Button>
+            <ConfirmDialog open={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirm} />
+            </>
             }
-
         </>
+    );
+}
+
+function ConfirmDialog({ open, onClose, onConfirm }) {
+    return (
+        <Modal show={open} >
+            <Modal.Header closeButton>
+                <Modal.Title>조건 삭제</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                등록된 조건을 삭제하시겠습니까?
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="dark" onClick={onConfirm} >
+                    확인
+                </Button>
+                <Button variant="secondary" onClick={onClose}>
+                    취소
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
 }
 

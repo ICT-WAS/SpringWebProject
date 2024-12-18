@@ -153,6 +153,25 @@ public class ConditionServiceImpl implements ConditionService{
         updateCondition03(userId, condition03DTO);
     }
 
+    @Override
+    public void deleteConditions(Long userId) {
+        Condition01 condition01 = c01r.findByUser_Id(userId);
+        c01r.deleteById(condition01.getCondition01Id());
+
+        List<Account> accountList = ar.findByUser_Id(userId);
+        for (Account account : accountList) {
+            ar.deleteById(account.getAccountId());
+        }
+
+        List<Family> familyList = fr.findByUser_Id(userId);
+        for (Family family : familyList) {
+            fr.deleteById(family.getFamilyId());
+        }
+
+        Condition03 condition03 = c03r.findByUser_Id(userId);
+        c03r.deleteById(condition03.getCondition03Id());
+    }
+
     public void updateCondition03(Long userId, Condition03DTO condition03DTO) {
         Condition03 condition03 = c03r.findByUser_Id(userId);
 
