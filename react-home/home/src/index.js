@@ -34,6 +34,7 @@ import ResetPassword from "./pages/find-password/ResetPassword";
 import SearchAnnouncementByName from "./apply_announcement/SearchAnnouncementByName";
 import UserInfo from "./pages/account/UserInfo";
 import UserInfoEdit from "./pages/account/UserInfoEdit";
+import InterestList from "./mypage/InterestList";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -65,6 +66,7 @@ root.render(
 
         {/* 마이페이지 */}
         <Route path="/mypage" element={<MyPage />} />
+        <Route path="/interest" element={<InterestList />} />
 
         {/* 커뮤니티 */}
         <Route exact path="/community" element={<CommunityPostList />} />

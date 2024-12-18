@@ -48,6 +48,13 @@ public class HouseCustomRepositoryImpl implements HouseCustomRepository {
     }
 
     @Override
+    public House findById(Long houseId) {
+        return jpaQueryFactory.selectFrom(house)
+                .where(house.houseId.eq(houseId))
+                .fetchOne();
+    }
+
+    @Override
     public List<House> findFilteredHouseList(List<String> regions,
                                              List<String> houseTypes,
                                              List<String> area,

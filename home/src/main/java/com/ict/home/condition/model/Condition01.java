@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.YesNoConverter;
 
 import java.time.LocalDate;
@@ -25,9 +27,11 @@ public class Condition01 {
     @Column(name = "condition01_id")
     private Long condition01Id;
 
+    @NotNull
     @Schema(description = "회원 고유 pk")
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     @NotNull
