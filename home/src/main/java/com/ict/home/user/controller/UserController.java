@@ -41,9 +41,9 @@ public class UserController {
      */
     @PostMapping("/login")
     public BaseResponse<PostLoginRes> login(@RequestBody @Valid PostLoginReq postLoginReq, HttpServletResponse response) {
-        try{
+        try {
             return new BaseResponse<>(userService.localLogin(postLoginReq, response));
-        } catch(BaseException exception) {
+        } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -53,9 +53,9 @@ public class UserController {
      */
     @PostMapping("/logout")
     public BaseResponse<String> logout(HttpServletRequest request, HttpServletResponse response) {
-        try{
+        try {
             return new BaseResponse<>(userService.logout(request, response));
-        } catch (BaseException exception){
+        } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -83,9 +83,9 @@ public class UserController {
      */
     @PostMapping("/check/access-token/reset")
     public BaseResponse<String> resetAccessToken(@RequestParam("userId") Long userId) {
-        try{
+        try {
             return new BaseResponse<>(userService.createAccessToken(userId));
-        } catch(BaseException exception) {
+        } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
@@ -97,7 +97,7 @@ public class UserController {
     public BaseResponse<String> findEmail(@RequestBody PostFindEmailReq postFindEmailReq) {
         try {
             String phoneNumber = postFindEmailReq.getPhoneNumber();
-            return new BaseResponse <>(userService.findEmailByPhoneNumber(phoneNumber));
+            return new BaseResponse<>(userService.findEmailByPhoneNumber(phoneNumber));
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
@@ -120,9 +120,21 @@ public class UserController {
      */
     @PostMapping("/reset/password")
     public BaseResponse<?> resetPassword(@RequestBody @Valid PostResetPasswordReq postResetPasswordReq) {
-        try{
+        try {
             return new BaseResponse<>(userService.resetPassword(postResetPasswordReq));
-        }catch (BaseException exception) {
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 유저 정보 조회
+     */
+    @GetMapping("")
+    public BaseResponse<?> getUserinfo(@RequestParam(name = "userId") Long userId) {
+        try {
+            return new BaseResponse<>(userService.getUserInfoDetails(userId));
+        } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
     }

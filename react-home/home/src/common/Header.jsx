@@ -15,7 +15,8 @@ function Logo() {
 
   return (
     <>
-      <Button variant="link"
+      <Button
+        variant="link"
         onClick={handleLogoClick}
         className="link-body-emphasis link-underline link-underline-opacity-0"
       >
@@ -37,23 +38,23 @@ function Logo() {
 }
 
 function SearchField() {
-  const [keyword, setKeyword] = useState('');  
-  const navigate = useNavigate(); 
+  const [keyword, setKeyword] = useState("");
+  const navigate = useNavigate();
 
   const handleSearch = () => {
     if (keyword) {
-      navigate(`/subscriptions/search/${keyword}`);  
+      navigate(`/subscriptions/search/${keyword}`);
     }
   };
 
   return (
     <>
       <InputGroup>
-        <Form.Control 
-        placeholder="공고 제목으로 검색" 
-        aria-label="Search" 
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
+        <Form.Control
+          placeholder="공고 제목으로 검색"
+          aria-label="Search"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
         />
         <Button variant="light" onClick={handleSearch}>
           <i className="bi bi-search" />
@@ -111,32 +112,32 @@ function NavBar() {
       <Container>
         <Row className="align-items-center">
           <Col md="auto">
-            <Button variant="link" onClick={handleListClick}
+            <Button
+              variant="link"
+              onClick={handleListClick}
               className="link-body-emphasis link-underline link-underline-opacity-0"
             >
-              <p className="nav-bar-links">
-                청약 공고
-              </p>
+              <p className="nav-bar-links">청약 공고</p>
             </Button>
           </Col>
 
           <Col md="auto">
-            <Button variant="link" onClick={handlePostListClick}
+            <Button
+              variant="link"
+              onClick={handlePostListClick}
               className="link-body-emphasis link-underline link-underline-opacity-0"
             >
-              <p className="nav-bar-links">
-                커뮤니티
-              </p>
+              <p className="nav-bar-links">커뮤니티</p>
             </Button>
           </Col>
 
           <Col md="auto">
-            <Button variant="link" onClick={handleConditionsClick}
+            <Button
+              variant="link"
+              onClick={handleConditionsClick}
               className="link-body-emphasis link-underline link-underline-opacity-0"
             >
-              <p className="nav-bar-links">
-                조건 등록
-              </p>
+              <p className="nav-bar-links">조건 등록</p>
             </Button>
           </Col>
 
@@ -151,7 +152,9 @@ function NavBar() {
           </Col>
 
           <Col md="auto">
-            <Button variant="link" onClick={handleMyPageClick}
+            <Button
+              variant="link"
+              onClick={handleMyPageClick}
               className="link-body-emphasis link-underline link-underline-opacity-0"
             >
               <p>

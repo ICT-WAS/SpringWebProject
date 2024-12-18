@@ -1,0 +1,125 @@
+.sec_3 {
+  width: 100%;
+  height: auto;
+}
+
+.user_form_main {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.information_list {
+  width: 100%;
+  height: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.information_list li {
+  width: 100%;
+  height: auto;
+  padding: 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #d2d7dc;
+}
+
+.information_list li:hover {
+  background-color: #f7f7f7;
+}
+
+.information_list li:first-child {
+  border-top: 1px solid #d2d7dc;
+}
+
+.no-hover .information_list li:hover {
+  background-color: transparent; /* 호버 시 배경색을 없앰 */
+}
+
+.info_flex_one {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  align-items: center;
+  line-height: normal;
+  gap: 35px;
+}
+
+.info_subtitle2 {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 24px;
+  color: #000000;
+  min-width: 90px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-left: 16px;
+  margin-bottom: 0px;
+}
+
+.info_data_text2 {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000000;
+  margin-bottom: 0px;
+}
+
+.info_data_text3 {
+  margin-left: auto;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  color: #33b377;
+  padding-right: 16px;
+  margin-bottom: 0px;
+  white-space: nowrap; /* 텍스트가 줄바꿈 없이 한 줄로 유지되도록 */
+  flex-shrink: 1; /* 화면 크기에 맞게 줄어들도록 설정 */
+}
+
+.nav-bar-links {
+  margin-left: auto; /* 왼쪽 여백 자동으로 채우기 */
+}
+
+.info_btn1 {
+  background: #3ca6e5;
+  border-radius: 100px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 16px;
+  gap: 6px;
+  width: 180px;
+  height: 48px;
+
+  font-style: normal;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: center;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.info-small-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 0.7);
+  margin-left: 16px;
+  text-decoration: underline;
+}
+
+.info-small-text:hover {
+  color: rgba(102, 102, 102, 1);
+  cursor: pointer;
+}
