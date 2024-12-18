@@ -1,10 +1,11 @@
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
-import { Container, Row, Col, Button, Card, CardBody, Modal } from "react-bootstrap";
+import { Container, Row, Col, Button, Modal } from "react-bootstrap";
 import LoginStateButton from "../components/login/LoginStateButton";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { getUserIdFromToken } from "../api/TokenUtils";
+import NotificationButton from "../notification/NotificationButton";
 
 function Logo() {
   const navigate = useNavigate();
@@ -67,6 +68,7 @@ function SearchField() {
 function NavBar() {
   const [showModal, setShowModal] = useState(false);
 
+
   // 로그인 모달 닫기 함수
   const handleCloseModal = () => setShowModal(false);
 
@@ -89,14 +91,6 @@ function NavBar() {
     navigate("/community");
   }
 
-  function handleMyPageClick() {
-    if (userId === null) {
-      handleShowModal(); // 로그인 필요 시 모달 표시
-    } else {
-      navigate("/mypage");
-    }
-  }
-
   function handleInterestListClick(){
     if (userId === null) {
       handleShowModal(); // 로그인 필요 시 모달 표시
@@ -104,7 +98,6 @@ function NavBar() {
       navigate("/interest");
     }
   }
-  
   
 
   return (
@@ -152,25 +145,13 @@ function NavBar() {
           </Col>
 
           <Col md="auto">
-            <Button
-              variant="link"
-              onClick={handleMyPageClick}
-              className="link-body-emphasis link-underline link-underline-opacity-0"
-            >
-              <p>
-                <a
-                  href="#"
-                  className="link-body-emphasis link-underline link-underline-opacity-0"
-                >
-                  <i className="bi bi-bell" />
-                </a>
-              </p>
-            </Button>
+            <NotificationButton/>
           </Col>
 
           <LoginStateButton />
         </Row>
       </Container>
+
       {/* 로그인 모달 */}
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>

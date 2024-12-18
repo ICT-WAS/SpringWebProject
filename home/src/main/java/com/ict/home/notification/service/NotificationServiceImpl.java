@@ -49,12 +49,9 @@ public class NotificationServiceImpl implements NotificationService{
     public boolean deleteNotification(Long notificationId) {
         Optional<Notification> notificationOpt = nr.findById(notificationId);
 
-        if (notificationOpt.isPresent()) {
-            nr.delete(notificationOpt.get());
-            return true;
-        }
+        notificationOpt.ifPresent(nr::delete);
 
-        return false;
+        return true;
     }
 
     @Override
