@@ -1,5 +1,5 @@
 import { Container, Row, Col } from 'react-bootstrap';
-import NotificationButton from './NotificationButton';
+import NotificationButton from './InterestButton';
 
 function InformationalPost({subscription}) {
     return (
