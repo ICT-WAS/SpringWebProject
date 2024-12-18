@@ -13,8 +13,8 @@ const FindEmail = () => {
   const confirmModalRef = useRef(null);
   const phoneRef = useRef(null);
   //에러관리
-  const [loginError, setLoginError] = useState("");
-  const [loginErrorTitle, setLoginErrorTitle] = useState("");
+  const [modalError, setModalError] = useState("");
+  const [errorModalTitle, setModalErrorTitle] = useState("");
 
   //모달 닫을 때
   const closeModal = () => {
@@ -35,11 +35,15 @@ const FindEmail = () => {
             <div className="info-container">
               <div className="info-container-area">
                 <h2>계정 찾기</h2>
-                <FindEmailByMobile ref={phoneRef} />
+                <FindEmailByMobile
+                  ref={phoneRef}
+                  setModalErrorTitle={setModalErrorTitle}
+                  setModalError={setModalError}
+                />
                 {isModal && (
                   <Modal
-                    title={loginErrorTitle}
-                    message={loginError}
+                    title={errorModalTitle}
+                    message={modalError}
                     onClose={closeModal}
                     ref={confirmModalRef}
                   />

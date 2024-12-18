@@ -1,5 +1,5 @@
 import { Card, Col, Container, Dropdown, Row, Stack } from "react-bootstrap";
-import NotificationButton from "./NotificationButton";
+import NotificationButton from "./InterestButton";
 import Spinners from "../common/Spinners";
 
 
@@ -80,7 +80,7 @@ function SubscriptionCard({ subscription, index }) {
               </Container>
             </Col>
             <Col md="auto">
-              <NotificationButton />
+              <NotificationButton houseId={subscription.houseId}/>
             </Col>
           </Row>
         </Card>

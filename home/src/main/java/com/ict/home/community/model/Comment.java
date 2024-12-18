@@ -2,10 +2,8 @@ package com.ict.home.community.model;
 
 import com.ict.home.user.User;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -28,16 +26,18 @@ public class Comment {
     @Column(name = "comment_id")
     private Long commentId;
 
+    @NotNull
     @Schema(description = "회원 고유 pk")
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)  // CASCADE 설정
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
+    @NotNull
     @Schema(description = "게시글 고유 pk")
     @ManyToOne
     @JoinColumn(name = "post_id", referencedColumnName = "post_id", nullable = false, foreignKey = @ForeignKey(name = "FK_COMMENT_POST"))
-    @OnDelete(action = OnDeleteAction.CASCADE)  // CASCADE 설정
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Post post;
 
     @NotNull
@@ -48,7 +48,7 @@ public class Comment {
     @Schema(description = "대댓글 시 댓글 고유 pk")
     @ManyToOne
     @JoinColumn(name = "parent_comment_id", referencedColumnName = "comment_id", nullable = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)  // CASCADE 설정
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Comment parentComment;
 
     @NotNull

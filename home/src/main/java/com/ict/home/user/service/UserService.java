@@ -1,7 +1,6 @@
 package com.ict.home.user.service;
 
 import com.ict.home.exception.BaseException;
-import com.ict.home.exception.BaseResponse;
 import com.ict.home.exception.BaseResponseStatus;
 import com.ict.home.login.auth.dto.PostVerifiedUserRes;
 import com.ict.home.login.auth.model.Verification;
@@ -10,6 +9,7 @@ import com.ict.home.login.jwt.JwtProvider;
 import com.ict.home.login.jwt.Secret;
 import com.ict.home.login.jwt.Token;
 import com.ict.home.login.jwt.TokenRepository;
+import com.ict.home.login.repository.SocialAccountRepository;
 import com.ict.home.user.dto.*;
 import com.ict.home.user.enums.UserVerify;
 import com.ict.home.user.repository.UserRepository;
@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.WebUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.ict.home.exception.BaseResponseStatus.*;
 
@@ -44,6 +45,7 @@ public class UserService {
     private final JwtProvider jwtProvider;
     private final UserUtilService userUtilService;
     private final VerificationRepository verificationRepository;
+    private final SocialAccountRepository socialAccountRepository;
 
     /**
      * 회원가입
@@ -227,6 +229,12 @@ public class UserService {
     /**
      * 회원정보 불러오기
      */
+    public GetUserInfoDetailsRes getUserInfoDetails(Long userId) {
+        User user = userUtilService.findByIdWithValidation(userId);
+        String userVerifyInKorea = user.getUserVerify() != null ? user.getUserVerify().getUserVerifyInKorea() : null;
+        List<String> userSocialLinks = socialAccountRepository.findProvidersByUserId(userId);
+        return new GetUserInfoDetailsRes(user.getUsername(), user.getEmail(), user.getPhoneNumber(), userVerifyInKorea, userSocialLinks);
+    }
 
     /**
      * 비동기 처리를 위한 email, 휴대폰 번호, 유저 이름 중복 체크

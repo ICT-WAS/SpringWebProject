@@ -2,8 +2,11 @@ package com.ict.home.house.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.YesNoConverter;
 
 import java.time.LocalDate;
@@ -21,9 +24,11 @@ public class Detail01 {
     @Column(name = "detail01_id")
     private Long detail01Id;
 
+    @NotNull
     @Schema(description = "주택청약 공고 고유 pk")
     @OneToOne
     @JoinColumn(name = "house_id", referencedColumnName = "house_id", insertable = false, updatable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private House house;
 
     @Schema(description = "주택상세구분코드 (01: 민영, 03: 국민)")
