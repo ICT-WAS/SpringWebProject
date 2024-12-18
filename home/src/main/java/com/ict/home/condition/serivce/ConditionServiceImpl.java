@@ -149,9 +149,27 @@ public class ConditionServiceImpl implements ConditionService{
 
     @Override
     public void updateCondition3(Condition03DTO condition03DTO, Long userId) {
-        User user = ur.getReferenceById(userId);
 
-        saveCondition03(condition03DTO, user);
+        updateCondition03(userId, condition03DTO);
+    }
+
+    public void updateCondition03(Long userId, Condition03DTO condition03DTO) {
+        Condition03 condition03 = c03r.findByUser_Id(userId);
+
+        condition03.setCarPrice(condition03DTO.getCarPrice());
+        condition03.setPropertyPrice(condition03DTO.getPropertyPrice());
+        condition03.setTotalAsset(condition03DTO.getTotalAsset());
+        condition03.setMyAsset(condition03DTO.getMyAsset());
+        condition03.setSpouseAsset(condition03DTO.getSpouseAsset());
+        condition03.setFamilyAverageMonthlyIncome(condition03DTO.getFamilyAverageMonthlyIncome());
+        condition03.setPreviousYearAverageMonthlyIncome(condition03DTO.getPreviousYearAverageMonthlyIncome());
+        condition03.setIncomeActivity(condition03DTO.getIncomeActivity());
+        condition03.setSpouseAverageMonthlyIncome(condition03DTO.getSpouseAverageMonthlyIncome());
+        condition03.setIncomeTaxPaymentPeriod(condition03DTO.getIncomeTaxPaymentPeriod());
+        condition03.setLastWinned(condition03DTO.getLastWinned());
+        condition03.setIneligible(condition03DTO.getIneligible());
+
+        c03r.save(condition03);
     }
 
     private void saveFamilyList(List<FamilyDTO> familyDTOList, User user) {

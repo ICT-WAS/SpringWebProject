@@ -61,19 +61,6 @@ public class ConditionController {
         }});
     }
 
-//    @PostMapping("/test")
-//    @Operation(summary = "조건 등록", description = "조건을 등록합니다.")
-//    public ResponseEntity<String> addConditionTest(@Valid @RequestBody ConditionDTO conditionDTO, @PathVariable(required = false) Long userId) {
-//        // 저장하는 로직 (예: repository 사용)
-//        System.out.println("conditionDTO.getCondition01DTO() = " + conditionDTO.getCondition01DTO());
-//        System.out.println("conditionDTO.getCondition03DTO() = " + conditionDTO.getCondition03DTO());
-//        System.out.println("conditionDTO.getAccountDTOList() = " + conditionDTO.getAccountDTOList());
-//        System.out.println("conditionDTO.getFamilyDTOList() = " + conditionDTO.getFamilyDTOList());
-//
-//
-//        return ResponseEntity.ok("등록 성공");
-//    }
-
     @PostMapping("/{userId}")
     @Operation(summary = "조건 등록", description = "조건을 등록합니다.")
     public ResponseEntity<String> addCondition(@Valid @RequestBody ConditionDTO conditionDTO, @PathVariable Long userId) {
@@ -85,11 +72,30 @@ public class ConditionController {
 
     @PatchMapping("/1/{userId}")
     @Operation(summary = "조건1 수정", description = "조건을 수정합니다.")
-    public ResponseEntity<String> updateCondition1(@Valid @RequestBody Condition01DTO condition01DTO,
-                                                   @Valid @RequestBody List<AccountDTO> accountDTOList,
+    public ResponseEntity<String> updateCondition1(@Valid @RequestBody Condition1UpdateRequest condition1UpdateRequest,
                                                    @PathVariable Long userId) {
         // 저장하는 로직 (예: repository 사용)
-        cs.updateCondition1(condition01DTO, accountDTOList, userId);
+        cs.updateCondition1(condition1UpdateRequest.getCondition01DTO(), condition1UpdateRequest.getAccountDTOList(), userId);
+
+        return ResponseEntity.ok("등록 성공");
+    }
+
+    @PatchMapping("/2/{userId}")
+    @Operation(summary = "조건2 수정", description = "조건을 수정합니다.")
+    public ResponseEntity<String> updateCondition2(@Valid @RequestBody List<FamilyDTO> familyDTOList,
+                                                   @PathVariable Long userId) {
+        // 저장하는 로직 (예: repository 사용)
+        cs.updateCondition2(familyDTOList, userId);
+
+        return ResponseEntity.ok("등록 성공");
+    }
+
+    @PatchMapping("/3/{userId}")
+    @Operation(summary = "조건3 수정", description = "조건을 수정합니다.")
+    public ResponseEntity<String> updateCondition3(@Valid @RequestBody Condition03DTO condition03DTO,
+                                                   @PathVariable Long userId) {
+        // 저장하는 로직 (예: repository 사용)
+        cs.updateCondition3(condition03DTO, userId);
 
         return ResponseEntity.ok("등록 성공");
     }

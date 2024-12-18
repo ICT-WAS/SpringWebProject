@@ -11,6 +11,7 @@ import { getUserIdFromToken } from '../api/TokenUtils';
 export default function Condition03Content() {
 
     const [loading, setLoading] = useState(false);
+    const [updateMode, setUpdateMode] = useState(false);
 
     const navigate = useNavigate();
 
@@ -41,7 +42,7 @@ export default function Condition03Content() {
         lastWinned: null,
         ineligible: null,
     });
-    
+
     const [familyDataList, setFamilyDataList] = useState([]);
 
     const [hasSpouse, setHasSpouse] = useState(false);
@@ -54,16 +55,51 @@ export default function Condition03Content() {
         ineligible: [{ value: 'Y', subQuestionId: 'disqualifiedDate' }]
     };
 
+    const token = localStorage.getItem("accessToken");
+    const userId = getUserIdFromToken(token);
+
+
+    const fetchCondition = () => {
+        axios
+            .get(`http://localhost:8989/condition/${userId}`)
+            .then((response) => {
+                if (response.data.hasCondition === true) {
+                    setUpdateMode(true);
+
+                    setFormData3(response.data.form3Data);
+                }
+
+            })
+            .catch((error) => {
+                console.error("데이터 요청 실패:", error);
+            });
+    };
+
+    const updateCondition = (condition03Data) => {
+            console.log(condition03Data)
+            axios
+                .patch(`http://localhost:8989/condition/3/${userId}`, condition03Data)
+                .then((response) => {
+                    console.log('업데이트 성공:', response.data);
+                })
+                .catch((error) => {
+                    console.error("데이터 요청 실패:", error);
+                });
+        };
+
     useEffect(() => {
         /* 이전 폼 데이터 읽어오기 */
+        // 수정모드
+        fetchCondition();
+
         //폼3데이터
         const sessionFormData3 = sessionStorage.getItem('formData3');
 
-        if(sessionFormData3) {
-            try{
+        if (sessionFormData3) {
+            try {
                 const storedFormData3 = JSON.parse(sessionFormData3);
                 setFormData3(storedFormData3);
-                setFormDateData({noVehicle: storedFormData3.carPrice <= 0, lastWinned: storedFormData3.lastWinned ? "Y" : "N", ineligible: storedFormData3.ineligible ? "Y" : "N"});
+                setFormDateData({ noVehicle: storedFormData3.carPrice <= 0, lastWinned: storedFormData3.lastWinned ? "Y" : "N", ineligible: storedFormData3.ineligible ? "Y" : "N" });
             } catch (error) { }
         }
 
@@ -109,18 +145,23 @@ export default function Condition03Content() {
             return;
         }
 
-
         let finalFormData3 = formData3;
-        if(formData3.carPrice === null) {
-            finalFormData3 = {...formData3, carPrice: 0};
+        if (formData3.carPrice === null) {
+            finalFormData3 = { ...formData3, carPrice: 0 };
         }
 
-        if(formDateData.ineligible === "N") {
-            finalFormData3 = {...formData3, ineligible: null};
+        if (formDateData.ineligible === "N") {
+            finalFormData3 = { ...formData3, ineligible: null };
         }
 
-        if(formDateData.lastWinned === "N") {
-            finalFormData3 = {...formData3, lastWinned: null};
+        if (formDateData.lastWinned === "N") {
+            finalFormData3 = { ...formData3, lastWinned: null };
+        }
+
+        if(updateMode) {
+            updateCondition(finalFormData3);
+            navigate("/conditions");
+            return;
         }
 
         const submitData = { condition01DTO: formData1, ...accountDTOList, condition03DTO: finalFormData3, familyDTOList: familyDataList };
@@ -131,13 +172,13 @@ export default function Condition03Content() {
         const userId = getUserIdFromToken(token);
 
         // POST 요청
-        
+
         setLoading(true);
         axios
-            .post(`http://localhost:8989/condition/${userId}`,submitData)
+            .post(`http://localhost:8989/condition/${userId}`, submitData)
             .then((response) => {
                 setLoading(false);
-                
+
                 sessionStorage.removeItem('formData1');
                 sessionStorage.removeItem('accountDTOList');
                 sessionStorage.removeItem('spouseFormData');
@@ -153,12 +194,14 @@ export default function Condition03Content() {
     };
 
     function onChangedInputValue({ name, value }) {
-        setFormData3(prevFormData => ({...prevFormData,
-            [name]: value}));
+        setFormData3(prevFormData => ({
+            ...prevFormData,
+            [name]: value
+        }));
     }
 
     function onChangedDateRadioValue({ name, value }) {
-        setFormDateData(prevFormData => ({...prevFormData, [name]: value}));
+        setFormDateData(prevFormData => ({ ...prevFormData, [name]: value }));
     }
 
     function handleFollowUpQuestion({ name, value, visible }) {
@@ -173,7 +216,7 @@ export default function Condition03Content() {
     return (
         <>
             <p className='heading-text'>
-                조건 등록 (3/3) - 재산 정보 입력
+                조건 등록 (3/3) - 재산 정보{updateMode ? " 수정" : " 입력" }
             </p>
 
             <Form noValidate onSubmit={handleSubmit}>
@@ -184,11 +227,11 @@ export default function Condition03Content() {
                     <HasVehicle handleFollowUpQuestion={handleFollowUpQuestion} onChangedInputValue={onChangedDateRadioValue} value={formDateData?.noVehicle} />
 
                     {/* ![꼬리질문] 차량가액 */}
-                    {formDateData?.noVehicle === false && <VehicleValueQuestion onChangedInputValue={onChangedInputValue} value={formData3?.carPrice}/>}
+                    {formDateData?.noVehicle === false && <VehicleValueQuestion onChangedInputValue={onChangedInputValue} value={formData3?.carPrice} />}
 
                     {/* 소유하신 부동산(건축물 + 토지)총 가액을 선택해주세요 */}
                     <RadioButtonItem question={'소유하신 부동산(건축물 + 토지)총 가액을 선택해주세요'}
-                        buttons={totalPropertyValueButtons} onChange={onChangedInputValue} value={formData3?.propertyPrice}/>
+                        buttons={totalPropertyValueButtons} onChange={onChangedInputValue} value={formData3?.propertyPrice} />
 
                     {/* 세대구성원 전원의 총 자산을 입력해주세요 */}
                     <InputNumberItem question={'세대구성원 전원의 총 자산을 입력해주세요'} value={formData3?.totalAsset}
@@ -205,20 +248,20 @@ export default function Condition03Content() {
 
                     {/* 세대구성원 중 만 19세 이상 세대원 전원의 전년도 월 평균소득을 모두 합산한 금액 */}
                     <InputNumberItem question={'세대구성원 중 만 19세 이상 세대원 전원의 전년도 월 평균소득을 모두 합산한 금액'}
-                        name={'familyAverageMonthlyIncome'} onChange={onChangedInputValue} 
+                        name={'familyAverageMonthlyIncome'} onChange={onChangedInputValue}
                         placeholder={placeholderText.moneyUnitType} value={formData3?.familyAverageMonthlyIncome} />
 
                     {/* 본인의 전년도 월 평균소득을 입력해주세요 */}
-                    <InputNumberItem question={'본인의 전년도 월 평균소득을 입력해주세요'} value={formData3?.previousYearAverageMonthlyIncome} 
+                    <InputNumberItem question={'본인의 전년도 월 평균소득을 입력해주세요'} value={formData3?.previousYearAverageMonthlyIncome}
                         name={'previousYearAverageMonthlyIncome'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
 
                     {/* 소득활동 여부를 선택해주세요 */}
-                    {hasSpouse === true && <RadioButtonItem question={'소득활동 여부를 선택해주세요'} 
+                    {hasSpouse === true && <RadioButtonItem question={'소득활동 여부를 선택해주세요'}
                         buttons={incomeActivityTypeButtons} direction={'horizontal'} onChange={onChangedInputValue}
                         handleFollowUpQuestion={handleFollowUpQuestion} value={formData3?.incomeActivity} />}
 
                     {/* [꼬리질문] 배우자의 월평균소득을 입력해주세요 */}
-                    {formData3?.incomeActivity === 1 && <SpouseIncomeQuestion onChangedInputValue={onChangedInputValue} 
+                    {formData3?.incomeActivity === 1 && <SpouseIncomeQuestion onChangedInputValue={onChangedInputValue}
                         value={formData3?.spouseAverageMonthlyIncome} />}
 
                     {/* 소득세 납부 기간 */}
@@ -231,7 +274,7 @@ export default function Condition03Content() {
                         handleFollowUpQuestion={handleFollowUpQuestion} value={formDateData?.lastWinned} />
 
                     {/* [꼬리질문] 가장 최근에 당첨된 날짜를 입력해주세요 */}
-                    {formDateData?.lastWinned === "Y" && <WinningDateQuestion onChangedInputValue={onChangedInputValue} 
+                    {formDateData?.lastWinned === "Y" && <WinningDateQuestion onChangedInputValue={onChangedInputValue}
                         value={formData3?.lastWinned} />}
 
                     {/* 신청자 본인이 주택청약에 당첨되고 부적격자 판정을 받은 적 있나요? */}
@@ -240,13 +283,14 @@ export default function Condition03Content() {
                         handleFollowUpQuestion={handleFollowUpQuestion} value={formDateData?.ineligible} />
 
                     {/* [꼬리질문] 부적격자 판정된 날짜가 언제인가요? */}
-                    {formDateData?.ineligible === "Y" && <DisqualifiedDate onChangedInputValue={onChangedInputValue} 
+                    {formDateData?.ineligible === "Y" && <DisqualifiedDate onChangedInputValue={onChangedInputValue}
                         value={formData3?.ineligible} />}
 
                     {/* 폼 제출 */}
+                    
                     <Stack direction="horizontal" gap={2}>
-                        <Button variant="light" onClick={handlePrevButtonClick} style={{ flex: '1' }} >이전</Button>
-                        <Button variant="dark" type="submit" style={{ flex: '1' }} >등록</Button>
+                    {!updateMode && <Button variant="light" onClick={handlePrevButtonClick} style={{ flex: '1' }} >이전</Button>}
+                        <Button variant="dark" type="submit" style={{ flex: '1' }} >{updateMode ? "수정" : "등록" }</Button>
                     </Stack>
                 </Stack>
 

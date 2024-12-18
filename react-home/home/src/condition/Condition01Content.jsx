@@ -67,13 +67,15 @@ export default function Condition01Content() {
         axios
             .get(`http://localhost:8989/condition/${userId}`)
             .then((response) => {
-                if(response.data.hasCondition === true) {
+                if (response.data.hasCondition === true) {
                     setUpdateMode(true);
 
                     setFormData(response.data.form1Data);
                     setSpouseFormData(response.data.spouseFormData);
                     setAccountData(response.data.accountData);
-                    setSpouseAccountData(response.data.spouseAccountData);
+                    if(response.data.spouseAccountData !== null) {
+                        setSpouseAccountData();
+                    }
 
                     sessionStorage.removeItem('familyDataList');
                     sessionStorage.setItem('familyDataList', JSON.stringify(response.data.familyList));
@@ -81,7 +83,7 @@ export default function Condition01Content() {
                     sessionStorage.setItem('formData3', JSON.stringify(response.data.form3Data));
                     sessionStorage.setItem('spouseFamilyDataList', JSON.stringify(response.data.spouseFamilyList));
                 }
-                
+
             })
             .catch((error) => {
                 console.error("데이터 요청 실패:", error);
@@ -89,10 +91,11 @@ export default function Condition01Content() {
     };
 
     const updateCondition = (condition01Data) => {
+        console.log(condition01Data)
         axios
             .patch(`http://localhost:8989/condition/1/${userId}`, condition01Data)
             .then((response) => {
-                console.log('업데이트 성공:', response.data); 
+                console.log('업데이트 성공:', response.data);
             })
             .catch((error) => {
                 console.error("데이터 요청 실패:", error);
@@ -157,23 +160,27 @@ export default function Condition01Content() {
 
     function handleSubmit(event) {
 
+        console.log(formData);
+        console.log(accountData);
+
         const form = event.target;
+        event.preventDefault();
+        event.stopPropagation();
+
         if (form.checkValidity() === false) {
 
             alert('모든 항목을 입력해주세요.');
-            event.preventDefault();
-            event.stopPropagation();
             return;
         }
 
         let accountDTOList = { accountDTOList: [{ ...accountData }] };
-        if (hasSpouse && spouseAccountData.createdAt) { // (기혼 || 예비신혼) && 배우자 계좌 정보
+        if (hasSpouse && (spouseAccountData?.createdAt !== null)) { // (기혼 || 예비신혼) && 배우자 계좌 정보
             accountDTOList = { accountDTOList: [{ ...accountData, }, { ...spouseAccountData }] };
         }
 
         // 수정
-        if(updateMode) {
-            updateCondition({condition01DTO: formData, accountDTOList: accountDTOList});
+        if (updateMode) {
+            updateCondition({ condition01DTO: formData, ...accountDTOList });
             navigate("/conditions");
             return;
         }
@@ -191,7 +198,7 @@ export default function Condition01Content() {
     return (
         <>
             <p className='heading-text'>
-                조건 등록 (1/3) - 신청자/배우자 정보{updateMode ? " 수정" : " 입력" }
+                조건 등록 (1/3) - 신청자/배우자 정보{updateMode ? " 수정" : " 입력"}
             </p>
 
             <Form noValidate onSubmit={handleSubmit}>
@@ -262,9 +269,9 @@ export default function Condition01Content() {
                             value={spouseAccountData?.createdAt} />}
 
                     {/* 다음으로 */}
-                    <Button variant="dark" type="submit" >{updateMode ? "수정" : "다음" }</Button>
+                    <Button variant="dark" type="submit" >{updateMode ? "수정" : "다음"}</Button>
 
-                    
+
                 </Stack>
 
             </Form>
