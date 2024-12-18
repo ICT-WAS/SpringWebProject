@@ -3,7 +3,6 @@ package com.ict.home.condition.controller;
 import com.ict.home.condition.dto.*;
 import com.ict.home.condition.model.*;
 import com.ict.home.condition.serivce.ConditionService;
-import com.ict.home.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -43,9 +44,21 @@ public class ConditionController {
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
     })
-    public ResponseEntity<?> getCondition() {
+    public ResponseEntity<?> getCondition(@PathVariable Long userId) {
 
-        return ResponseEntity.ok("조회 성공");
+        GetConditionDTO conditionDTO = cs.getConditions(userId);
+
+        return ResponseEntity.ok(new HashMap<String, Object>() {{
+            put("hasCondition", !conditionDTO.isEmpty());
+            put("form1Data", conditionDTO.getCondition01());
+            put("spouseFormData", conditionDTO.getSpouseFormData());
+            put("accountData", conditionDTO.getAccountData());
+            put("spouseAccountData", conditionDTO.getSpouseAccountData());
+
+            put("familyList", conditionDTO.getFamilyList());
+            put("spouseFamilyList", conditionDTO.getSpouseFamilyList());
+            put("form3Data", conditionDTO.getCondition03());
+        }});
     }
 
     @PostMapping("/{userId}")
@@ -53,6 +66,36 @@ public class ConditionController {
     public ResponseEntity<String> addCondition(@Valid @RequestBody ConditionDTO conditionDTO, @PathVariable Long userId) {
         // 저장하는 로직 (예: repository 사용)
         cs.saveConditions(conditionDTO, userId);
+
+        return ResponseEntity.ok("등록 성공");
+    }
+
+    @PatchMapping("/1/{userId}")
+    @Operation(summary = "조건1 수정", description = "조건을 수정합니다.")
+    public ResponseEntity<String> updateCondition1(@Valid @RequestBody Condition1UpdateRequest condition1UpdateRequest,
+                                                   @PathVariable Long userId) {
+        // 저장하는 로직 (예: repository 사용)
+        cs.updateCondition1(condition1UpdateRequest.getCondition01DTO(), condition1UpdateRequest.getAccountDTOList(), userId);
+
+        return ResponseEntity.ok("등록 성공");
+    }
+
+    @PatchMapping("/2/{userId}")
+    @Operation(summary = "조건2 수정", description = "조건을 수정합니다.")
+    public ResponseEntity<String> updateCondition2(@Valid @RequestBody List<FamilyDTO> familyDTOList,
+                                                   @PathVariable Long userId) {
+        // 저장하는 로직 (예: repository 사용)
+        cs.updateCondition2(familyDTOList, userId);
+
+        return ResponseEntity.ok("등록 성공");
+    }
+
+    @PatchMapping("/3/{userId}")
+    @Operation(summary = "조건3 수정", description = "조건을 수정합니다.")
+    public ResponseEntity<String> updateCondition3(@Valid @RequestBody Condition03DTO condition03DTO,
+                                                   @PathVariable Long userId) {
+        // 저장하는 로직 (예: repository 사용)
+        cs.updateCondition3(condition03DTO, userId);
 
         return ResponseEntity.ok("등록 성공");
     }
