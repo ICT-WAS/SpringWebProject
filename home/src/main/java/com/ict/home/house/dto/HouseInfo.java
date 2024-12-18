@@ -7,6 +7,7 @@ import lombok.ToString;
 import java.time.LocalDate;
 
 @ToString
+@Schema(title = "주택청약 공고 목록을 위한 dto")
 public class HouseInfo {
 
     @Schema(description = "House 고유 pk")
