@@ -6,6 +6,7 @@ import PaginationItem from './PaginationItem';
 import Filters from './Filters';
 import Conditions from './Conditions.jsx';
 import { convertFiltersToQuery, convertFiltersToUrl } from '../common/utils.js';
+import { getUserIdFromToken } from '../api/TokenUtils.js';
 
 
 export default function MainContent() {
@@ -17,6 +18,12 @@ export default function MainContent() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const pageSize = 10;  // 한 페이지에 표시할 항목 수
+
+  const token = localStorage.getItem("accessToken");
+  const userId = getUserIdFromToken(token);
+
+  // 내 조건으로 검색
+  const [checked, setChecked] = useState(false);
 
   // {category: '주택정보', subcategories: [{category: '주택분류', values: [{value: '민영주택'}]}]}
 
@@ -90,49 +97,49 @@ export default function MainContent() {
 
     const updateFilters = (prevFilters, category, subcategoryName, value, submitData) => {
       let handledUpdate = false;
-    
+
       // 카테고리 및 서브카테고리를 업데이트하는 함수
       const updateSubcategories = (subcategories) => {
         return subcategories.map((sub) => {
           if (sub.category !== subcategoryName) {
             return sub;
           }
-    
+
           handledUpdate = true;
-    
+
           const valueExists = sub.values.some((v) => v.value === value);
           if (valueExists) {
             return sub;
           }
-    
+
           const shouldClearSubCategory =
             (category === '희망지역' && (value.endsWith('전체') || sub.values.some((v) => v.value.endsWith('전체')))) ||
             subcategoryName === '공급금액';
-    
+
           if (shouldClearSubCategory) {
             return { ...sub, values: [{ value, submitData }] };
           }
-    
+
           return { ...sub, values: [...sub.values, { value, submitData }] };
         });
       };
-    
+
       // 필터 업데이트 로직
       const updatedFilters = prevFilters.map((filter) => {
         if (filter.category !== category) {
           return filter;
         }
-    
+
         const updatedSubcategories = updateSubcategories(filter.subcategories);
-    
+
         if (!handledUpdate) {
           updatedSubcategories.push({ category: subcategoryName, values: [{ value, submitData }] });
           handledUpdate = true;
         }
-    
+
         return { ...filter, subcategories: updatedSubcategories };
       });
-    
+
       // 새로운 카테고리 추가
       if (!handledUpdate) {
         updatedFilters.push({
@@ -140,10 +147,10 @@ export default function MainContent() {
           subcategories: [{ category: subcategoryName, values: [{ value, submitData }] }],
         });
       }
-    
+
       return updatedFilters;
     };
-    
+
     setSelectedFilter((prevFilters) => updateFilters(prevFilters, category, subcategoryName, value, submitData));
   }
 
@@ -179,12 +186,17 @@ export default function MainContent() {
     fetchData(queryParams, page);
   }
 
-  const fetchData = (filters, page) => {
+  const fetchData = (queryParams, page) => {
+    let finalQueryParams = queryParams;
+    if(checked) {
+      finalQueryParams = {...queryParams, userId: userId};
+    }
+
     setLoading(true);
     axios
       .get("http://localhost:8989/house", {
         params: {
-          ...filters,
+          ...finalQueryParams,
           page: page - 1,
           size: pageSize,
         },
@@ -217,14 +229,22 @@ export default function MainContent() {
     paginationRef.current.resetPage(filter);
   }
 
+
+  // 내 조건으로 검색
+  function handleChangeCheck(checked) {
+    setChecked(checked);
+  }
+
+
+
   return (
     <>
       <Container>
         <Row className="mb-2">
-          <Conditions onClickedFilter={onClickedFilter} />
+          <Conditions onClickedFilter={onClickedFilter} onChangeCheck={handleChangeCheck} value={checked} />
         </Row>
         <Row >
-        <Button onClick={onFilterClearClick}
+          <Button onClick={onFilterClearClick}
             variant='link' className="link-body-emphasis link-underline link-underline-opacity-0">
             <p className="nav-bar-links" style={{ textAlign: 'right' }}>
               <b><i className="bi bi-arrow-clockwise" />초기화</b>
