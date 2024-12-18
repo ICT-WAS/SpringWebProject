@@ -67,11 +67,9 @@ instance.interceptors.response.use(
       try {
         const accessToken = localStorage.getItem("accessToken");
         const newToken = await refreshTokenIfExpired(accessToken); //토큰 만료 확인 후 재발급 및 재설정
-        // console.log("interseptor-newToken", newToken);
 
         if (newToken) {
           localStorage.setItem("accessToken", newToken);
-          // originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
           procssQueue(null, newToken); //대기 중인 요청들에 새로운 토큰 전달
 
           return instance(originalRequest); //원래 요청 재시도
@@ -87,52 +85,4 @@ instance.interceptors.response.use(
     return Promise.reject(error); //401 외 다른 오류는 그대로 반환
   }
 );
-// setupAxiosInterceptor();
 export { instance };
-
-// const accessToken = await refreshTokenIfExpired(token); //토큰 만료 확인 후 재발급 및 재설정
-
-// export const useAxiosClient = () => {
-//   const { isLogin } = useGlobalContext();
-//   const [client, setClient] = useState(instance);
-
-//   useEffect(() => {
-//     if (isLogin) {
-//       setupAxiosInterceptor(isLogin);
-//       setClient(instance);
-//     } else {
-//       setClient(null); // 로그인되지 않으면 client 초기화
-//     }
-//   }, [isLogin]);
-
-//   return client; // 준비된 클라이언트 반환
-// };
-
-// //요청 실패 시 Promise 추가
-// function onRequestFailed() {
-//   return new Promise((resolve, reject) => {
-//     console.log("Adding to failedQueue");
-//     failedQueue.push({ resolve, reject });
-//   });
-// }
-
-// //실패한 요청 시 Promise 생성
-// onRequestFailed()
-//   .then((token) => {
-//     console.log("Request resolved with token:", token);
-//   })
-//   .catch((err) => {
-//     console.error("Request failed:", err);
-//   });
-
-//토큰 갱신 중인 경우 대기열에 요청 추가
-// if (isRefreshing) {
-//   return new Promise((resolve, reject) => {
-//     failedQueue.push({ resolve, reject });
-//   })
-//     .then((token) => {
-//       originalRequest.headers["Authorization"] = `Bearer ${token}`;
-//       return instance(originalRequest);
-//     })
-//     .catch((err) => Promise.reject(err));
-// }

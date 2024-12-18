@@ -15,11 +15,7 @@ export const refreshTokenIfExpired = async (token) => {
 
     //만료일이 현재 시간보다 이전일 시(만료 되었을 시)
     if (decodedToken.exp < currentTime) {
-      // console.log("TokenUitls-token", token);
-      const newToken = await refreshAccessToken(token)
-        .then
-        // console.log("TokenUitls-newToken", newToken)
-        ();
+      const newToken = await refreshAccessToken(token).then();
 
       if (newToken) {
         localStorage.removeItem("accessToken");
@@ -58,11 +54,8 @@ const refreshAccessToken = async (token) => {
       { withCredentials: true } // 쿠키 포함, 리프레시 토큰을 함께 보냄
     );
 
-    // console.log("response", response);
-
     const accessToken = response.data.result;
     if (response.data.isSuccess) {
-      // console.log("response.data.result", accessToken);
       localStorage.setItem("accessToken", accessToken);
     }
     return accessToken;

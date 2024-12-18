@@ -26,7 +26,6 @@ const Email = ({
     setEmail(e.target.value);
     setIsValid(true);
     setError("");
-    setVerificationType("");
   };
 
   //인증 요청을 보내는 함수

@@ -32,6 +32,8 @@ import FindPassword from "./pages/find-password/FindPassword";
 import SendVerification from "./pages/find-password/SendVerification";
 import ResetPassword from "./pages/find-password/ResetPassword";
 import SearchAnnouncementByName from "./apply_announcement/SearchAnnouncementByName";
+import UserInfo from "./pages/account/UserInfo";
+import UserInfoEdit from "./pages/account/UserInfoEdit";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -46,13 +48,14 @@ root.render(
             </React.StrictMode>
           }
         />
-        {/* 회원가입 */}
-        <Route path="/signup" element={<Signup />} />
 
         {/* 청약 */}
         <Route path="/subscriptions" element={<ApplyAnnouncementList />} />
         <Route path="/subscriptions/info" element={<ApplyAnnouncement />} />
-        <Route path="/subscriptions/search/:keyword" element={<SearchAnnouncementByName />} />
+        <Route
+          path="/subscriptions/search/:keyword"
+          element={<SearchAnnouncementByName />}
+        />
 
         {/* 조건등록 */}
         <Route path="/conditions" element={<Conditions />} />
@@ -67,23 +70,28 @@ root.render(
         <Route exact path="/community" element={<CommunityPostList />} />
         <Route exact path="/community/posting" element={<CommunityPosting />} />
         <Route exact path="/community/:postId" element={<PostDetail />} />
-        <Route exact path="/community/posting/:postId" element={<UpdatePost />} />
-
-        {/* 이메일 찾기 */}
-        <Route exact path="/find-email" element={<FindEmail />} />
-        <Route exact path="/find-email/verify" element={<EmailRecoveryResult />} />
-
-        {/* 비밀번호 찾기 */}
-        <Route exact path="/find-password" element={<FindPassword />} />
-        <Route exact path="/find-password/verify" element={<SendVerification />} />
-        <Route exact path="/find-password/reset" element={<ResetPassword />} />
+        <Route
+          exact
+          path="/community/posting/:postId"
+          element={<UpdatePost />}
+        />
 
         {/* 소셜 로그인 리다이렉트 경로 */}
         <Route exact path="/kakao/callback" element={<KakaoRedirection />} />
         <Route exact path="/naver/callback" element={<NaverRedirection />} />
 
         {/* 로그인한 사용자는 접근할 수 없음 - LoginRoute 컴포넌트로 감싸면 보호 설정 됨 */}
-        {/* 로그인한 사용자가 login 페이지 접근 시 메인 페이지("/")로 리다이렉트 */}
+        {/* 로그인한 사용자가 페이지 접근 시 메인 페이지("/")로 리다이렉트 */}
+        {/* 회원가입 */}
+        <Route
+          path="/signup"
+          element={
+            <LoginRoute>
+              <Signup />
+            </LoginRoute>
+          }
+        />
+
         {/* 로그인 */}
         <Route
           path="/login"
@@ -94,8 +102,73 @@ root.render(
           }
         />
 
+        {/* 이메일 찾기 */}
+        <Route
+          path="/find-email"
+          element={
+            <LoginRoute>
+              <FindEmail />
+            </LoginRoute>
+          }
+        />
+        <Route
+          exact
+          path="/find-email/verify"
+          element={
+            <LoginRoute>
+              <EmailRecoveryResult />
+            </LoginRoute>
+          }
+        />
+
+        {/* 비밀번호 찾기 */}
+        <Route
+          exact
+          path="/find-password"
+          element={
+            <LoginRoute>
+              <FindPassword />
+            </LoginRoute>
+          }
+        />
+        <Route
+          exact
+          path="/find-password/verify"
+          element={
+            <LoginRoute>
+              <SendVerification />
+            </LoginRoute>
+          }
+        />
+        <Route
+          exact
+          path="/find-password/reset"
+          element={
+            <LoginRoute>
+              <ResetPassword />
+            </LoginRoute>
+          }
+        />
+
         {/* 로그인한 사용자만 접근할 수 있는 페이지 - PrivateRoute 컴포넌트로 감싸면 보호 설정 됨 */}
         {/* 로그인하지 않으면 로그인 페이지(/login)로 리다이렉트 */}
+        {/* 정보 조회 및 수정 */}
+        <Route
+          path="/mypage/account"
+          element={
+            <PrivateRoute>
+              <UserInfo />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/mypage/account/edit"
+          element={
+            <PrivateRoute>
+              <UserInfoEdit />
+            </PrivateRoute>
+          }
+        />
         {/* 테스트 페이지입니다. -hw */}
         <Route
           path="/test"
