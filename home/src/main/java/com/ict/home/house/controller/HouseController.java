@@ -1,5 +1,6 @@
 package com.ict.home.house.controller;
 
+import com.ict.home.house.dto.HouseDetailDTO;
 import com.ict.home.house.dto.HouseInfo;
 import com.ict.home.house.service.HouseService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,18 @@ import java.util.List;
 public class HouseController {
 
     private final HouseService hs;
+
+    @GetMapping("/{houseId}")
+    @Operation(summary = "공고 상세 정보 조회", description = "공고의 상세 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공고의 상세 정보를 조회합니다.",
+                    content = @Content(schema = @Schema(implementation = HouseDetailDTO.class)))
+    })
+    public ResponseEntity<?> getHouseDetail(@PathVariable Long houseId) {
+        HouseDetailDTO houseDetail = hs.getHouseDetail(houseId);
+
+        return ResponseEntity.ok(houseDetail);
+    }
 
     @GetMapping("")
     @Operation(summary = "공고 목록 조회", description = "공고를 조회합니다.")
@@ -42,17 +55,6 @@ public class HouseController {
                                           @RequestParam(defaultValue = "10") int size) {
         List<HouseInfo> houseInfoListByFilter = hs.getHouseInfoListByFilter(regions, houseTypes, area, prices, supplies, statuses, userId, orderBy);
 
-        System.out.println("regions = " + regions);
-        System.out.println("houseTypes = " + houseTypes);
-        System.out.println("area = " + area);
-        System.out.println("prices = " + prices);
-        System.out.println("supplies = " + supplies);
-        System.out.println("statuses = " + statuses);
-        System.out.println("userId = " + userId);
-        System.out.println("orderBy = " + orderBy);
-        System.out.println("page = " + page);
-        System.out.println("size = " + size);
-
         if (houseInfoListByFilter.isEmpty() || houseInfoListByFilter.size() < 10) {
             HashMap<String, Object> stringObjectHashMap = new HashMap<>();
             stringObjectHashMap.put("totalCount", houseInfoListByFilter.size());
@@ -66,6 +68,37 @@ public class HouseController {
 
         return ResponseEntity.ok(new HashMap<String, Object>() {{
             put("totalCount", houseInfoListByFilter.size());
+            put("houseInfoList", paginatedList);
+        }});
+    }
+
+    @GetMapping("/keyword")
+    @Operation(summary = "공고 목록 이름 검색", description = "공고를 이름으로 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "공고 조회 성공",
+                    content = @Content(schema = @Schema(implementation = HouseInfo.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
+    })
+    public ResponseEntity<?> getHouseListByKeyword(@RequestParam String keyword,
+                                                   @RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "10") int size){
+        List<HouseInfo> houseInfoList = hs.getHouseInfoListByName(keyword);
+
+        if (houseInfoList.isEmpty() || houseInfoList.size() < 10) {
+            HashMap<String, Object> stringObjectHashMap = new HashMap<>();
+            stringObjectHashMap.put("totalCount", houseInfoList.size());
+            stringObjectHashMap.put("houseInfoList", houseInfoList);
+            return ResponseEntity.ok(stringObjectHashMap);
+        }
+
+        int fromIndex = page * size;
+        int toIndex = Math.min(fromIndex + size, houseInfoList.size());
+        List<HouseInfo> paginatedList = houseInfoList.subList(fromIndex, toIndex);
+
+        return ResponseEntity.ok(new HashMap<String, Object>() {{
+            put("totalCount", houseInfoList.size());
             put("houseInfoList", paginatedList);
         }});
     }

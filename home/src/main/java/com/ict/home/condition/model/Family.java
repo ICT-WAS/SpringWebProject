@@ -32,6 +32,10 @@ public class Family {
     private User user;
 
     @NotNull
+    @Column(name = "seq_index", nullable = false)
+    private Integer seqIndex;
+
+    @NotNull
     @Schema(description = "관계")
     @Column(name = "relationship", nullable = false)
     private Integer relationship; // https://miro.com/app/board/uXjVLQRFe_4=/ 찾기 '가족관계'

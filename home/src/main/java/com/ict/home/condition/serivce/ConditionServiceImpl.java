@@ -12,6 +12,7 @@ import com.ict.home.condition.repository.FamilyRepository;
 import com.ict.home.user.User;
 import com.ict.home.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +54,49 @@ public class ConditionServiceImpl implements ConditionService{
         saveFamilyList(conditionDTO, user);
     }
 
+    @Override
+    public GetConditionDTO getConditions(Long userId) {
+
+        GetConditionDTO getConditionDTO = new GetConditionDTO();
+
+        Condition01 condition01 = c01r.findByUser_Id(userId);
+        Condition03 condition03 = c03r.findByUser_Id(userId);
+        List<Account> accountList = ar.findByUser_Id(userId);
+
+        Optional<Account> accountData = accountList.stream()
+                .filter(account -> account.getRelationship() == 1)
+                .findAny();
+        Optional<Account> spouseAccountData = accountList.stream()
+                .filter(account -> account.getRelationship() == 2)
+                .findAny();
+
+        List<Family> familyData = fr.findByUser_Id(userId);
+
+        List<Family> familyList = familyData.stream()
+                .filter(family -> family.getLivingTogether() == 1)
+                .collect(Collectors.toList());
+        List<Family> spouseFamilyList = familyData.stream()
+                .filter(family -> family.getLivingTogether() == 2)
+                .collect(Collectors.toList());
+
+        getConditionDTO.setCondition01(condition01);
+        getConditionDTO.setCondition03(condition03);
+        getConditionDTO.setAccountData(accountData.orElse(null));
+        getConditionDTO.setSpouseAccountData(spouseAccountData.orElse(null));
+        getConditionDTO.setFamilyList(familyList);
+        getConditionDTO.setSpouseFamilyList(spouseFamilyList);
+
+        // 배우자 동거 여부
+        String spouse = spouseFamilyList.isEmpty() ? "Y" : "N";
+        // 배우자 청약통장 소유 여부
+        String spouseHasAccount = spouseAccountData.isPresent() ? "Y" : "N";
+        SpouseFormData spouseFormData = new SpouseFormData(spouse, spouseHasAccount);
+
+        getConditionDTO.setSpouseFormData(spouseFormData);
+
+        return getConditionDTO;
+    }
+
     private void saveFamilyList(ConditionDTO conditionDTO, User user) {
         List<FamilyDTO> familyDTOList = conditionDTO.getFamilyDTOList();
         List<Family> familyList = new ArrayList<>();
@@ -58,6 +104,7 @@ public class ConditionServiceImpl implements ConditionService{
         for (FamilyDTO familyDTO : familyDTOList) {
             Family family = new Family();
             family.setUser(user);
+            family.setSeqIndex(familyDTO.getSeqIndex());
             family.setRelationship(familyDTO.getRelationship());
             family.setLivingTogether(familyDTO.getLivingTogether());
             family.setLivingTogetherDate(familyDTO.getLivingTogetherDate());

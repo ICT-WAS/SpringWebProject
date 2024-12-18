@@ -21,4 +21,8 @@ public interface HouseCustomRepository {
                                       Condition03 condition03,
                                       List<Family> families,
                                       String orderBy);
+
+    List<House> findByName(String keyword);
+
+    House findById(Long houseId);
 }

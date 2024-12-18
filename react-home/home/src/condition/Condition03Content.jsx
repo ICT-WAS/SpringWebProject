@@ -37,10 +37,11 @@ export default function Condition03Content() {
     });
 
     const [formDateData, setFormDateData] = useState({
+        noVehicle: false,
         lastWinned: null,
         ineligible: null,
     });
-    const [spouseAverageMonthlyIncome, setSpouseAverageMonthlyIncome] = useState({});
+    
     const [familyDataList, setFamilyDataList] = useState([]);
 
     const [hasSpouse, setHasSpouse] = useState(false);
@@ -52,48 +53,46 @@ export default function Condition03Content() {
         lastWinned: [{ value: 'Y', subQuestionId: 'winningDate' }],
         ineligible: [{ value: 'Y', subQuestionId: 'disqualifiedDate' }]
     };
-    const [visibility, setVisibility] = useState({ vehicleValue: true, spouseIncome: false, hasHouseInfo: false, soldHouseInfo: false, winningDate: false, disqualifiedDate: false });
-
 
     useEffect(() => {
         /* 이전 폼 데이터 읽어오기 */
+        //폼3데이터
+        const sessionFormData3 = sessionStorage.getItem('formData3');
+
+        if(!sessionFormData3) {
+            return;
+        }
+
+        try{
+            const storedFormData3 = JSON.parse(sessionFormData3);
+            setFormData3(storedFormData3);
+            setFormDateData({noVehicle: storedFormData3.carPrice <= 0, lastWinned: storedFormData3.lastWinned ? "Y" : "N", ineligible: storedFormData3.ineligible ? "Y" : "N"});
+        } catch (error) { }
+
         const sessionFormData1 = sessionStorage.getItem('formData1');
         const sessionAccountData = sessionStorage.getItem('accountDTOList');
         const sessionFamilyData = sessionStorage.getItem('familyDataList');
+        const sessionSpouseFamilyData = sessionStorage.getItem('spouseFamilyDataList');
         const sessionHasSpouse = sessionStorage.getItem('hasSpouse') === 'true';
         let storedFormData1 = {};
         let storedAccountData = {};
         let storedFamilyData = {};
+        let storedSpouseFamilyData = {};
 
         try {
             storedFormData1 = JSON.parse(sessionFormData1);
             storedAccountData = JSON.parse(sessionAccountData);
             storedFamilyData = JSON.parse(sessionFamilyData);
+            storedSpouseFamilyData = JSON.parse(sessionSpouseFamilyData);
 
             // 상태 업데이트
             setHasSpouse(sessionHasSpouse);
             setFormData1(storedFormData1);
             setAccountDTOList(storedAccountData);
-            setFamilyDataList(storedFamilyData);
+            setFamilyDataList([...storedFamilyData, ...storedSpouseFamilyData]);
         } catch (error) { }
+
     }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행
-
-    useEffect(() => {
-        const keysToRemove = Object.keys(visibility).filter(
-            (key) => visibility[key] === false
-        );
-
-        if (keysToRemove.length > 0) {
-            setFormData3((prev) => {
-                const updatedFormData = { ...prev };
-                keysToRemove.forEach((key) => {
-                    delete updatedFormData[key]; // false인 키를 삭제
-                });
-                return updatedFormData;
-            });
-        }
-    }, [visibility]);
-
 
     function handlePrevButtonClick(e) {
 
@@ -112,13 +111,21 @@ export default function Condition03Content() {
             return;
         }
 
+
         let finalFormData3 = formData3;
-        if (formData3.incomeActivity === 1) {
-            finalFormData3 = { ...finalFormData3, ...spouseAverageMonthlyIncome };
+        if(formDateData.noVehicle === true) {
+            finalFormData3 = {...formData3, carPrice: 0};
+        }
+
+        if(formDateData.ineligible === "N") {
+            finalFormData3 = {...formData3, ineligible: null};
+        }
+
+        if(formDateData.lastWinned === "N") {
+            finalFormData3 = {...formData3, lastWinned: null};
         }
 
         const submitData = { condition01DTO: formData1, ...accountDTOList, condition03DTO: finalFormData3, familyDTOList: familyDataList };
-
         console.log(submitData);
 
 
@@ -132,6 +139,14 @@ export default function Condition03Content() {
             .post(`http://localhost:8989/condition/${userId}`,submitData)
             .then((response) => {
                 setLoading(false);
+                
+                sessionStorage.removeItem('formData1');
+                sessionStorage.removeItem('accountDTOList');
+                sessionStorage.removeItem('spouseFormData');
+                sessionStorage.removeItem('familyDataList');
+                sessionStorage.removeItem('spouseFamilyDataList');
+
+                navigate("/conditions");
             })
             .catch((error) => {
                 console.error("데이터 저장 실패:", error);
@@ -140,24 +155,12 @@ export default function Condition03Content() {
     };
 
     function onChangedInputValue({ name, value }) {
-        const questionName = followUpQuestions[name];
-
-        setFormData3(prevFormData => {
-            const { [questionName]: _, ...filteredData } = prevFormData;
-
-            return {
-                ...filteredData,
-                [name]: value
-            };
-        });
+        setFormData3(prevFormData => ({...prevFormData,
+            [name]: value}));
     }
 
     function onChangedDateRadioValue({ name, value }) {
         setFormDateData(prevFormData => ({...prevFormData, [name]: value}));
-    }
-
-    function onChangedSpouseMonthlyIncomValue({ name, value }) {
-        setSpouseAverageMonthlyIncome({ [name]: value });
     }
 
     function handleFollowUpQuestion({ name, value, visible }) {
@@ -167,14 +170,6 @@ export default function Condition03Content() {
             return;
         }
 
-        matchedItem.forEach((item) => {
-            const questionName = item.subQuestionId;
-
-            setVisibility((prevVisibility) => ({
-                ...prevVisibility,
-                [questionName]: visible,
-            }));
-        });
     }
 
     return (
@@ -188,67 +183,67 @@ export default function Condition03Content() {
 
                     {/* 차량가액을 입력해주세요 */}
                     {/* 미보유 체크시 0원 */}
-                    <HasVehicle handleFollowUpQuestion={handleFollowUpQuestion} onChangedInputValue={onChangedInputValue} />
+                    <HasVehicle handleFollowUpQuestion={handleFollowUpQuestion} onChangedInputValue={onChangedDateRadioValue} value={formDateData?.noVehicle} />
 
                     {/* ![꼬리질문] 차량가액 */}
-                    <VehicleValueQuestion onChangedInputValue={onChangedInputValue} visibility={visibility['vehicleValue']} value={formData3.carPrice}/>
+                    {formDateData?.noVehicle === false && <VehicleValueQuestion onChangedInputValue={onChangedInputValue} value={formData3?.carPrice}/>}
 
                     {/* 소유하신 부동산(건축물 + 토지)총 가액을 선택해주세요 */}
                     <RadioButtonItem question={'소유하신 부동산(건축물 + 토지)총 가액을 선택해주세요'}
-                        buttons={totalPropertyValueButtons} onChange={onChangedInputValue} value={formData3.propertyPrice}/>
+                        buttons={totalPropertyValueButtons} onChange={onChangedInputValue} value={formData3?.propertyPrice}/>
 
                     {/* 세대구성원 전원의 총 자산을 입력해주세요 */}
-                    <InputNumberItem question={'세대구성원 전원의 총 자산을 입력해주세요'} value={formData3.totalAsset}
+                    <InputNumberItem question={'세대구성원 전원의 총 자산을 입력해주세요'} value={formData3?.totalAsset}
                         name={'totalAsset'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
 
                     {/* 본인의 총 자산을 입력해주세요 */}
-                    <InputNumberItem question={'본인의 총 자산을 입력해주세요'} value={formData3.myAsset}
+                    <InputNumberItem question={'본인의 총 자산을 입력해주세요'} value={formData3?.myAsset}
                         name={'myAsset'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
 
                     {/* 배우자의 총 자산을 입력해주세요 */}
                     {hasSpouse === true && (<InputNumberItem question={'배우자의 총 자산을 입력해주세요'}
-                        name={'spouseAsset'} onChange={onChangedInputValue} value={formData3.spouseAsset}
+                        name={'spouseAsset'} onChange={onChangedInputValue} value={formData3?.spouseAsset}
                         placeholder={placeholderText.largeMoneyUnitType} />)}
 
                     {/* 세대구성원 중 만 19세 이상 세대원 전원의 전년도 월 평균소득을 모두 합산한 금액 */}
                     <InputNumberItem question={'세대구성원 중 만 19세 이상 세대원 전원의 전년도 월 평균소득을 모두 합산한 금액'}
                         name={'familyAverageMonthlyIncome'} onChange={onChangedInputValue} 
-                        placeholder={placeholderText.moneyUnitType} value={formData3.familyAverageMonthlyIncome} />
+                        placeholder={placeholderText.moneyUnitType} value={formData3?.familyAverageMonthlyIncome} />
 
                     {/* 본인의 전년도 월 평균소득을 입력해주세요 */}
-                    <InputNumberItem question={'본인의 전년도 월 평균소득을 입력해주세요'} value={formData3.previousYearAverageMonthlyIncome} 
+                    <InputNumberItem question={'본인의 전년도 월 평균소득을 입력해주세요'} value={formData3?.previousYearAverageMonthlyIncome} 
                         name={'previousYearAverageMonthlyIncome'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
 
                     {/* 소득활동 여부를 선택해주세요 */}
                     {hasSpouse === true && <RadioButtonItem question={'소득활동 여부를 선택해주세요'} 
                         buttons={incomeActivityTypeButtons} direction={'horizontal'} onChange={onChangedInputValue}
-                        handleFollowUpQuestion={handleFollowUpQuestion} value={formData3.incomeActivity} />}
+                        handleFollowUpQuestion={handleFollowUpQuestion} value={formData3?.incomeActivity} />}
 
                     {/* [꼬리질문] 배우자의 월평균소득을 입력해주세요 */}
-                    <SpouseIncomeQuestion onChangedInputValue={onChangedSpouseMonthlyIncomValue} 
-                        value={spouseAverageMonthlyIncome.spouseIncome} visibility={visibility['spouseIncome']} />
+                    {formData3?.incomeActivity === 1 && <SpouseIncomeQuestion onChangedInputValue={onChangedInputValue} 
+                        value={formData3?.spouseIncome} />}
 
                     {/* 소득세 납부 기간 */}
-                    <InputNumberItem question={'소득세 납부 기간'} value={formData3.incomeTaxPaymentPeriod}
+                    <InputNumberItem question={'소득세 납부 기간'} value={formData3?.incomeTaxPaymentPeriod}
                         name={'incomeTaxPaymentPeriod'} onChange={onChangedInputValue} placeholder={placeholderText.yearCountType} />
 
                     {/* 신청자 및 세대구성원이 과거 주택 청약에 당첨된 적 있나요? */}
                     <RadioButtonItem question={'신청자 및 세대구성원이 과거 주택 청약에 당첨된 적 있나요?'}
                         buttons={winningHistoryButtons} direction={'horizontal'} onChange={onChangedDateRadioValue}
-                        handleFollowUpQuestion={handleFollowUpQuestion} value={formDateData.lastWinned} />
+                        handleFollowUpQuestion={handleFollowUpQuestion} value={formDateData?.lastWinned} />
 
                     {/* [꼬리질문] 가장 최근에 당첨된 날짜를 입력해주세요 */}
-                    <WinningDateQuestion onChangedInputValue={onChangedInputValue} 
-                        value={formData3.lastWinned} visibility={visibility['winningDate']} />
+                    {formDateData?.lastWinned === "Y" && <WinningDateQuestion onChangedInputValue={onChangedInputValue} 
+                        value={formData3?.lastWinned} />}
 
                     {/* 신청자 본인이 주택청약에 당첨되고 부적격자 판정을 받은 적 있나요? */}
                     <RadioButtonItem number={15} question={'신청자 본인이 주택청약에 당첨되고 부적격자 판정을 받은 적 있나요?'}
                         buttons={wasDisqualifiedButtons} direction={'horizontal'} onChange={onChangedDateRadioValue}
-                        handleFollowUpQuestion={handleFollowUpQuestion} value={formDateData.ineligible} />
+                        handleFollowUpQuestion={handleFollowUpQuestion} value={formDateData?.ineligible} />
 
                     {/* [꼬리질문] 부적격자 판정된 날짜가 언제인가요? */}
-                    <DisqualifiedDate onChangedInputValue={onChangedInputValue} 
-                        value={formData3.ineligible} visibility={visibility['disqualifiedDate']} />
+                    {formDateData?.ineligible === "Y" && <DisqualifiedDate onChangedInputValue={onChangedInputValue} 
+                        value={formData3?.ineligible} />}
 
                     {/* 폼 제출 */}
                     <Stack direction="horizontal" gap={2}>
@@ -263,17 +258,10 @@ export default function Condition03Content() {
     );
 }
 
-function HasVehicle({ handleFollowUpQuestion, onChangedInputValue }) {
+function HasVehicle({ onChangedInputValue, value }) {
 
     function handleCheckChange(e) {
-
-        let checked = e.target.checked;
-
-        if (checked) {
-            onChangedInputValue({ name: 'carPrice', value: 0 });
-        }
-
-        handleFollowUpQuestion({ name: 'hasVehicle', visible: (!checked) });
+        onChangedInputValue({ name: 'noVehicle', value: e.target.checked });
     }
 
     return (
@@ -284,9 +272,10 @@ function HasVehicle({ handleFollowUpQuestion, onChangedInputValue }) {
                     type={'checkbox'}
                     name={'hasVehicle'}
                     label={'차량 미보유'}
-                    id={'hasVehicle'}
+                    id={'hasVehicle-checked'}
                     style={{ flex: `1` }}
                     onChange={handleCheckChange}
+                    checked={value}
                 />
             </div>
         </>
@@ -294,11 +283,7 @@ function HasVehicle({ handleFollowUpQuestion, onChangedInputValue }) {
 }
 
 {/* 차량가액 - 차량가액을 입력해주세요 */ }
-function VehicleValueQuestion({ onChangedInputValue, visibility, value }) {
-    if (!visibility) {
-        return;
-    }
-
+function VehicleValueQuestion({ onChangedInputValue, value }) {
     return (
         <InputNumberSubItem question={'차량가액을 입력해주세요'} depth={3} value={value}
             name={'carPrice'} onChange={onChangedInputValue} placeholder={placeholderText.largeMoneyUnitType} />
@@ -306,11 +291,7 @@ function VehicleValueQuestion({ onChangedInputValue, visibility, value }) {
 }
 
 {/* 배우자 소득활동 - 배우자의 월평균소득을 입력해주세요 */ }
-function SpouseIncomeQuestion({ onChangedInputValue, visibility, value }) {
-    if (!visibility) {
-        return;
-    }
-
+function SpouseIncomeQuestion({ onChangedInputValue, value }) {
     return (
         <InputNumberSubItem question={'배우자의 월평균소득을 입력해주세요'} depth={3} value={value}
             name={'spouseAverageMonthlyIncome'} onChange={onChangedInputValue} placeholder={placeholderText.moneyUnitType} />
@@ -318,10 +299,7 @@ function SpouseIncomeQuestion({ onChangedInputValue, visibility, value }) {
 }
 
 {/* 당첨이력 - 가장 최근에 당첨된 날짜를 입력해주세요 */ }
-function WinningDateQuestion({ onChangedInputValue, visibility, value }) {
-    if (!visibility) {
-        return;
-    }
+function WinningDateQuestion({ onChangedInputValue, value }) {
 
     return (
         <InputNumberSubItem question={'가장 최근에 당첨된 날짜를 입력해주세요'} depth={3} value={value}
@@ -330,11 +308,7 @@ function WinningDateQuestion({ onChangedInputValue, visibility, value }) {
 }
 
 {/* 당첨이력 - 부적격자 판정된 날짜가 언제인가요? */ }
-function DisqualifiedDate({ onChangedInputValue, visibility, value }) {
-    if (!visibility) {
-        return;
-    }
-
+function DisqualifiedDate({ onChangedInputValue, value }) {
     return (
         <InputNumberSubItem question={'부적격자 판정된 날짜가 언제인가요?'} depth={3} value={value}
             name={'ineligible'} onChange={onChangedInputValue} type={'date'} placeholder={placeholderText.dateType} />

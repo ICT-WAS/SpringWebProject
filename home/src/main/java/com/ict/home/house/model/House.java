@@ -68,7 +68,7 @@ public class House {
     @Column(name = "CNTRCT_CNCLS_ENDDE")
     private LocalDate cntrctCnclsEndde;
 
-    @Schema(description = "계약종료일")
+    @Schema(description = "홈페이지 주소")
     @Column(name = "HMPG_ADRES")
     private String hmpgAdres;
 

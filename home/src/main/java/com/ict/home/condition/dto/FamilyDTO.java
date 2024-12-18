@@ -19,6 +19,9 @@ public class FamilyDTO {
     private Long userId;
 
     @NotNull
+    private Integer seqIndex;
+
+    @NotNull
     @Schema(description = "관계")
     private Integer relationship; // https://miro.com/app/board/uXjVLQRFe_4=/ 찾기 '가족관계'
 
@@ -33,7 +36,7 @@ public class FamilyDTO {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
 
-    @Schema(description = "혼인여부 (Y: 혼인x, N: 혼인o)")
+    @Schema(description = "혼인여부 (false: 혼인x, true: 혼인o)")
     private Boolean isMarried;
 
     @NotNull
