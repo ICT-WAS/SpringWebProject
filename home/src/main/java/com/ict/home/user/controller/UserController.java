@@ -138,4 +138,16 @@ public class UserController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 유저 정보 업데이트
+     */
+    @PostMapping("/update")
+    public BaseResponse<?> UpdateUserInfo(@RequestBody @Valid PostUpdateUserInfoReq postUpdateUserInfoReq) {
+        try {
+            return new BaseResponse<>(userService.updateUserInfo(postUpdateUserInfoReq));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 }
