@@ -97,10 +97,6 @@ export default function PostDetailContent() {
         }
     };
 
-    const handleCountEdit = () => {
-
-    }
-
     // 댓글 수정 취소 함수
     const handleCancelEdit = () => {
         setEditingCommentId(null);  // 수정 취소
