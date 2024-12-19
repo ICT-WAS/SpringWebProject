@@ -223,4 +223,10 @@ public class CommunityServiceImpl implements CommunityService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("댓글 수정에 실패하였습니다.");
         }
     }
+
+    @Override
+    public List<Comment> getCommentList() {
+
+        return cr.findAll();
+    }
 }
