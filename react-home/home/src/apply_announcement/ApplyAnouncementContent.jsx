@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { Container, Row, Col, Stack, Nav, Table } from 'react-bootstrap';
-import NotificationButton from './InterestButton';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import InterestButton from './InterestButton';
 
 export default function ApplyAnnouncementContent() {
 
@@ -74,7 +74,7 @@ export default function ApplyAnnouncementContent() {
                 <DetailHeader houseData={houseData} houseDetailData={houseDetailData} />
               </Col>
               <Col md="auto">
-                <NotificationButton />
+                <InterestButton houseId={houseId} />
               </Col>
 
               {/* 기본 상세 */}
