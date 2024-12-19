@@ -4,6 +4,9 @@ import com.ict.home.community.model.Comment;
 import com.ict.home.community.model.Post;
 import com.ict.home.community.repository.CommentRepository;
 import com.ict.home.community.repository.PostRepository;
+import com.ict.home.notification.enumeration.NotificationType;
+import com.ict.home.notification.model.Notification;
+import com.ict.home.notification.repository.NotificationRepository;
 import com.ict.home.user.User;
 import com.ict.home.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
@@ -14,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -30,13 +35,11 @@ public class CommunityServiceImpl implements CommunityService {
 
     private final UserRepository ur;
 
+    private final NotificationRepository nr;
+
     @Override
     public Long create(Long userId, String title, String subject) {
-        System.out.println("userId = " + userId);
-        System.out.println("title = " + title);
-        System.out.println("subject = " + subject);
         User user = ur.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
-
 
         Post post = new Post();
         post.setUser(user);
@@ -44,8 +47,6 @@ public class CommunityServiceImpl implements CommunityService {
         post.setTitle(title);
         post.setSubject(subject);
         Post savedPost = pr.save(post);
-        System.out.println("savedPost = " + savedPost);
-        System.out.println("savedPost = " + savedPost.getPostId());
 
         return savedPost.getPostId();
     }
@@ -69,7 +70,6 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     public Comment createComment(Long postId, String comments, Integer depth, Long parentCommentId, Long id) {
         User user = ur.findById(id).get();
-        System.out.println("user = " + user.toString());
         Post post = pr.findById(postId).get();
 
         Comment comment = new Comment();
@@ -78,9 +78,66 @@ public class CommunityServiceImpl implements CommunityService {
         comment.setComments(comments);
         comment.setDepth(depth);
 
+        // 댓글 작성 시 알림
+        if (!Objects.equals(post.getUser().getId(), id)) {
+            // 게시글 작성자와 댓글 작성자가 같지 않을 때 게시글 작성자에게 댓글 알림 보내기
+            Notification notification = new Notification();
+            notification.setCreatedAt(LocalDateTime.now());
+            notification.setPost(post);
+            notification.setUser(post.getUser());
+            notification.setType(NotificationType.ABOUT_POST);
+            String message = "내 \"" + post.getTitle() + "\" 게시글에 \'" + user.getUsername() + "\' 님이 댓글을 남겼습니다.";
+            notification.setMessage(message);
+
+            nr.save(notification);
+        }
+
+
+
         if (depth == 2) {
             Comment parentComment = cr.findById(parentCommentId).get();
             comment.setParentComment(parentComment);
+
+            // 답글 작성 시 알림
+            List<Comment> byParentComment = cr.findByParentComment(parentComment);
+
+            List<Long> sendNotificationList = new ArrayList<>();
+
+            for (Comment reply : byParentComment) {
+                // 답글 작성 시, 동일 댓글 다른 작성자들에게 알림 보내기
+                if (Objects.equals(post.getUser().getId(), reply.getUser().getId())) {
+                    continue;
+                }
+                if(!Objects.equals(reply.getUser().getId(), id) && !sendNotificationList.contains(reply.getUser().getId())) {
+                    Notification notification = new Notification();
+                    notification.setType(NotificationType.ABOUT_COMMENT);
+                    notification.setPost(post);
+                    notification.setUser(reply.getUser());
+                    notification.setCreatedAt(LocalDateTime.now());
+                    String message = "\"" + post.getTitle() + "\" 게시글의 쓴 댓글에 \'" + user.getUsername() + "\' 님이 답글을 남겼습니다.";
+                    notification.setMessage(message);
+                    sendNotificationList.add(reply.getUser().getId());
+
+                    nr.save(notification);
+                }
+            }
+
+            if (!Objects.equals(post.getUser().getId(), parentComment.getUser().getId())) {
+                // 답글 작성시 본 댓글 작성자에게 알림 보내기
+                if (!Objects.equals(parentComment.getUser().getId(), id) && !sendNotificationList.contains(parentComment.getUser().getId())) {
+                    Notification notification = new Notification();
+                    notification.setType(NotificationType.ABOUT_COMMENT);
+                    notification.setPost(post);
+                    notification.setUser(parentComment.getUser());
+                    notification.setCreatedAt(LocalDateTime.now());
+                    String message = "\"" + post.getTitle() + "\" 게시글의 쓴 댓글에 \'" + user.getUsername() + "\' 님이 답글을 남겼습니다.";
+                    notification.setMessage(message);
+
+                    nr.save(notification);
+                }
+            }
+
+
         } else {
             comment.setParentComment(null);
         }

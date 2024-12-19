@@ -1,7 +1,6 @@
 package com.ict.home.notification.model;
 
 import com.ict.home.community.model.Post;
-import com.ict.home.condition.enumeration.AccountType;
 import com.ict.home.house.model.House;
 import com.ict.home.notification.enumeration.NotificationType;
 import com.ict.home.user.User;
@@ -61,7 +60,7 @@ public class Notification {
     private LocalDateTime createdAt;
 
     @Schema(description = "주택청약 공고 고유 pk")
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "house_id", referencedColumnName = "house_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private House house;
