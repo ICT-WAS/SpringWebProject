@@ -132,7 +132,6 @@ const SendVerification = () => {
           setIsTimerActive(false); //타이머 종료
         }
 
-        localStorage.setItem("userId", response.data.result.userId);
         navigate("/find-password/reset");
       } catch (error) {
         setErrorTitle("인증 요청 실패");

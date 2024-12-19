@@ -150,4 +150,16 @@ public class UserController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 회원 탈퇴
+     */
+    @PostMapping("delete")
+    public BaseResponse<?> setUserStateInactive(@RequestParam(name = "userId") Long userId, HttpServletResponse response) {
+        try {
+            return new BaseResponse<>(userService.setUserStateInactive(userId, response));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 }

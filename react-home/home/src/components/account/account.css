@@ -115,6 +115,14 @@
   margin-bottom: 0px;
   border-radius: 4px;
   padding: 4px 10px 4px 8px;
+  border: 1px solid #000000;
+  box-sizing: border-box;
+  box-sizing: border-box;
+  transition: border 0.3s;
+}
+
+.info_data_input:focus {
+  border: 1.5px solid #000000;
 }
 
 .info_data_text3 {
