@@ -1,342 +1,110 @@
 import axios from 'axios';
 import { Container, Row, Col, Stack, Nav, Table } from 'react-bootstrap';
-import NotificationButton from './InterestButton';
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import InterestButton from './InterestButton';
 
 export default function ApplyAnnouncementContent() {
 
-  // const [houseData, setHouseData] = useState({});
-  // cosnt [loading, setLoading] = useState(false);
+  const { houseId } = useParams();
 
-  // const getDetailData = () => {
-  //   axios
-  //     .get(`http://localhost:8989/house/${houseId}`)
-  //     .then((response) => {
-  //       setHouseData(response.data.houseDetail);
-  //       setLoading(true);
-  //     })
-  //     .catch((error) => {
-  //       console.error("데이터 요청 실패:", error);
-  //       setLoading(false);
-  //     });
-  // };
+  const [loading, setLoading] = useState(false);
 
+  const [houseData, setHouseData] = useState({});
+
+  // Detail01 or Detail04
+  const [houseDetailData, setHouseDetailData] = useState({});
+
+  const [houseDetailListData, setHouseDetailListData] = useState([]);
+
+  const [selectedHouseDetailData, setSelectedHouseDetailData] = useState({});
+
+  const [houseTypes, setHouseType] = useState([]);
+
+  const [key, setKey] = useState(null);
+
+  const getDetailData = () => {
+    axios
+      .get(`http://localhost:8989/house/${houseId}`)
+      .then((response) => {
+        setLoading(false);
+        const detail01 = response.data.detail01;
+        const detail04 = response.data.detail04;
+        const detailData = detail01 === null ? detail04 : detail01;
+
+        const nextHouseDetailData = response.data.houseDetailInfoDTOList;
+
+        setHouseData(response.data.house); // House
+        setHouseDetailData(detailData); // Detail01 or Detail04
+        setHouseDetailListData(nextHouseDetailData); // List<HouseDetailInfoDTO>
+
+        const nextKey = nextHouseDetailData[0].houseType;
+        setKey(nextKey);
+        const nextSelectedHouseData = nextHouseDetailData.find(house => house.houseType === nextKey);
+        setSelectedHouseDetailData(nextSelectedHouseData);
+
+        setHouseType(nextHouseDetailData.map(house => house.houseType));
+      })
+      .catch((error) => {
+        console.error("데이터 요청 실패:", error);
+        setLoading(false);
+      });
+  };
 
   useState(() => {
-    // getDetailData();
+    getDetailData();
   }, [])
 
-  /* 임시 데이터 */
-
-  return (
-    <>
-      <Container>
-        <Row>
-          <InformationalPost />
-        </Row>
-      </Container>
-    </>
-  );
-}
-
-function InformationalPost() {
-
-  const [houseData, setHouseData1] = useState({
-    "houseId": 1,
-    "houseManageNo": 2024000714,
-    "pblancNo": 2024000714,
-    "houseNm": "아산탕정자이 퍼스트시티",
-    "houseSecd": "01",
-    "houseSecdNm": "APT",
-    "hssplyZip": "31458",
-    "hssplyAdres": "충청남도 아산시 탕정면 동산리 142-12번지 일원",
-    "totSuplyHsldco": 797,
-    "rcritPblancDe": "2024-12-12",
-    "przwnerPresnatnDe": "2024-12-30",
-    "cntrctCnclsBgnde": "2025-01-10",
-    "cntrctCnclsEndde": "2025-01-12",
-    "hmpgAdres": "https://xi.co.kr/xi1st",
-    "bsnsMbyNm": "교보자산신탁(주)",
-    "mdhsTelno": "18332543",
-    "mvnPrearngeYm": "202712",
-    "pblancUrl": "https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancDetail.do?houseManageNo=2024000714&pblancNo=2024000714"
-
-  });
-
-  const [houseDetailData, setHouseDetailData] = useState({
-    "detail01Id": 1,
-    "house": {
-      "houseId": 1,
-      "houseManageNo": 2024000714,
-      "pblancNo": 2024000714,
-      "houseNm": "아산탕정자이 퍼스트시티",
-      "houseSecd": "01",
-      "houseSecdNm": "APT",
-      "hssplyZip": "31458",
-      "hssplyAdres": "충청남도 아산시 탕정면 동산리 142-12번지 일원",
-      "totSuplyHsldco": 797,
-      "rcritPblancDe": "2024-12-12",
-      "przwnerPresnatnDe": "2024-12-30",
-      "cntrctCnclsBgnde": "2025-01-10",
-      "cntrctCnclsEndde": "2025-01-12",
-      "hmpgAdres": "https://xi.co.kr/xi1st",
-      "bsnsMbyNm": "교보자산신탁(주)",
-      "mdhsTelno": "18332543",
-      "mvnPrearngeYm": "202712",
-      "pblancUrl": "https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancDetail.do?houseManageNo=2024000714&pblancNo=2024000714"
-    },
-    "houseDtlSecd": "01",
-    "houseDtlSecdNm": "민영",
-    "rentSecd": 0,
-    "rentSecdNm": "분양주택",
-    "subscrptAreaCode": "312",
-    "subscrptAreaCodeNm": "충남",
-    "rceptBgnde": "2024-12-19",
-    "rceptEndde": "2024-12-23",
-    "spsplyRceptBgnde": "2024-12-19",
-    "spsplyRceptEndde": "2024-12-19",
-    "gnrlRnk1CrspareaRcptde": "2024-12-20",
-    "gnrlRnk1CrspareaEndde": "2024-12-20",
-    "gnrlRnk1EtcGgRcptde": null,
-    "gnrlRnk1EtcGgEndde": null,
-    "gnrlRnk1EtcAreaRcptde": "2024-12-20",
-    "gnrlRnk1EtcAreaEndde": "2024-12-20",
-    "gnrlRnk2CrspareaRcptde": "2024-12-23",
-    "gnrlRnk2CrspareaEndde": "2024-12-23",
-    "gnrlRnk2EtcGgRcptde": null,
-    "gnrlRnk2EtcGgEndde": null,
-    "gnrlRnk2EtcAreaRcptde": "2024-12-23",
-    "gnrlRnk2EtcAreaEndde": "2024-12-23",
-    "cnstrctEntrpsNm": "지에스건설(주)",
-    "specltRdnEarthAt": false,
-    "mdatTrgetAreaSecd": false,
-    "parcprcUlsAt": false,
-    "imprnmBsnsAt": false,
-    "publicHouseEarthAt": false,
-    "lrsclBldlndAt": false,
-    "nplnPrvoprPublicHouseAt": false,
-    "publicHouseSpclwApplcAt": false
-  });
-
-  const [houseDetailListData, setHouseDetailListData] = useState([
-    {
-      "houseType": "59",
-      "houseTypeDTOList": [
-        {
-          "typeName": "059.9941A",
-          "normalSupply": 52,
-          "specialSupply": 50,
-          "mnychHshldco": 10,
-          "nwwdsHshldco": 18,
-          "lfeFrstHshldco": 9,
-          "oldParntsSuportHshldco": 3,
-          "insttRecomendHshldco": 10,
-          "etcHshldco": 0,
-          "transrInsttEnfsnHshldco": 0,
-          "ygmnHshldco": 0,
-          "nwbbHshldco": 0,
-          "price": 39750
-        },
-        {
-          "typeName": "059.9843B",
-          "normalSupply": 18,
-          "specialSupply": 16,
-          "mnychHshldco": 3,
-          "nwwdsHshldco": 6,
-          "lfeFrstHshldco": 3,
-          "oldParntsSuportHshldco": 1,
-          "insttRecomendHshldco": 3,
-          "etcHshldco": 0,
-          "transrInsttEnfsnHshldco": 0,
-          "ygmnHshldco": 0,
-          "nwbbHshldco": 0,
-          "price": 39520
-        }
-      ],
-      "normalSupply": 70,
-      "maxPrice": 39750,
-      "minPrice": 39520,
-      "specialSupply": 66,
-      "mnychHshldco": 13,
-      "nwwdsHshldco": 24,
-      "lfeFrstHshldco": 12,
-      "oldParntsSuportHshldco": 4,
-      "insttRecomendHshldco": 13,
-      "etcHshldco": 0,
-      "transrInsttEnfsnHshldco": 0,
-      "ygmnHshldco": 0,
-      "nwbbHshldco": 0
-    },
-    {
-      "houseType": "84",
-      "houseTypeDTOList": [
-        {
-          "typeName": "084.9905A",
-          "normalSupply": 237,
-          "specialSupply": 229,
-          "mnychHshldco": 46,
-          "nwwdsHshldco": 83,
-          "lfeFrstHshldco": 41,
-          "oldParntsSuportHshldco": 13,
-          "insttRecomendHshldco": 46,
-          "etcHshldco": 0,
-          "transrInsttEnfsnHshldco": 0,
-          "ygmnHshldco": 0,
-          "nwbbHshldco": 0,
-          "price": 52410
-        },
-        {
-          "typeName": "084.9923B",
-          "normalSupply": 50,
-          "specialSupply": 45,
-          "mnychHshldco": 9,
-          "nwwdsHshldco": 17,
-          "lfeFrstHshldco": 8,
-          "oldParntsSuportHshldco": 2,
-          "insttRecomendHshldco": 9,
-          "etcHshldco": 0,
-          "transrInsttEnfsnHshldco": 0,
-          "ygmnHshldco": 0,
-          "nwbbHshldco": 0,
-          "price": 52390
-        },
-        {
-          "typeName": "084.9921C",
-          "normalSupply": 36,
-          "specialSupply": 29,
-          "mnychHshldco": 6,
-          "nwwdsHshldco": 11,
-          "lfeFrstHshldco": 5,
-          "oldParntsSuportHshldco": 1,
-          "insttRecomendHshldco": 6,
-          "etcHshldco": 0,
-          "transrInsttEnfsnHshldco": 0,
-          "ygmnHshldco": 0,
-          "nwbbHshldco": 0,
-          "price": 52560
-        },
-        {
-          "typeName": "084.9921D",
-          "normalSupply": 16,
-          "specialSupply": 14,
-          "mnychHshldco": 3,
-          "nwwdsHshldco": 5,
-          "lfeFrstHshldco": 2,
-          "oldParntsSuportHshldco": 1,
-          "insttRecomendHshldco": 3,
-          "etcHshldco": 0,
-          "transrInsttEnfsnHshldco": 0,
-          "ygmnHshldco": 0,
-          "nwbbHshldco": 0,
-          "price": 52560
-        }
-      ],
-      "normalSupply": 339,
-      "maxPrice": 52560,
-      "minPrice": 52390,
-      "specialSupply": 317,
-      "mnychHshldco": 64,
-      "nwwdsHshldco": 116,
-      "lfeFrstHshldco": 56,
-      "oldParntsSuportHshldco": 17,
-      "insttRecomendHshldco": 64,
-      "etcHshldco": 0,
-      "transrInsttEnfsnHshldco": 0,
-      "ygmnHshldco": 0,
-      "nwbbHshldco": 0
-    },
-    {
-      "houseType": "125",
-      "houseTypeDTOList": [
-        {
-          "typeName": "125.6353A",
-          "normalSupply": 3,
-          "specialSupply": 0,
-          "mnychHshldco": 0,
-          "nwwdsHshldco": 0,
-          "lfeFrstHshldco": 0,
-          "oldParntsSuportHshldco": 0,
-          "insttRecomendHshldco": 0,
-          "etcHshldco": 0,
-          "transrInsttEnfsnHshldco": 0,
-          "ygmnHshldco": 0,
-          "nwbbHshldco": 0,
-          "price": 100040
-        },
-        {
-          "typeName": "125.9654B",
-          "normalSupply": 2,
-          "specialSupply": 0,
-          "mnychHshldco": 0,
-          "nwwdsHshldco": 0,
-          "lfeFrstHshldco": 0,
-          "oldParntsSuportHshldco": 0,
-          "insttRecomendHshldco": 0,
-          "etcHshldco": 0,
-          "transrInsttEnfsnHshldco": 0,
-          "ygmnHshldco": 0,
-          "nwbbHshldco": 0,
-          "price": 100270
-        }
-      ],
-      "normalSupply": 5,
-      "maxPrice": 100270,
-      "minPrice": 100040,
-      "specialSupply": 0,
-      "mnychHshldco": 0,
-      "nwwdsHshldco": 0,
-      "lfeFrstHshldco": 0,
-      "oldParntsSuportHshldco": 0,
-      "insttRecomendHshldco": 0,
-      "etcHshldco": 0,
-      "transrInsttEnfsnHshldco": 0,
-      "ygmnHshldco": 0,
-      "nwbbHshldco": 0
-    }
-  ]);
-
-  const [houseTypes, setHouseType] = useState(houseDetailListData.map(house => house.houseType));
-
   function handleTypeClick(houseType) {
-
+    setKey(houseType);
+    const nextSelectedHouseData = houseDetailListData.find(house => house.houseType === houseType);
+    setSelectedHouseDetailData(nextSelectedHouseData);
   }
 
+
   return (
     <>
-
       <Container>
         <Row>
-          {/* 기본 헤더 */}
-          <Col>
-            <DetailHeader houseData={houseData} houseDetailData={houseDetailData} />
-          </Col>
-          <Col md="auto">
-            <NotificationButton />
-          </Col>
-        </Row>
-        {/* 타입 내비게이션 */}
-        <Row className="mb-5">
-          <TypeNavBar houseTypes={houseTypes} onClick={handleTypeClick} />
-        </Row>
+          <Container>
 
-        {/* 기본 상세 */}
-        <Row className="mb-5">
-          <DefaultDetailData houseData={houseData} houseDetailData={houseDetailData} />
-        </Row>
+            <Row>
+              {/* 기본 헤더 */}
+              <Col>
+                <DetailHeader houseData={houseData} houseDetailData={houseDetailData} />
+              </Col>
+              <Col md="auto">
+                <InterestButton houseId={houseId} />
+              </Col>
 
-        {/* 타입 상세 */}
-        <Row>
-          <TypeDetailData houseDetailListData={houseDetailListData} />
-        </Row>
+              {/* 기본 상세 */}
+              <Row className="mb-5">
+                <DefaultDetailData houseData={houseData} houseDetailData={houseDetailData} />
+              </Row>
+            </Row>
+            
+            {/* 타입 내비게이션 */}
+            <Row className="mb-5">
+              <TypeNavBar houseTypes={houseTypes} setKey={handleTypeClick} eventKey={key} />
+            </Row>
 
-        {/* 특이사항, 문의 */}
-        <Row>
-          <AdditionalInfo houseData={houseData} />
+            {/* 타입 상세 */}
+            <Row>
+              <TypeDetailData selectedHouseDetailData={selectedHouseDetailData} />
+            </Row>
+
+            {/* 특이사항, 문의 */}
+            <Row>
+              <AdditionalInfo houseData={houseData} houseDetailData={houseDetailData} />
+            </Row>
+
+          </Container>
         </Row>
       </Container>
     </>
   );
 }
+
 
 function DetailHeader({ houseData, houseDetailData }) {
   return (
@@ -356,15 +124,37 @@ function DetailHeader({ houseData, houseDetailData }) {
 /* 공고 상세(기본) */
 function DefaultDetailData({ houseData, houseDetailData }) {
 
-  const scheduleData = [
+  const detail01ScheduleData = [
     { name: 'rcritPblancDe', display: '모집공고일' },
     { name: 'rceptBgnde', display: '청약접수시작일' },
-    { name: 'rceptEndde', display: '청약접수시작일' },
+    { name: 'rceptEndde', display: '청약접수종료일' },
     { name: 'przwnerPresnatnDe', display: '당첨자발표일' },
     { name: 'cntrctCnclsBgnde', display: '계약시작일' },
     { name: 'cntrctCnclsEndde', display: '계약종료일' },
     { name: 'mvnPrearngeYm', display: '입주예정월' },
-  ]
+  ];
+
+  const detail04ScheduleData = [
+    { name: 'rcritPblancDe', display: '모집공고일' },
+    { name: 'subscrptRceptBgnde', display: '청약접수시작일' },
+    { name: 'subscrptRceptEndde', display: '청약접수종료일' },
+    { name: 'przwnerPresnatnDe', display: '당첨자발표일' },
+    { name: 'cntrctCnclsBgnde', display: '계약시작일' },
+    { name: 'cntrctCnclsEndde', display: '계약종료일' },
+    { name: 'mvnPrearngeYm', display: '입주예정월' },
+  ];
+
+  const scheduleData = houseData.houseSecd === "01" ? detail01ScheduleData : detail04ScheduleData;
+
+  const today = new Date();
+
+  const scheduleList = [
+    {id: 1, name: scheduleData[0].display, date: houseData[scheduleData[0].name], completed: new Date(houseData[scheduleData[0].name]) <= today},
+    {id: 2, name: scheduleData[1].display, date: houseDetailData[scheduleData[1].name], completed: new Date(houseDetailData[scheduleData[1].name]) <= today},
+    {id: 3, name: scheduleData[2].display, date: houseDetailData[scheduleData[2].name], completed: new Date(houseDetailData[scheduleData[2].name]) <= today},
+    {id: 4, name: scheduleData[3].display, date: houseData[scheduleData[3].name], completed: new Date(houseData[scheduleData[3].name]) <= today},
+    {id: 5, name: scheduleData[4].display, date: houseData[scheduleData[4].name], completed: new Date(houseData[scheduleData[4].name]) <= today},
+  ];
 
   return (
     <div className='house-detail'>
@@ -376,7 +166,7 @@ function DefaultDetailData({ houseData, houseDetailData }) {
 
       <section className='mb-5'>
         <h3>접수 일정</h3>
-        <ScheduleProgress houseData={houseData} scheduleData={scheduleData} />
+        <ScheduleProgress scheduleList={scheduleList} />
 
       </section>
 
@@ -392,21 +182,11 @@ function DefaultDetailData({ houseData, houseDetailData }) {
 }
 
 /* 일정 바 */
-function ScheduleProgress({ houseData, scheduleData }) {
-
-
-  const steps = [
-    { id: 1, label: 'Step 1', completed: true },
-    { id: 2, label: 'Step 2', completed: true },
-    { id: 3, label: 'Step 3', completed: false },
-    { id: 4, label: 'Step 4', completed: false },
-    { id: 5, label: 'Step 5', completed: false },
-  ];
-
+function ScheduleProgress({ scheduleList }) {
 
   return (
     <Container>
-      {steps.map((step, index) => (
+      {scheduleList.map((step, index) => (
         <Row key={step.id} className="d-flex align-items-center">
           {/* 왼쪽 열: 진행도 표시 */}
           <Col xs="auto" className="d-flex flex-column align-items-center" style={{ height: '100%' }}>
@@ -417,19 +197,19 @@ function ScheduleProgress({ houseData, scheduleData }) {
                 width: '20px',
                 height: '20px',
                 borderRadius: '50%',
-                border: '2px solid #000000',
-                backgroundColor: step.completed ? '#000000' : 'transparent',
+                border: '2px solid #6c757d',
+                backgroundColor: step.completed ? '#6c757d' : 'transparent',
               }}
             ></div>
 
             {/* 세로 선 표시 */}
-            {index < steps.length - 1 && (
+            {index < scheduleList.length - 1 && (
               <div
                 className="line"
                 style={{
                   height: '40px', // 세로 선의 높이
                   width: '4px',   // 세로 선의 너비
-                  backgroundColor: step.completed ? '#000000' : '#ddd', // 진행 여부에 따라 색상 변경
+                  backgroundColor: step.completed ? '#6c757d' : '#ddd', // 진행 여부에 따라 색상 변경
                 }}
               ></div>
             )}
@@ -438,8 +218,8 @@ function ScheduleProgress({ houseData, scheduleData }) {
           {/* 오른쪽 열: 특별공급 정보 */}
           <Col style={{ alignSelf: 'stretch' }}>
             <div >
-              <strong>{scheduleData[index].display}:&nbsp;</strong>
-              {houseData[scheduleData[index].name]}
+              <strong>{scheduleList[index].name}:&nbsp;</strong>
+              {scheduleList[index].date}
             </div>
           </Col>
         </Row>
@@ -449,7 +229,8 @@ function ScheduleProgress({ houseData, scheduleData }) {
 }
 
 /* 타입 상세 */
-function TypeDetailData({ houseDetailListData }) {
+function TypeDetailData({ selectedHouseDetailData }) {
+
   return (
     <div className='house-detail'>
 
@@ -461,18 +242,34 @@ function TypeDetailData({ houseDetailListData }) {
             <th>주택형</th>
             <th>일반 공급</th>
             <th>특별 공급</th>
-            <th>최저가</th>
-            <th>최고가</th>
+            <th>다자녀가구</th>
+            <th>신혼부부</th>
+            <th>생애최초</th>
+            <th>노부모부양</th>
+            <th>기관추천</th>
+            <th>기타</th>
+            <th>이전기관</th>
+            <th>청년</th>
+            <th>신생아</th>
+            <th>공급금액(분양최고금액) (단위:만원)</th>
           </tr>
         </thead>
         <tbody>
-          {houseDetailListData.map((data, index) => (
+          {selectedHouseDetailData?.houseTypeDTOList?.map((typeData, index) => (
             <tr key={index}>
-              <td>{data.houseType}</td>
-              <td>{data.normalSupply}</td>
-              <td>{data.specialSupply || 0}</td>
-              <td>{data.minPrice}</td>
-              <td>{data.maxPrice}</td>
+              <td>{typeData.typeName}</td>
+              <td>{typeData.normalSupply}</td>
+              <td>{typeData.specialSupply || 0}</td>
+              <td>{typeData.mnychHshldco || 0}</td>
+              <td>{typeData.nwwdsHshldco || 0}</td>
+              <td>{typeData.lfeFrstHshldco || 0}</td>
+              <td>{typeData.oldParntsSuportHshldco || 0}</td>
+              <td>{typeData.insttRecomendHshldco || 0}</td>
+              <td>{typeData.etcHshldco || 0}</td>
+              <td>{typeData.transrInsttEnfsnHshldco || 0}</td>
+              <td>{typeData.ygmnHshldco || 0}</td>
+              <td>{typeData.nwbbHshldco || 0}</td>
+              <td>{typeData.price || 0}</td>
             </tr>
           ))}
         </tbody>
@@ -483,14 +280,14 @@ function TypeDetailData({ houseDetailListData }) {
 }
 
 /* 타입 네비게이션 */
-function TypeNavBar({ houseTypes, onClick }) {
+function TypeNavBar({ houseTypes, setKey, eventKey }) {
 
   return (
-    <Nav variant="underline" defaultActiveKey={houseTypes[0]}>
-      {houseTypes.map((type, index) =>
-        <Nav.Item key={type}>
-          <Nav.Link eventKey={type}>
-            {type}
+    <Nav variant="underline" activeKey={eventKey} onSelect={(k) => setKey(k)}>
+      {houseTypes.map((type) =>
+        <Nav.Item key={type} >
+          <Nav.Link eventKey={type} >
+            {type}m²
           </Nav.Link>
         </Nav.Item>
       )}
@@ -510,24 +307,26 @@ function AdditionalInfo({ houseData, houseDetailData }) {
     { name: 'lrsclBldlndAt', display: '대규모 택지개발지구' },
     { name: 'nplnPrvoprPublicHouseAt', display: '수도권 내 민영 공공주택지구' },
     { name: 'publicHouseSpclwApplcAt', display: '공공주택 특별법 적용' },
-  ]
+  ];
 
   return (
     <div className='house-detail'>
-      <section>
-        <h2>특이사항</h2>
-        <ul>
-          {houseDetailData &&
-            scheduleData.map((data, index) => (
-              <li key={index}>{houseDetailData[data] === "Y" ? scheduleData[index]['display'] : ""}</li>
-            ))
-          }
-        </ul>
-      </section>
+      {houseData.houseSecd === "01" &&
+        <section>
+          <ul>
+            특이사항
+            {
+              scheduleData.map((data, index) => (
+                houseDetailData[data] === "Y" ?? <li key={index}>scheduleData[index]['display']</li>
+              ))
+            }
+          </ul>
+        </section>
+      }
 
       <section>
         <h2>문의 정보</h2>
-        <a href={houseData.hmpgAdres}><p>{houseData.bsnsMbyNm}</p></a>
+        <p><a href={houseData.hmpgAdres}>{houseData.bsnsMbyNm}</a></p>
         <p>문의처: {houseData.mdhsTelno}</p>
         <p>
           공고 모집 url : <a href={houseData.pblancUrl}>{houseData.pblancUrl}</a>

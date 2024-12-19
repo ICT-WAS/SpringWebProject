@@ -59,8 +59,7 @@ export function SubscriptionCards({ subscriptions }) {
 function SubscriptionCard({ subscription, index }) {
   return (
     <>
-      <Container>
-        <Card body>
+      <Card body>
           <Row>
             <Col>
               <Container >
@@ -84,7 +83,6 @@ function SubscriptionCard({ subscription, index }) {
             </Col>
           </Row>
         </Card>
-      </Container>
     </>
   );
 }

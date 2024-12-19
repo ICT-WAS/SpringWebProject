@@ -27,4 +27,6 @@ public interface CommunityService {
     ResponseEntity<?> updatePost(Long postId, String title, String subject);
 
     ResponseEntity<?> updateComment(Long commentId, String comments);
+
+    List<Comment> getCommentList();
 }

@@ -7,7 +7,6 @@ import com.ict.home.community.dto.PostingDto;
 import com.ict.home.community.model.Comment;
 import com.ict.home.community.model.Post;
 import com.ict.home.community.service.CommunityService;
-import com.ict.home.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -54,7 +53,7 @@ public class CommunityController {
                     .collect(Collectors.toList());
         }
 
-        if (filteredPosts.isEmpty() || filteredPosts == null) {
+        if (filteredPosts.isEmpty()) {
             Map<String, Object> response = new HashMap<>();
             response.put("totalCount", 0);
             response.put("content", new ArrayList<>());
@@ -221,5 +220,45 @@ public class CommunityController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("댓글을 찾을 수 없습니다."); // 삭제 실패, HTTP 404
         }
+    }
+
+    @GetMapping("/posts/{userId}")
+    @Operation(summary = "유저의 게시글 조회", description = "특정 유저의 게시글을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
+    })
+    public ResponseEntity<?> getPosts(@Parameter(name = "userId", description = "게시글의 작성자의 ID") @PathVariable Long userId) {
+
+        List<Post> postList = cs.getPostList();
+
+        // Post의 User.getId()가 userId와 같은 것만 필터링
+        List<Post> filteredPosts = postList.stream()
+                .filter(post -> post.getUser() != null && post.getUser().getId().equals(userId))  // User의 ID가 일치하는 것만 필터
+                .toList();  // 필터링된 결과를 리스트로 수집
+
+        return ResponseEntity.ok(filteredPosts);
+    }
+
+    @GetMapping("/comments/{userId}")
+    @Operation(summary = "유저의 댓글 조회", description = "특정 유저의 댓글을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "댓글 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
+    })
+    public ResponseEntity<?> getComments(@Parameter(name = "userId", description = "댓글 작성자의 ID") @PathVariable Long userId) {
+
+        List<Comment> commentList = cs.getCommentList();
+
+        // Comment User.getId()가 userId와 같은 것만 필터링
+        List<Comment> filteredComments = commentList.stream()
+                .filter(comment -> comment.getUser() != null && comment.getUser().getId().equals(userId))  // User의 ID가 일치하는 것만 필터
+                .toList();  // 필터링된 결과를 리스트로 수집
+
+        return ResponseEntity.ok(filteredComments);
     }
 }

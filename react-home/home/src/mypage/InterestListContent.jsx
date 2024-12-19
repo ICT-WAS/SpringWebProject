@@ -9,6 +9,7 @@ import axios from 'axios';
 export default function InterestListContent() {
     const [subscriptions, setSubscriptions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [totalCount, setTotalCount] = useState(0);
 
     const token = localStorage.getItem("accessToken");
     const userId = getUserIdFromToken(token);
@@ -18,15 +19,16 @@ export default function InterestListContent() {
         axios
             .get(`http://localhost:8989/interest/${userId}`
 
-        )
-        .then((response) => {
-            setSubscriptions(response.data);
-            setLoading(false);
-        })
-        .catch((error) => {
-            console.error("데이터 요청 실패:", error);
-            setLoading(false);
-        });
+            )
+            .then((response) => {
+                setSubscriptions(response.data);
+                setLoading(false);
+                setTotalCount(response.data.length);
+            })
+            .catch((error) => {
+                console.error("데이터 요청 실패:", error);
+                setLoading(false);
+            });
     }
 
     useEffect(() => {
@@ -36,12 +38,14 @@ export default function InterestListContent() {
     return (
         <>
             <Container className="px-5" fluid="md">
-                <p className='heading-text'>
-                    관심 공고 목록
-                </p>
-                {loading && <Spinners />}
-                {subscriptions.length < 1 && <p className='filter-values'>관심 공고가 없습니다.</p>}
                 <Stack direction='vertical' gap={3}>
+                    <p className='heading-text'>
+                        관심 공고 목록
+                    </p>
+
+                    <p className='card-body-text' >{totalCount || 0} 건</p>
+                    {loading && <Spinners />}
+                    {subscriptions.length < 1 && <p className='filter-values'>관심 공고가 없습니다.</p>}
                     <SubscriptionCards subscriptions={subscriptions} />
                 </Stack>
             </Container>
