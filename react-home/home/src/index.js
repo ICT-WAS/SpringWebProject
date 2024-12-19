@@ -35,6 +35,9 @@ import SearchAnnouncementByName from "./apply_announcement/SearchAnnouncementByN
 import UserInfo from "./pages/account/UserInfo";
 import UserInfoEdit from "./pages/account/UserInfoEdit";
 import InterestList from "./mypage/InterestList";
+import MyPageContent from "./mypage/MyPageContent";
+import CollectionCommentPost from "./mypage/CollectionCommentPost";
+import CollectionPost from "./mypage/CollectionPost";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -52,7 +55,7 @@ root.render(
 
         {/* 청약 */}
         <Route path="/subscriptions" element={<ApplyAnnouncementList />} />
-        <Route path="/subscriptions/info" element={<ApplyAnnouncement />} />
+        <Route path="/subscriptions/info/:houseId" element={<ApplyAnnouncement />} />
         <Route
           path="/subscriptions/search/:keyword"
           element={<SearchAnnouncementByName />}
@@ -67,6 +70,8 @@ root.render(
         {/* 마이페이지 */}
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/interest" element={<InterestList />} />
+        <Route path="/myposts" element={<CollectionPost />} />
+        <Route path="/mycomments" element={<CollectionCommentPost />} />
 
         {/* 커뮤니티 */}
         <Route exact path="/community" element={<CommunityPostList />} />
