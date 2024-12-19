@@ -36,6 +36,7 @@ public enum BaseResponseStatus {
     FAILED_TO_LOGIN(false,3001,"이메일과 비밀번호를 다시 확인해주세요."),
     FAILED_TO_LOGOUT(false, 3002, "로그아웃에 실패하였습니다"),
     FAILED_TO_USER_UPDATE(false, 3003, "회원 정보 수정에 실패했습니다."),
+    USER_ALREADY_DEACTIVATED(false, 3004, "탈퇴한 회원입니다."),
 
     /**
      * 4000: Database, Server 오류
