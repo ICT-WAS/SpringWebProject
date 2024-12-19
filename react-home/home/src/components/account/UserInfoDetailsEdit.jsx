@@ -4,13 +4,27 @@ import { useGlobalContext } from "../../Context";
 import { instance } from "../../api/AxiosInterseptor";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AccountInputUsername from "./AccountInputUsername";
+import AccountInputPhoneNumber from "./AccountInputPhoneNumber";
 
 const UserInfoDetailsEdit = ({ setError, setErrorTitle }) => {
   //로그인 상태를 관리하는 전역 변수
   const { userId } = useGlobalContext();
-
+  //수정된 값을 담을 변수
+  const [username, setUsername] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  //초기 버튼 disabled 를 위한 값 변경 감지 변수
+  const [isModified, setIsModified] = useState(false);
   //네비게이트
   const navigate = useNavigate();
+  //자식 컴포넌트 유효성 에러 확인
+  const [validUsernameError, setValidUsernameError] = useState("");
+  const [validPhoneNumberError, setValidPhoneNumberError] = useState("");
+
+  //초기화 함수
+  useEffect(() => {
+    setError("");
+  }, []);
 
   // 사용자 정보를 저장할 상태 변수
   const [userInfo, setUserInfo] = useState({
@@ -21,6 +35,14 @@ const UserInfoDetailsEdit = ({ setError, setErrorTitle }) => {
     socialLinks: [],
   });
 
+  //userId 있을 때 초기값 가져오기
+  useEffect(() => {
+    if (userId) {
+      getUserInfo();
+    }
+  }, []);
+
+  //초기값 가져오는 함수
   const getUserInfo = async () => {
     try {
       const response = await instance.get(`/users`, {
@@ -42,31 +64,39 @@ const UserInfoDetailsEdit = ({ setError, setErrorTitle }) => {
     }
   };
 
-  const handleClick = () => {
-    navigate("/mypage/account");
-  };
-
-  // 입력 값 변경 핸들러
-  const handleNameInputChange = (e) => {
-    const { name, value } = e.target;
-
-    // userInfo 상태 업데이트
-    setUserInfo((prevState) => ({
-      ...prevState, // 다른 필드는 기존 상태를 유지하게끔
-      [name]: value, // 변경된 값을 해당 name 이라는 새로운 필드로 할당
-    }));
-  };
-
-  useEffect(() => {
-    if (userId) {
-      getUserInfo();
+  //정보 수정하기
+  const handleUpdateUser = async () => {
+    try {
+      const response = await instance.post(`/users/update`, {
+        //이메일은 어떤 경우에도 수정될 수 없음
+        userId: userId,
+        username: userInfo.username,
+        phoneNumber: userInfo.phoneNumber,
+      });
+      alert(response.data.result);
+    } catch (error) {
+      setErrorTitle("정보 수정 실패");
+      setError("입력 값을 확인하고 다시 시도해주세요.");
     }
-  }, [userId]);
+  };
 
-  // useEffect로 상태 변화 추적(디버깅용)
+  const handleClickToMypage = () => {
+    navigate("/mypage");
+  };
+
+  // username과 phoneNumber 값이 변경되었는지 감지
+  useEffect(() => {
+    if (username || phoneNumber) {
+      setIsModified(true);
+    } else {
+      setIsModified(false);
+    }
+  }, [username, phoneNumber]);
+
+  //디버깅용
   useEffect(() => {
     // console.log("username 변경됨", userInfo.username);
-  }, [userInfo.username]); // userInfo.username이 변경될 때마다 실행
+  }, [userInfo.username]);
 
   return (
     <>
@@ -78,12 +108,12 @@ const UserInfoDetailsEdit = ({ setError, setErrorTitle }) => {
               <li>
                 <div className="info_flex_one">
                   <p className="info_subtitle2">이름</p>
-                  <input
-                    type="text"
-                    className="info_data_text2"
-                    name="username"
-                    value={userInfo.username}
-                    onChange={handleNameInputChange}
+                  <AccountInputUsername
+                    setUsername={setUsername}
+                    userInfo={userInfo}
+                    setUserInfo={setUserInfo}
+                    setValidUsernameError={setValidUsernameError}
+                    validUsernameError={validUsernameError}
                   />
                 </div>
               </li>
@@ -99,7 +129,7 @@ const UserInfoDetailsEdit = ({ setError, setErrorTitle }) => {
               </li>
               <li>
                 <div className="info_flex_one">
-                  <p className="info_subtitle2">핸드폰 번호</p>
+                  <p className="info_subtitle2">휴대폰 번호</p>
 
                   {userInfo.userVerify &&
                   userInfo.userVerify === "휴대폰 인증" ? (
@@ -108,11 +138,12 @@ const UserInfoDetailsEdit = ({ setError, setErrorTitle }) => {
                       <p className="info_data_text3">인증됨</p>
                     </>
                   ) : (
-                    <input
-                      input
-                      type="text"
-                      className="info_data_text2"
-                      value={userInfo.phoneNumber}
+                    <AccountInputPhoneNumber
+                      setPhoneNumber={setPhoneNumber}
+                      userInfo={userInfo}
+                      setUserInfo={setUserInfo}
+                      validPhoneNumberError={validPhoneNumberError}
+                      setValidPhoneNumberError={setValidPhoneNumberError}
                     />
                   )}
                 </div>
@@ -142,10 +173,21 @@ const UserInfoDetailsEdit = ({ setError, setErrorTitle }) => {
           >
             <p className="info-small-text">회원 탈퇴</p>
             <div className="d-flex gap-4">
-              <Button type="button" variant="light" onClick={handleClick}>
+              <Button
+                type="button"
+                variant="light"
+                onClick={handleClickToMypage}
+              >
                 취소
               </Button>
-              <Button type="submit" variant="dark">
+              <Button
+                type="submit"
+                variant="dark"
+                disabled={
+                  !isModified || validPhoneNumberError || validUsernameError
+                }
+                onClick={handleUpdateUser}
+              >
                 수정
               </Button>
             </div>

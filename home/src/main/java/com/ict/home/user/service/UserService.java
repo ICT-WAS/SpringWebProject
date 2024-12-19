@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.sql.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
@@ -234,6 +235,31 @@ public class UserService {
         String userVerifyInKorea = user.getUserVerify() != null ? user.getUserVerify().getUserVerifyInKorea() : null;
         List<String> userSocialLinks = socialAccountRepository.findProvidersByUserId(userId);
         return new GetUserInfoDetailsRes(user.getUsername(), user.getEmail(), user.getPhoneNumber(), userVerifyInKorea, userSocialLinks);
+    }
+
+    /**
+     * 회원정보 수정
+     */
+    @Transactional
+    public String updateUserInfo(PostUpdateUserInfoReq postUpdateUserInfoReq) {
+        User user;
+
+        try {
+            user = userUtilService.findByIdWithValidation(postUpdateUserInfoReq.getUserId());
+
+        } catch (Exception e) {
+            throw new BaseException(USERS_EMPTY_USER_ID);
+        }
+
+        try {
+            user.setUsername(postUpdateUserInfoReq.getUsername());
+            user.setPhoneNumber(postUpdateUserInfoReq.getPhoneNumber());
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new BaseException(FAILED_TO_USER_UPDATE);
+        }
+
+        return "수정 성공";
     }
 
     /**

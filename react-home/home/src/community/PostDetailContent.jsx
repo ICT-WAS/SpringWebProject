@@ -30,20 +30,20 @@ export default function PostDetailContent() {
             alert("댓글 작성자가 아닙니다.");
             return; // 댓글 작성자가 아닐 경우 함수 종료
         }
-    
+
         const updatedCommentData = {
             comments: editedComment.replace(/\n/g, "<br>"),  // 줄바꿈을 <br>로 변환
             postId: postId,
             userId: userId,
         };
-    
+
         try {
             const response = await fetch(`http://localhost:8989/community/${commentId}/comment`, {
-                method: 'PATCH', 
+                method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedCommentData), // 수정된 댓글 데이터
             });
-    
+
             // 서버가 응답을 OK로 반환하면 성공 처리
             if (response.ok) {
                 const data = await response.text();
@@ -55,31 +55,35 @@ export default function PostDetailContent() {
                         return {
                             ...comment,
                             comments: showComment, // 댓글 내용 업데이트
-                            replies: comment.replies.map((reply) => {
-                                // 댓글 안의 대댓글 중 commentId와 일치하는 대댓글을 찾아 업데이트
-                                if (reply.commentId === commentId) {
-                                    return { ...reply, comments: showComment };
-                                }
-                                return reply; // 일치하지 않으면 그대로 반환
-                            }),
+                            replies: comment.depth === 1 
+                                ? comment.replies.map((reply) => {
+                                    // 댓글 안의 대댓글 중 commentId와 일치하는 대댓글을 찾아 업데이트
+                                    if (reply.commentId === commentId) {
+                                        return { ...reply, comments: showComment };
+                                    }
+                                    return reply; // 일치하지 않으면 그대로 반환
+                                })
+                                : comment.replies, // depth가 2일 경우 replies는 그대로 유지
                         };
                     }
-                
+
                     // 댓글 안에 대댓글이 있는 경우, 대댓글에서 commentId와 일치하는 값을 찾음
-                    const updatedReplies = comment.replies.map((reply) => {
-                        if (reply.commentId === commentId) {
-                            return { ...reply, comments: showComment };
-                        }
-                        return reply;
-                    });
-                
+                    const updatedReplies = comment.depth === 1
+                        ? comment.replies.map((reply) => {
+                            if (reply.commentId === commentId) {
+                                return { ...reply, comments: showComment };
+                            }
+                            return reply;
+                        })
+                        : comment.replies; // depth가 2일 경우 replies는 그대로 유지
+
                     return {
                         ...comment,
                         replies: updatedReplies, // 대댓글이 업데이트된 상태로 반환
                     };
                 }));
-                
-            
+
+
                 setEditingCommentId(null);  // 수정 상태 종료
                 setEditedComment("");  // 입력 필드 초기화
                 alert("댓글이 수정되었습니다.");  // 사용자에게 성공 메시지 표시
@@ -102,7 +106,7 @@ export default function PostDetailContent() {
     // 댓글 삭제 함수 (기존 코드와 동일)
     const handleDeleteComment = (commentId, _userId) => {
         const confirmDelete = window.confirm("이 댓글을 삭제하시겠습니까?");
-        if(_userId !== userId){
+        if (_userId !== userId) {
             console.log(_userId);
             console.log(userId);
             alert("댓글의 작성자가 아닙니다.");
@@ -112,15 +116,34 @@ export default function PostDetailContent() {
             fetch(`http://localhost:8989/community/${commentId}/comment`, {
                 method: 'DELETE',
             })
-            .then((res) => {
-                if (res.ok) {
-                    setComments(comments.filter(comment => comment.commentId !== commentId));
-                    setCount(count-1);
-                } else {
-                    alert("댓글 삭제에 실패했습니다.");
-                }
-            })
-            .catch((err) => console.error("댓글 삭제 실패:", err));
+                .then((res) => {
+                    if (res.ok) {
+                        setComments(comments
+                            .filter(comment => comment.commentId !== commentId) // commentId가 일치하는 comment 제거
+                            .map(comment => {
+                                if (comment.depth === 1) {
+                                    // depth가 1인 경우 replies 필터링
+                                    const filteredReplies = comment.replies.filter(reply => reply.commentId !== commentId);
+                                    return {
+                                        ...comment, // 기존 comment 속성 그대로 유지
+                                        replies: filteredReplies, // 필터링된 replies 배열 적용
+                                    };
+                                } else if (comment.depth === 2) {
+                                    // depth가 2인 경우 replies 필터링 없이 그대로 반환
+                                    return {
+                                        ...comment, // 기존 comment 속성 그대로 유지
+                                        replies: comment.replies, // replies를 그대로 반환
+                                    };
+                                }
+                                return comment; // 그 외의 경우 그대로 반환
+                            })
+                        );
+                        setCount(count - 1);
+                    } else {
+                        alert("댓글 삭제에 실패했습니다.");
+                    }
+                })
+                .catch((err) => console.error("댓글 삭제 실패:", err));
         }
     };
 
@@ -153,7 +176,7 @@ export default function PostDetailContent() {
                         normalComments.push(comment);
                     }
                 });
-                
+
                 // 댓글과 대댓글을 상태에 설정
                 setComments(normalComments);
 
@@ -176,7 +199,7 @@ export default function PostDetailContent() {
             userId: userId
         };
 
-        if(userId===null){
+        if (userId === null) {
             alert("로그인 후 이용해주세요.");
             return;
         }
@@ -190,7 +213,7 @@ export default function PostDetailContent() {
             .then((data) => {
                 setComments([...comments, data]);  // 새 댓글 추가
                 setNewComment("");  // 입력 필드 초기화
-                setCount(count+1);
+                setCount(count + 1);
             })
             .catch((err) => console.error("댓글 작성 실패:", err));
     };
@@ -198,7 +221,7 @@ export default function PostDetailContent() {
     // 답글 작성 함수
     const handleReplySubmit = (commentId) => {
 
-        if(userId === null){
+        if (userId === null) {
             alert("로그인 후 이용해주세요.");
             return;
         }
@@ -219,21 +242,21 @@ export default function PostDetailContent() {
             .then((res) => res.json())
             .then((data) => {
                 // 댓글에 답글 추가
-                setComments(comments.map(comment => 
+                setComments(comments.map(comment =>
                     comment.commentId === commentId
                         ? { ...comment, replies: [...(comment.replies || []), data] }
                         : comment
                 ));
                 setNewReply("");  // 입력 필드 초기화
                 setReplyTo(null);  // 답글 작성 취소
-                setCount(count+1);
+                setCount(count + 1);
             })
             .catch((err) => console.error("답글 작성 실패:", err));
     };
 
     // 게시글 수정 함수
     const handleEdit = () => {
-        if(userId !== post.user.id){
+        if (userId !== post.user.id) {
             alert("게시글 작성자가 아닙니다.");
             return;
         }
@@ -243,7 +266,7 @@ export default function PostDetailContent() {
     // 게시글 삭제 함수
     const handleDelete = () => {
         const confirmDelete = window.confirm("이 게시글을 삭제하시겠습니까?");
-        if(userId !== post.user.id){
+        if (userId !== post.user.id) {
             alert("게시글 작성자가 아닙니다.");
             return;
         }
@@ -251,14 +274,14 @@ export default function PostDetailContent() {
             fetch(`http://localhost:8989/community/${postId}`, {
                 method: 'DELETE',
             })
-            .then((res) => {
-                if (res.ok) {
-                    navigate("/community");  // 삭제 후 목록 페이지로 리디렉션
-                } else {
-                    alert("게시글 삭제에 실패했습니다.");
-                }
-            })
-            .catch((err) => console.error("게시글 삭제 실패:", err));
+                .then((res) => {
+                    if (res.ok) {
+                        navigate("/community");  // 삭제 후 목록 페이지로 리디렉션
+                    } else {
+                        alert("게시글 삭제에 실패했습니다.");
+                    }
+                })
+                .catch((err) => console.error("게시글 삭제 실패:", err));
         }
     };
 
@@ -267,59 +290,59 @@ export default function PostDetailContent() {
     }
 
     const createdDateTime = new Date(post.createdAt)
-                                .toLocaleString("ko-KR", { hour12: false })
-                                .replace(",", "")
-                                .replace("T", "")
-                                .replaceAll(". ", "-")
-                                .slice(0, 22)
-                                .replace("-", "년 ")
-                                .replace("-", "월 ")
-                                .replace("-", "일 ");
+        .toLocaleString("ko-KR", { hour12: false })
+        .replace(",", "")
+        .replace("T", "")
+        .replaceAll(". ", "-")
+        .slice(0, 22)
+        .replace("-", "년 ")
+        .replace("-", "월 ")
+        .replace("-", "일 ");
 
     const updatedDateTime = new Date(post.updatedAt)
-                                .toLocaleString("ko-KR", { hour12: false })
-                                .replace(",", "")
-                                .replace("T", "")
-                                .replaceAll(". ", "-")
-                                .slice(0, 22)
-                                .replace("-", "년 ")
-                                .replace("-", "월 ")
-                                .replace("-", "일 ");
+        .toLocaleString("ko-KR", { hour12: false })
+        .replace(",", "")
+        .replace("T", "")
+        .replaceAll(". ", "-")
+        .slice(0, 22)
+        .replace("-", "년 ")
+        .replace("-", "월 ")
+        .replace("-", "일 ");
 
     return (
         <div style={{ width: '90%', margin: '0 auto' }}>
             {/* 제목 글자 굵기 수정 */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ fontWeight: 'bold', fontSize: '24px'}}>{post.title}</h2>
-                
+                <h2 style={{ fontWeight: 'bold', fontSize: '24px' }}>{post.title}</h2>
+
                 {/* 수정 및 삭제 버튼 */}
                 {post.user && post.user.id === userId && (
                     <div>
-                        <Button 
-                            variant="link" 
-                            onClick={handleEdit} 
+                        <Button
+                            variant="link"
+                            onClick={handleEdit}
                             style={{ marginRight: '10px', borderRadius: '20px', padding: '5px 15px', border: '1px solid black', color: 'black', textDecoration: 'none' }}>
                             수정
                         </Button>
 
-                        <Button 
-                            variant="link" 
-                            onClick={handleDelete} 
+                        <Button
+                            variant="link"
+                            onClick={handleDelete}
                             style={{ color: 'red', borderRadius: '20px', padding: '5px 15px', border: '1px solid red', textDecoration: 'none' }}>
                             삭제
                         </Button>
                     </div>
                 )}
             </div>
-            
+
             <Row className="mb-3">
-                <Col style={{ color: 'gray', fontSize: '16px'}}><small>작성일: {createdDateTime}</small></Col>
-                
+                <Col style={{ color: 'gray', fontSize: '16px' }}><small>작성일: {createdDateTime}</small></Col>
+
                 {/* 수정일이 null일 경우 수정일 정보는 표시되지 않도록 */}
-                {post.updatedAt && <Col style={{ color: 'gray', fontSize: '16px'}}><small>수정일: {updatedDateTime}</small></Col>}
-                
+                {post.updatedAt && <Col style={{ color: 'gray', fontSize: '16px' }}><small>수정일: {updatedDateTime}</small></Col>}
+
                 {/* 작성자 존재 여부 확인 후 출력 */}
-                {post.user && <Col style={{ color: 'gray', fontSize: '16px'}}><small>작성자: {post.user.username}</small></Col>}
+                {post.user && <Col style={{ color: 'gray', fontSize: '16px' }}><small>작성자: {post.user.username}</small></Col>}
             </Row>
 
             {/* 글과 댓글 간 거리 띄우기 */}
@@ -327,7 +350,7 @@ export default function PostDetailContent() {
 
             <h4 style={{ marginTop: '30px', fontSize: '16px' }}>댓글 ({count})</h4>
             {/* 댓글 작성 */}
-            <div className="d-flex justify-content-between align-items-stretch" style={{ marginBottom: '30px'}}>
+            <div className="d-flex justify-content-between align-items-stretch" style={{ marginBottom: '30px' }}>
                 <Form.Control
                     as="textarea"
                     value={newComment}
@@ -337,26 +360,14 @@ export default function PostDetailContent() {
                 />
                 <Button onClick={handleCommentSubmit} className="mt-2" variant="dark" style={{ width: '13%', whiteSpace: 'nowrap' }} disabled={!newComment.trim()}>전송</Button>
             </div>
-            
+
             <ListGroup style={{ marginBottom: '20px' }}>
-            {comments.map((comment) => (
-                <ListGroup.Item key={comment.commentId} style={{ paddingLeft: comment.parentComment ? '40px' : '0' }}>
-                    {/* 댓글 작성자가 존재하는지 확인 후 출력 */}
-                    <strong style={{ fontSize: '14px', marginLeft: '10px' }}>{comment.user ? comment.user.username : '알 수 없는 사용자'}</strong>
-                    <span style={{ fontSize: '12px', color: 'gray', marginLeft: '4px' }}>
-                        ({new Date(comment.createdAt)
-                            .toLocaleString("ko-KR", { hour12: false })
-                            .replace(",", "")
-                            .replace("T", "")
-                            .replaceAll(". ", "-")
-                            .slice(0, 22)
-                            .replace("-", "년 ")
-                            .replace("-", "월 ")
-                            .replace("-", "일 ")
-                        })
-                        {/* 수정일이 존재하면 수정일도 표시 */}
-                        {comment.updatedAt && (
-                            <> / 수정일: {new Date(comment.updatedAt)
+                {comments.map((comment) => (
+                    <ListGroup.Item key={comment.commentId} style={{ paddingLeft: comment.parentComment ? '40px' : '0' }}>
+                        {/* 댓글 작성자가 존재하는지 확인 후 출력 */}
+                        <strong style={{ fontSize: '14px', marginLeft: '10px' }}>{comment.user ? comment.user.username : '알 수 없는 사용자'}</strong>
+                        <span style={{ fontSize: '12px', color: 'gray', marginLeft: '4px' }}>
+                            ({new Date(comment.createdAt)
                                 .toLocaleString("ko-KR", { hour12: false })
                                 .replace(",", "")
                                 .replace("T", "")
@@ -365,96 +376,96 @@ export default function PostDetailContent() {
                                 .replace("-", "년 ")
                                 .replace("-", "월 ")
                                 .replace("-", "일 ")
-                            }
-                            </>
-                        )}
-                    </span>
+                            })
+                            {/* 수정일이 존재하면 수정일도 표시 */}
+                            {comment.updatedAt && (
+                                <> / 수정일: {new Date(comment.updatedAt)
+                                    .toLocaleString("ko-KR", { hour12: false })
+                                    .replace(",", "")
+                                    .replace("T", "")
+                                    .replaceAll(". ", "-")
+                                    .slice(0, 22)
+                                    .replace("-", "년 ")
+                                    .replace("-", "월 ")
+                                    .replace("-", "일 ")
+                                }
+                                </>
+                            )}
+                        </span>
 
-                    {/* 댓글 내용 */}
-                    {editingCommentId === comment.commentId ? (
-                        <div style={{ width: '90%', margin: '0 auto' }}>
-                            {/* 수정할 댓글 내용을 텍스트박스에 넣기 */}
-                            <textarea
-                                value={editedComment}
-                                onChange={(e) => setEditedComment(e.target.value)}
-                                rows="3"
-                                style={{ width: '100%' }}
-                            />
-                            <div style={{ marginTop: '10px' }}>
-                                <Button style={{ whiteSpace: 'nowrap' }}
-                                        variant="dark" 
+                        {/* 댓글 내용 */}
+                        {editingCommentId === comment.commentId ? (
+                            <div style={{ width: '90%', margin: '0 auto' }}>
+                                {/* 수정할 댓글 내용을 텍스트박스에 넣기 */}
+                                <textarea
+                                    value={editedComment}
+                                    onChange={(e) => setEditedComment(e.target.value)}
+                                    rows="3"
+                                    style={{ width: '100%' }}
+                                />
+                                <div style={{ marginTop: '10px' }}>
+                                    <Button style={{ whiteSpace: 'nowrap' }}
+                                        variant="dark"
                                         onClick={() => handleSaveEdit(comment.commentId, comment.user.id)}>저장</Button>
-                                <Button variant="secondary" onClick={handleCancelEdit} style={{ marginLeft: '10px' }}>취소</Button>
+                                    <Button variant="secondary" onClick={handleCancelEdit} style={{ marginLeft: '10px' }}>취소</Button>
+                                </div>
                             </div>
-                        </div>
-                    ) : (
-                        <p style={{ fontSize: '16px', marginLeft: '10px'}} dangerouslySetInnerHTML={{ __html: comment.comments }} />
-                    )}
+                        ) : (
+                            <p style={{ fontSize: '16px', marginLeft: '10px' }} dangerouslySetInnerHTML={{ __html: comment.comments }} />
+                        )}
 
-                    {/* 댓글 수정 및 삭제 버튼 (일반 댓글과 대댓글 모두 적용) */}
-                    {(comment.user && comment.user.id === userId) && (
-                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <Button 
-                                variant="link" 
-                                onClick={() => handleEditComment(comment.commentId, comment.comments)} 
-                                style={{ marginRight: '10px', borderRadius: '20px', padding: '5px 15px', border: '1px solid black', color: 'black', textDecoration: 'none' }}>
-                                수정
+                        {/* 댓글 수정 및 삭제 버튼 (일반 댓글과 대댓글 모두 적용) */}
+                        {(comment.user && comment.user.id === userId) && (
+                            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                <Button
+                                    variant="link"
+                                    onClick={() => handleEditComment(comment.commentId, comment.comments)}
+                                    style={{ marginRight: '10px', borderRadius: '20px', padding: '5px 15px', border: '1px solid black', color: 'black', textDecoration: 'none' }}>
+                                    수정
+                                </Button>
+                                <Button
+                                    variant="link"
+                                    onClick={() => handleDeleteComment(comment.commentId, comment.user.id)}
+                                    style={{ color: 'red', borderRadius: '20px', padding: '5px 15px', border: '1px solid red', textDecoration: 'none' }}>
+                                    삭제
+                                </Button>
+                            </div>
+                        )}
+
+                        {!comment.parentComment && (  // parentComment가 없을 경우에만 버튼을 렌더링
+                            <Button
+                                style={{ textDecoration: 'none', color: 'gray' }}
+                                variant="link"
+                                onClick={() => setReplyTo(comment.commentId)}
+                            >
+                                답글 달기
                             </Button>
-                            <Button 
-                                variant="link" 
-                                onClick={() => handleDeleteComment(comment.commentId, comment.user.id)} 
-                                style={{ color: 'red', borderRadius: '20px', padding: '5px 15px', border: '1px solid red', textDecoration: 'none' }}>
-                                삭제
-                            </Button>
-                        </div>
-                    )}
+                        )}
 
-                    {!comment.parentComment && (  // parentComment가 없을 경우에만 버튼을 렌더링
-                        <Button 
-                            style={{ textDecoration: 'none', color: 'gray' }} 
-                            variant="link" 
-                            onClick={() => setReplyTo(comment.commentId)}
-                        >
-                            답글 달기
-                        </Button>
-                    )}
-
-                    {/* 답글 입력창 추가 */}
-                    {replyTo === comment.commentId && (
-                        <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center' }}>
-                            <Form.Control
-                                as="textarea"
-                                value={newReply}
-                                onChange={(e) => setNewReply(e.target.value)}
-                                placeholder="답글을 작성해주세요"
-                                style={{ flex: 1, marginRight: '10px' }}  // 버튼과 여백을 두기 위해 marginRight 추가
-                            />
-                            <Button style={{ whiteSpace: 'nowrap' }}
+                        {/* 답글 입력창 추가 */}
+                        {replyTo === comment.commentId && (
+                            <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center' }}>
+                                <Form.Control
+                                    as="textarea"
+                                    value={newReply}
+                                    onChange={(e) => setNewReply(e.target.value)}
+                                    placeholder="답글을 작성해주세요"
+                                    style={{ flex: 1, marginRight: '10px' }}  // 버튼과 여백을 두기 위해 marginRight 추가
+                                />
+                                <Button style={{ whiteSpace: 'nowrap' }}
                                     variant="dark"
                                     onClick={() => handleReplySubmit(comment.commentId)} className="mt-2">답글 작성</Button>
-                        </div>
-                    )}
+                            </div>
+                        )}
 
-                    {/* 대댓글 */}
-                    {comment.replies && comment.replies.length > 0 && (
-                        <ListGroup variant="flush">
-                            {comment.replies.map(reply => (
-                                <ListGroup.Item key={reply.commentId} style={{ paddingLeft: '40px' }}>
-                                    <strong style={{ fontSize: '14px', marginLeft: '10px' }}>{reply.user ? reply.user.username : '알 수 없는 사용자'}</strong>
-                                    <span style={{ fontSize: '12px', color: 'gray', marginLeft: '4px' }}>
-                                        ({new Date(reply.createdAt)
-                                            .toLocaleString("ko-KR", { hour12: false })
-                                            .replace(",", "")
-                                            .replace("T", "")
-                                            .replaceAll(". ", "-")
-                                            .slice(0, 22)
-                                            .replace("-", "년 ")
-                                            .replace("-", "월 ")
-                                            .replace("-", "일 ")
-                                        })
-                                        {/* 수정일이 존재하면 수정일도 표시 */}
-                                        {reply.updatedAt && (
-                                            <> / 수정일: {new Date(reply.updatedAt)
+                        {/* 대댓글 */}
+                        {comment.replies && comment.replies.length > 0 && (
+                            <ListGroup variant="flush">
+                                {comment.replies.map(reply => (
+                                    <ListGroup.Item key={reply.commentId} style={{ paddingLeft: '40px' }}>
+                                        <strong style={{ fontSize: '14px', marginLeft: '10px' }}>{reply.user ? reply.user.username : '알 수 없는 사용자'}</strong>
+                                        <span style={{ fontSize: '12px', color: 'gray', marginLeft: '4px' }}>
+                                            ({new Date(reply.createdAt)
                                                 .toLocaleString("ko-KR", { hour12: false })
                                                 .replace(",", "")
                                                 .replace("T", "")
@@ -463,52 +474,64 @@ export default function PostDetailContent() {
                                                 .replace("-", "년 ")
                                                 .replace("-", "월 ")
                                                 .replace("-", "일 ")
-                                            }
-                                            </>
-                                        )}
-                                    </span>
+                                            })
+                                            {/* 수정일이 존재하면 수정일도 표시 */}
+                                            {reply.updatedAt && (
+                                                <> / 수정일: {new Date(reply.updatedAt)
+                                                    .toLocaleString("ko-KR", { hour12: false })
+                                                    .replace(",", "")
+                                                    .replace("T", "")
+                                                    .replaceAll(". ", "-")
+                                                    .slice(0, 22)
+                                                    .replace("-", "년 ")
+                                                    .replace("-", "월 ")
+                                                    .replace("-", "일 ")
+                                                }
+                                                </>
+                                            )}
+                                        </span>
 
-                                    {/* 대댓글 내용 */}
-                                    {editingCommentId === reply.commentId ? (
-                                        <div>
-                                            <textarea
-                                                value={editedComment}
-                                                onChange={(e) => setEditedComment(e.target.value)}
-                                                rows="3"
-                                                style={{ width: '100%' }}
-                                            />
-                                            <div style={{ marginTop: '10px' }}>
-                                                <Button variant="dark" style={{ whiteSpace: 'nowrap' }} onClick={() => handleSaveEdit(reply.commentId, reply.user.id)}>저장</Button>
-                                                <Button variant="secondary" onClick={handleCancelEdit} style={{ marginLeft: '10px' }}>취소</Button>
+                                        {/* 대댓글 내용 */}
+                                        {editingCommentId === reply.commentId ? (
+                                            <div>
+                                                <textarea
+                                                    value={editedComment}
+                                                    onChange={(e) => setEditedComment(e.target.value)}
+                                                    rows="3"
+                                                    style={{ width: '100%' }}
+                                                />
+                                                <div style={{ marginTop: '10px' }}>
+                                                    <Button variant="dark" style={{ whiteSpace: 'nowrap' }} onClick={() => handleSaveEdit(reply.commentId, reply.user.id)}>저장</Button>
+                                                    <Button variant="secondary" onClick={handleCancelEdit} style={{ marginLeft: '10px' }}>취소</Button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ) : (
-                                        <p style={{ fontSize: '16px', marginLeft: '10px'}} dangerouslySetInnerHTML={{ __html: reply.comments }} />
-                                    )}
+                                        ) : (
+                                            <p style={{ fontSize: '16px', marginLeft: '10px' }} dangerouslySetInnerHTML={{ __html: reply.comments }} />
+                                        )}
 
-                                    {/* 대댓글 수정 및 삭제 버튼 */}
-                                    {(reply.user && reply.user.id === userId) && (
-                                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                            <Button 
-                                                variant="link" 
-                                                onClick={() => handleEditComment(reply.commentId, reply.comments)} 
-                                                style={{ marginRight: '10px', borderRadius: '20px', padding: '5px 15px', border: '1px solid black', color: 'black', textDecoration: 'none' }}>
-                                                수정
-                                            </Button>
-                                            <Button 
-                                                variant="link" 
-                                                onClick={() => handleDeleteComment(reply.commentId, reply.user.id)} 
-                                                style={{ color: 'red', borderRadius: '20px', padding: '5px 15px', border: '1px solid red', textDecoration: 'none' }}>
-                                                삭제
-                                            </Button>
-                                        </div>
-                                    )}
-                                </ListGroup.Item>
-                            ))}
-                        </ListGroup>
-                    )}
-                </ListGroup.Item>
-            ))}
+                                        {/* 대댓글 수정 및 삭제 버튼 */}
+                                        {(reply.user && reply.user.id === userId) && (
+                                            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                                <Button
+                                                    variant="link"
+                                                    onClick={() => handleEditComment(reply.commentId, reply.comments)}
+                                                    style={{ marginRight: '10px', borderRadius: '20px', padding: '5px 15px', border: '1px solid black', color: 'black', textDecoration: 'none' }}>
+                                                    수정
+                                                </Button>
+                                                <Button
+                                                    variant="link"
+                                                    onClick={() => handleDeleteComment(reply.commentId, reply.user.id)}
+                                                    style={{ color: 'red', borderRadius: '20px', padding: '5px 15px', border: '1px solid red', textDecoration: 'none' }}>
+                                                    삭제
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </ListGroup.Item>
+                                ))}
+                            </ListGroup>
+                        )}
+                    </ListGroup.Item>
+                ))}
 
             </ListGroup>
         </div>
