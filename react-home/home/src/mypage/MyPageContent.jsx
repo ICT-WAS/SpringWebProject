@@ -1,5 +1,4 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -9,84 +8,125 @@ import {
   Row,
   Stack,
 } from "react-bootstrap";
-import { getUserIdFromToken } from "../api/TokenUtils";
 import { useNavigate } from "react-router-dom";
-import UserInfoAndConditionDetails from "./UserInfoAndConditionDetails";
-import Modal from "../components/modal/Modal";
+import { getUserIdFromToken } from '../api/TokenUtils';
+import axios from "axios";
 
 export default function MyPageContent() {
-  const navigate = useNavigate();
+  const token = localStorage.getItem("accessToken");
+  const userId = getUserIdFromToken(token);
+  const [interests, setInterests] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [comments, setComments] = useState([]);
 
-  //모달 상태 관리
-  const [isModal, setIsModal] = useState(false);
-  const [error, setError] = useState("");
-  const [errorTitle, setErrorTitle] = useState("");
-
-  //에러 메시지가 변할 시 모달 출력
-  useEffect(() => {
-    if (error) {
-      //loginError 빈문자열 아닐 때만 modal 호출
-      setIsModal(true);
-    }
-  }, [error]);
-
-  //모달 닫을 때
-  const closeModal = () => {
-    setIsModal(false);
-  };
-
-  function onConditionButtonClick() {
-    navigate("/conditions");
+  function fetchInterest() {
+    axios
+      .get(`http://localhost:8989/interest/${userId}`
+      )
+      .then((response) => {
+        setInterests(response.data);
+      })
+      .catch((error) => {
+        console.error("데이터 요청 실패:", error);
+      });
   }
+
+  function fetchPosts() {
+    axios
+      .get(`http://localhost:8989/community/posts/${userId}`
+      )
+      .then((response) => {
+        setPosts(response.data);
+      })
+      .catch((error) => {
+        console.error("데이터 요청 실패:", error);
+      });
+  }
+
+  function fetchComments(){
+    axios
+      .get(`http://localhost:8989/community/comments/${userId}`
+      )
+      .then((response) => {
+        setComments(response.data);
+      })
+      .catch((error) => {
+        console.error("데이터 요청 실패:", error);
+      });
+  }
+
+  useEffect(() => {
+    fetchInterest();
+    fetchPosts()
+    fetchComments()
+  }, []);
 
   return (
     <>
-      <p className="heading-text">마이페이지</p>
-      <Stack direction="vertical" gap={5}>
-        <UserInfoAndConditionDetails
-          setError={setError}
-          setErrorTitle={setErrorTitle}
-        />
-
-        <p className="heading-text">모아보기</p>
+      <Stack direction="vertical" gap={5} style={{ marginBottom: '100px' }}>
+        <p className="heading-text">마이페이지</p>
         <Container fluid>
+          <Row style={{ marginBottom: '20px' }}>
+            <Col>
+              <MyMenuCard
+                name={"개인 정보"}
+                text={"개인 정보 확인 및 변경"}
+                iClassName={"bi-person"}
+                url={"/mypage/account/edit"}
+              />
+            </Col>
+            <Col>
+              <MyMenuCard
+                name={"내 조건"}
+                text={"신청자 및 세대구성원 정보 관리"}
+                iClassName={"bi-person-gear"}
+                url={"/conditions"}
+              />
+            </Col>
+          </Row>
           <Row>
             <Col>
               <MyMenuCard
-                name={"찜한 공고"}
-                total={21}
+                name={"관심 공고"}
+                text={interests.length + " 건"}
                 iClassName={"bi-suit-heart"}
+                url={"/interest"}
               />
             </Col>
             <Col>
               <MyMenuCard
                 name={"내가 쓴 글"}
-                total={1}
+                text={posts.length + " 건"}
                 iClassName={"bi-feather"}
+                url={"/myposts"}
               />
             </Col>
             <Col>
               <MyMenuCard
                 name={"내가 쓴 댓글"}
-                total={3}
+                text={comments.length + " 건"}
                 iClassName={"bi-chat-left-dots"}
+                url={"/mycomments"}
               />
             </Col>
           </Row>
         </Container>
       </Stack>
-      {isModal && (
-        <Modal title={errorTitle} message={error} onClose={closeModal} />
-      )}
     </>
   );
 }
 
-function MyMenuCard({ name, total, iClassName }) {
+function MyMenuCard({ name, text, iClassName, url }) {
+  const navigate = useNavigate();
+
+  function onButtonClick() {
+    navigate(url);
+  }
+
   return (
     <>
       <Card>
-        <Button className="btn-mypage-card" style={{ textAlign: "left" }}>
+        <Button className="btn-mypage-card" style={{ textAlign: "left" }} onClick={onButtonClick}>
           <CardBody>
             <p className="heading-text">
               {name}
@@ -98,7 +138,7 @@ function MyMenuCard({ name, total, iClassName }) {
                 style={{ fontSize: "2.5rem" }}
               />
             </b>
-            <span className="px-4 ">{total}건</span>
+            <span className="px-4 filter-category">{text}</span>
           </CardBody>
         </Button>
       </Card>
@@ -106,32 +146,3 @@ function MyMenuCard({ name, total, iClassName }) {
   );
 }
 
-function ConditionButton({ onClick }) {
-  const [hasCondition, setHasCondition] = useState(false);
-
-  const token = localStorage.getItem("accessToken");
-  const userId = getUserIdFromToken(token);
-
-  const fetchCondition = () => {
-    axios
-      .get(`http://localhost:8989/condition/${userId}`)
-      .then((response) => {
-        setHasCondition(response.data.hasCondition);
-      })
-      .catch((error) => {
-        console.error("데이터 요청 실패:", error);
-      });
-  };
-
-  useEffect(() => {
-    fetchCondition();
-  }, []);
-
-  return (
-    <>
-      <Button variant="dark" onClick={onClick}>
-        {hasCondition ? "조건 확인" : "조건 등록"}
-      </Button>
-    </>
-  );
-}

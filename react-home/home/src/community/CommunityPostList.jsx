@@ -10,7 +10,7 @@ export default function CommunityPostList() {
         <Container className="p-5" fluid="md">
             <Stack direction="vertical" gap={5}>
                 <Header />
-                <CommunityPostListContent />
+                    <CommunityPostListContent />
                 <Footer />
             </Stack>
         </Container>

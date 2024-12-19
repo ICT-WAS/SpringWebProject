@@ -1,6 +1,6 @@
 import { Card } from 'react-bootstrap';
 
-export default function CommunityCard({post}) {
+export default function MainPostCard({post}) {
     // 제목과 내용을 최대 글자 수로 자르기
     
     const truncatedTitle = post.title.length > 15 ? post.title.slice(0, 15) + "..." : post.title;
