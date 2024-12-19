@@ -52,7 +52,7 @@ root.render(
 
         {/* 청약 */}
         <Route path="/subscriptions" element={<ApplyAnnouncementList />} />
-        <Route path="/subscriptions/info" element={<ApplyAnnouncement />} />
+        <Route path="/subscriptions/info/:houseId" element={<ApplyAnnouncement />} />
         <Route
           path="/subscriptions/search/:keyword"
           element={<SearchAnnouncementByName />}
