@@ -46,6 +46,11 @@ public class ConditionServiceImpl implements ConditionService{
     @Transactional
     public void saveConditions(ConditionDTO conditionDTO, Long userId) {
 
+        Condition01 condition01 = c01r.findByUser_Id(userId);
+        if(condition01 != null) {
+            return;
+        }
+
         User user = ur.getReferenceById(userId);
 
         saveCondition01(conditionDTO.getCondition01DTO(), user);
