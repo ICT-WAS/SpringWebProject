@@ -2,7 +2,6 @@ import axios from 'axios';
 import { Container, Row, Col, Stack, Nav, Table } from 'react-bootstrap';
 import NotificationButton from './InterestButton';
 import React, { useState, useEffect } from 'react';
-import KakaoMap from './KakaoMap';
 import { useParams } from 'react-router-dom';
 
 export default function ApplyAnnouncementContent() {
@@ -99,9 +98,6 @@ export default function ApplyAnnouncementContent() {
               <AdditionalInfo houseData={houseData} houseDetailData={houseDetailData} />
             </Row>
 
-            <Row>
-              <KakaoMap />
-            </Row>
           </Container>
         </Row>
       </Container>
