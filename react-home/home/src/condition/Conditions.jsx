@@ -56,8 +56,15 @@ function ConditionInfo() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.error("데이터 요청 실패:", error);
-                setLoading(false);
+                if (error.response.status === 500) {
+                    console.error("서버 에러(500):", error.response.data);
+                    alert("서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.");
+                    navigate("/conditions");
+                  } else {
+                    console.error("응답 에러:", error.response.status, error.response.data);
+                    console.error("데이터 요청 실패:", error);
+                  }
+                  setLoading(false);
             });
     };
 

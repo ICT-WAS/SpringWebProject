@@ -244,3 +244,7 @@ table tr:hover {
   background-color: #000000 !important;
   color: white !important;
 }
+
+.house-detail * {
+  font-size: 0.75rem;
+}

@@ -1,4 +1,4 @@
-import { Button, Col, Container, Form, InputGroup, Row, Pagination } from "react-bootstrap";
+import { Button, Col, Container, Form, InputGroup, Row, Pagination, Stack } from "react-bootstrap";
 import CommunityCard from "./CommunityCard";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -106,7 +106,7 @@ export default function CommunityPostListContent() {
                 {loading ? (
                     <p>로딩 중...</p>
                 ) : (
-                    <div>
+                    <Stack direction='vertical' gap={3}>
                         {totalCount === 0 ? (
                             <p>해당 키워드가 포함된 게시글이 없습니다.</p>
                         ) : (
@@ -116,7 +116,7 @@ export default function CommunityPostListContent() {
                                 </div>
                             ))
                         )}
-                    </div>
+                    </Stack>
                 )}
 
                 {/* 페이지네이션 */}
