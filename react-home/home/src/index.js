@@ -154,15 +154,7 @@ root.render(
 
         {/* 로그인한 사용자만 접근할 수 있는 페이지 - PrivateRoute 컴포넌트로 감싸면 보호 설정 됨 */}
         {/* 로그인하지 않으면 로그인 페이지(/login)로 리다이렉트 */}
-        {/* 정보 조회 및 수정 */}
-        <Route
-          path="/mypage/account"
-          element={
-            <PrivateRoute>
-              <UserInfo />
-            </PrivateRoute>
-          }
-        />
+        {/* 정보 수정 */}
         <Route
           path="/mypage/account/edit"
           element={
