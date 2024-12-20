@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Container, Row, Col, Stack, Nav, Table, Form, Card } from 'react-bootstrap';
+import { Container, Row, Col, Stack, Nav, Table, Form, Card, Button } from 'react-bootstrap';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import InterestButton from './InterestButton';
@@ -111,7 +111,7 @@ export default function ApplyAnnouncementContent() {
         <Row>
           <Container>
 
-            <Row>
+            <Row className="mb-5">
               {/* 기본 헤더 */}
               <Col>
                 <DetailHeader houseData={houseData} houseDetailData={houseDetailData} />
@@ -119,25 +119,54 @@ export default function ApplyAnnouncementContent() {
               <Col md="auto">
                 <InterestButton houseId={houseId} />
               </Col>
+            </Row>
 
-              {/* 기본 상세 */}
-              <Row className="mb-5">
-                <Stack direction='horizontal' gap={3} style={{ alignItems: 'start'}}>
-
-                  <div style={{ flex: 1 }} >
-                    <DefaultDetailData houseData={houseData} houseDetailData={houseDetailData}
-                      normalSupplyCount={normalSupplyCount} specialSupplyCount={specialSupplyCount} />
-
-                  </div>
-
-                  <div style={{ flex: 1 }} >
-                    <SupplyType supplyTypeList={supplyTypeList} />
-                  </div>
-
-                </Stack>
+            {/* 기본 상세 */}
+            <Row className="mb-5">
+              <div className='house-detail'>
+                <section className='mb-5'>
+                  <h2>공고 상세</h2>
+                  <hr />
+                </section></div>
 
 
-              </Row>
+
+              <Stack direction='horizontal' gap={3} style={{ alignItems: 'start' }}>
+
+                <div style={{ flex: 1 }} >
+                  <DefaultDetailData houseData={houseData} houseDetailData={houseDetailData}
+                    normalSupplyCount={normalSupplyCount} specialSupplyCount={specialSupplyCount} />
+
+                </div>
+
+                <div style={{ flex: 1 }} >
+                  <SupplyType supplyTypeList={supplyTypeList} />
+                </div>
+
+              </Stack>
+
+            </Row>
+
+            <Row>
+              <div className='house-detail'>
+                <section className='mb-5'>
+                  <h2>공급 위치</h2>
+                  <hr />
+                </section></div>
+            </Row>
+
+            <Row>
+              <div style={{ minHeight: '300px' }}>
+
+              </div>
+            </Row>
+
+            <Row>
+              <div className='house-detail'>
+                <section className='mb-5'>
+                  <h2>타입 별 상세</h2>
+                  <hr />
+                </section></div>
             </Row>
 
             {/* 타입 내비게이션 */}
@@ -150,7 +179,7 @@ export default function ApplyAnnouncementContent() {
               <TypeDetailData selectedHouseDetailData={selectedHouseDetailData} />
             </Row>
 
-            {/* 특이사항, 문의 */}
+            {/* 문의 */}
             <Row>
               <AdditionalInfo houseData={houseData} houseDetailData={houseDetailData} />
             </Row>
@@ -167,12 +196,12 @@ function DetailHeader({ houseData, houseDetailData }) {
   return (
     <Stack direction='vertical' gap={3}>
       <Stack direction='horizontal' gap={3} >
-        <p className='card-body-text'>{houseDetailData.houseDtlSecdNm || '무순위'}</p>
-        <p className='card-body-text'>{houseDetailData.hssplyAdres}</p>
         <p className='card-body-text'>{houseData.rcritPblancDe}</p>
+        <p className='card-body-text'>{houseDetailData.houseDtlSecdNm || '무순위'}</p>
+        <p className='card-body-text'>{houseData.hssplyAdres}</p>
       </Stack>
       <p className='housing-subtitle'>
-        {houseData.houseNm}
+        [{houseDetailData.houseDtlSecdNm || '무순위'}]{houseData.houseNm}
       </p>
     </Stack>
   );
@@ -201,6 +230,17 @@ function DefaultDetailData({ houseData, houseDetailData, normalSupplyCount, spec
     { name: 'mvnPrearngeYm', display: '입주예정월' },
   ];
 
+  const specialNotes = [
+    { name: 'specltRdnEarthAt', display: '투기과열지구' },
+    { name: 'mdatTrgetAreaSecd', display: '조정대상지역' },
+    { name: 'parcprcUlsAt', display: '분양가상한제' },
+    { name: 'imprnmBsnsAt', display: '정비사업' },
+    { name: 'publicHouseEarthAt', display: '공공주택지구' },
+    { name: 'lrsclBldlndAt', display: '대규모 택지개발지구' },
+    { name: 'nplnPrvoprPublicHouseAt', display: '수도권 내 민영 공공주택지구' },
+    { name: 'publicHouseSpclwApplcAt', display: '공공주택 특별법 적용' },
+  ];
+
   const scheduleData = houseData.houseSecd === "01" ? detail01ScheduleData : detail04ScheduleData;
 
   const today = new Date();
@@ -214,28 +254,49 @@ function DefaultDetailData({ houseData, houseDetailData, normalSupplyCount, spec
   ];
 
   return (
-    <div className='house-detail'>
-      <h1>청약 공고 상세 정보</h1>
+    <>
+      <div className='house-detail'>
 
-      <section>
-        <p>공급 위치 : ({houseData.hssplyZip})&nbsp;{houseData.hssplyAdres}</p>
-      </section>
+        <section>
+          <h3>공급 위치</h3>
 
-      <section className='mb-5'>
-        <h3>접수 일정</h3>
+          <p className='filter-values'>
+            ({houseData.hssplyZip})&nbsp;{houseData.hssplyAdres}
+          </p>
 
-        <ScheduleProgress scheduleList={scheduleList} />
+        </section>
 
-      </section>
+        <section>
+          <h3>공급 세대 수</h3>
+          <p className='filter-values'>일반 공급 {normalSupplyCount || 0}세대, 
+            특별 공급 {specialSupplyCount || 0}세대, 
+            총 공급 {houseData.totSuplyHsldco}세대
+          </p>
+        </section>
 
-      <section>
-        <h2>총 공급 수량</h2>
-        <p>일반 공급: {normalSupplyCount || 0}세대</p>
-        <p>특별 공급: {specialSupplyCount || 0}세대</p>
-        <p>총 공급: {houseData.totSuplyHsldco}세대</p>
-      </section>
+        {houseData.houseSecd === "01" &&
+          <section className='mb-5'>
+            <h3>특이사항</h3>
 
-    </div>
+            {
+              specialNotes.map((data, index) => (
+                houseDetailData[data.name] === true
+                  ? <li key={index} className='mb-1'>{data.display}</li>
+                  : null
+              ))
+            }
+          </section>
+        }
+
+        <section className='mb-5'>
+          <h3>접수 일정</h3>
+
+          <ScheduleProgress scheduleList={scheduleList} />
+
+        </section>
+
+      </div>
+    </>
   );
 }
 
@@ -246,7 +307,7 @@ function SupplyType({ supplyTypeList }) {
 
   useEffect(() => {
     setSelectedValue(supplyTypeList[0]);
-    
+
   }, []);
 
   function handleChanged(e) {
@@ -255,16 +316,19 @@ function SupplyType({ supplyTypeList }) {
 
   return (
     <Card body>
-    <Form.Label>신청 자격 조회</Form.Label>
+      <div className='house-detail mb-3'>
+        <h3>신청 자격 조회</h3>
+
+      </div>
       <Form.Select value={selectedValue} onChange={handleChanged} >
-        
+
         {supplyTypeList.map((type) =>
           <option key={type} value={type} >
             {type}
           </option>
         )}
       </Form.Select>
-      <div style={{minHeight: '10vh'}} >
+      <div style={{ minHeight: '30vh' }} >
 
       </div>
     </Card>
@@ -324,7 +388,7 @@ function TypeDetailData({ selectedHouseDetailData }) {
   return (
     <div className='house-detail'>
 
-      <h2>공급 대상</h2>
+      <h3>공급 대상</h3>
 
       <Table striped bordered hover>
         <thead>
@@ -386,39 +450,20 @@ function TypeNavBar({ houseTypes, setKey, eventKey }) {
 }
 
 /* 특이사항, 문의 */
-function AdditionalInfo({ houseData, houseDetailData }) {
-
-  const scheduleData = [
-    { name: 'specltRdnEarthAt', display: '투기과열지구' },
-    { name: 'mdatTrgetAreaSecd', display: '조정대상지역' },
-    { name: 'parcprcUlsAt', display: '분양가상한제' },
-    { name: 'imprnmBsnsAt', display: '정비사업' },
-    { name: 'publicHouseEarthAt', display: '공공주택지구' },
-    { name: 'lrsclBldlndAt', display: '대규모 택지개발지구' },
-    { name: 'nplnPrvoprPublicHouseAt', display: '수도권 내 민영 공공주택지구' },
-    { name: 'publicHouseSpclwApplcAt', display: '공공주택 특별법 적용' },
-  ];
+function AdditionalInfo({ houseData }) {
 
   return (
     <div className='house-detail'>
-      {houseData.houseSecd === "01" &&
-        <section>
-          <ul>
-            특이사항
-            {
-              scheduleData.map((data, index) => (
-                houseDetailData[data] === "Y" ?? <li key={index}>scheduleData[index]['display']</li>
-              ))
-            }
-          </ul>
-        </section>
-      }
 
       <section>
-        <h2>문의 정보</h2>
+        <h3>문의 정보</h3>
         <p><a href={houseData.hmpgAdres}>{houseData.bsnsMbyNm}</a></p>
         <p>문의처: {houseData.mdhsTelno}</p>
+      </section>
+
+      <section>
         <p>
+          <Button variant='light'></Button>
           공고 모집 url : <a href={houseData.pblancUrl}>{houseData.pblancUrl}</a>
         </p>
       </section>
