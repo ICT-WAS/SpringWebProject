@@ -9,7 +9,7 @@ import {
   Stack,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { getUserIdFromToken } from '../api/TokenUtils';
+import { getUserIdFromToken } from "../api/TokenUtils";
 import axios from "axios";
 
 export default function MyPageContent() {
@@ -21,8 +21,7 @@ export default function MyPageContent() {
 
   function fetchInterest() {
     axios
-      .get(`http://localhost:8989/interest/${userId}`
-      )
+      .get(`http://localhost:8989/interest/${userId}`)
       .then((response) => {
         setInterests(response.data);
       })
@@ -33,8 +32,7 @@ export default function MyPageContent() {
 
   function fetchPosts() {
     axios
-      .get(`http://localhost:8989/community/posts/${userId}`
-      )
+      .get(`http://localhost:8989/community/posts/${userId}`)
       .then((response) => {
         setPosts(response.data);
       })
@@ -43,10 +41,9 @@ export default function MyPageContent() {
       });
   }
 
-  function fetchComments(){
+  function fetchComments() {
     axios
-      .get(`http://localhost:8989/community/comments/${userId}`
-      )
+      .get(`http://localhost:8989/community/comments/${userId}`)
       .then((response) => {
         setComments(response.data);
       })
@@ -57,22 +54,22 @@ export default function MyPageContent() {
 
   useEffect(() => {
     fetchInterest();
-    fetchPosts()
-    fetchComments()
+    fetchPosts();
+    fetchComments();
   }, []);
 
   return (
     <>
-      <Stack direction="vertical" gap={5} style={{ marginBottom: '100px' }}>
+      <Stack direction="vertical" gap={5} style={{ marginBottom: "100px" }}>
         <p className="heading-text">마이페이지</p>
         <Container fluid>
-          <Row style={{ marginBottom: '20px' }}>
+          <Row style={{ marginBottom: "20px" }}>
             <Col>
               <MyMenuCard
                 name={"개인 정보"}
                 text={"개인 정보 확인 및 변경"}
                 iClassName={"bi-person"}
-                url={"/mypage/account/edit"}
+                url={"/mypage/account"}
               />
             </Col>
             <Col>
@@ -126,7 +123,11 @@ function MyMenuCard({ name, text, iClassName, url }) {
   return (
     <>
       <Card>
-        <Button className="btn-mypage-card" style={{ textAlign: "left" }} onClick={onButtonClick}>
+        <Button
+          className="btn-mypage-card"
+          style={{ textAlign: "left" }}
+          onClick={onButtonClick}
+        >
           <CardBody>
             <p className="heading-text">
               {name}
@@ -145,4 +146,3 @@ function MyMenuCard({ name, text, iClassName, url }) {
     </>
   );
 }
-
