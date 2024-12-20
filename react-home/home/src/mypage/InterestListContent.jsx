@@ -45,7 +45,7 @@ export default function InterestListContent() {
 
                     <p className='card-body-text' >{totalCount || 0} 건</p>
                     {loading && <Spinners />}
-                    {subscriptions.length < 1 && <p className='filter-values'>관심 공고가 없습니다.</p>}
+                    {totalCount < 1 && <p className='filter-values'>관심 공고가 없습니다.</p>}
                     <SubscriptionCards subscriptions={subscriptions} />
                 </Stack>
             </Container>

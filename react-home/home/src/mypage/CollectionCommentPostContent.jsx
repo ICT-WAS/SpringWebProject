@@ -10,7 +10,7 @@ export default function CollectionCommentPostContent() {
      const token = localStorage.getItem("accessToken");
     const userId = getUserIdFromToken(token);
 
-    const [posts, setPosts] = useState([]);
+    const [comments, setComments] = useState([]);
     const [totalCount, setTotalCount] = useState();
     const [loading, setLoading] = useState(false);
 
@@ -19,7 +19,17 @@ export default function CollectionCommentPostContent() {
         axios
             .get(`http://localhost:8989/community/comments/${userId}`)
             .then((response) => {
-                setPosts(response.data);
+                const nextComments = response.data.map(comment => ({
+                    ...comment,
+                    title: comment.comments,
+                    subject: "",
+                    postId: comment.post.postId,
+                    post: undefined,
+                  }));
+
+                  console.log(nextComments)
+
+                setComments(nextComments);
                 setTotalCount(response.data?.length);
                 setLoading(false);
             })
@@ -46,18 +56,18 @@ export default function CollectionCommentPostContent() {
 
                 <p className='card-body-text' >{totalCount || 0} 건</p>
                 {loading && <Spinners />}
-                {posts.length < 1 && <p className='filter-values'>관심 공고가 없습니다.</p>}
-                <Posts posts={posts} />
+                {totalCount < 1 && <p className='filter-values'>작성한 댓글이 없습니다.</p>}
+                <Comments comments={comments} />
             </Stack>
             </Container>
         </>
     );
 }
 
-function Posts({ posts }) {
-    return posts.map((post) => (
-        <div key={post.postId}>
-            <CommunityCard post={post} />
+function Comments({ comments }) {
+    return comments.map((comment) => (
+        <div key={comment.commentId}>
+            <CommunityCard post={comment} />
         </div>
     ));
 }
