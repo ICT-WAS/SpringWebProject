@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { Container, Row, Col, Stack, Nav, Table } from 'react-bootstrap';
-import React, { useState } from 'react';
+import { Container, Row, Col, Stack, Nav, Table, Form, Card } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import InterestButton from './InterestButton';
 
@@ -17,11 +17,33 @@ export default function ApplyAnnouncementContent() {
 
   const [houseDetailListData, setHouseDetailListData] = useState([]);
 
+  // 선택한 타입의 상세 정보
   const [selectedHouseDetailData, setSelectedHouseDetailData] = useState({});
 
   const [houseTypes, setHouseType] = useState([]);
 
   const [key, setKey] = useState(null);
+
+  // 일반공급세대수
+  const [normalSupplyCount, setNormalSupplyCount] = useState(0);
+  // 특별공급세대수
+  const [specialSupplyCount, setSpecialSupplyCount] = useState(0);
+
+
+  const [supplyTypeList, setSupplyTypeList] = useState([]);
+
+  const supplyTypeNameList = [
+    { name: 'mnychHshldco', kor: '다자녀가구' },
+    { name: 'nwwdsHshldco', kor: '신혼부부' },
+    { name: 'lfeFrstHshldco', kor: '생애최초' },
+    { name: 'oldParntsSuportHshldco', kor: '노부모부양' },
+    { name: 'insttRecomendHshldco', kor: '기관추천' },
+    { name: 'etcHshldco', kor: '기타' },
+    { name: 'transrInsttEnfsnHshldco', kor: '이전기관' },
+    { name: 'ygmnHshldco', kor: '청년' },
+    { name: 'nwbbHshldco', kor: '신생아' },
+  ];
+
 
   const getDetailData = () => {
     axios
@@ -44,6 +66,27 @@ export default function ApplyAnnouncementContent() {
         setSelectedHouseDetailData(nextSelectedHouseData);
 
         setHouseType(nextHouseDetailData.map(house => house.houseType));
+
+        const nextNormalSupplyCount = nextHouseDetailData
+          .map(house => house.normalSupply)
+          .reduce((sum, current) => sum + current, 0);
+        setNormalSupplyCount(nextNormalSupplyCount);
+
+        const nextSpecialSupplyCount = nextHouseDetailData
+          .map(house => house.specialSupply)
+          .reduce((sum, current) => sum + current, 0);
+        setSpecialSupplyCount(nextSpecialSupplyCount);
+
+        let nextSupplyTypeList = response.data.house.houseSecd === "04" ? ["일반"] : ["1순위", "2순위"];
+        nextHouseDetailData.forEach(data => {
+          supplyTypeNameList.forEach((typeName) => {
+            if (data[typeName.name] > 0 && !nextSupplyTypeList.find(type => type === typeName.kor)) {
+              nextSupplyTypeList.push(typeName.kor);
+            }
+          })
+        });
+
+        setSupplyTypeList(nextSupplyTypeList);
       })
       .catch((error) => {
         console.error("데이터 요청 실패:", error);
@@ -79,10 +122,24 @@ export default function ApplyAnnouncementContent() {
 
               {/* 기본 상세 */}
               <Row className="mb-5">
-                <DefaultDetailData houseData={houseData} houseDetailData={houseDetailData} />
+                <Stack direction='horizontal' gap={3} style={{ alignItems: 'start'}}>
+
+                  <div style={{ flex: 1 }} >
+                    <DefaultDetailData houseData={houseData} houseDetailData={houseDetailData}
+                      normalSupplyCount={normalSupplyCount} specialSupplyCount={specialSupplyCount} />
+
+                  </div>
+
+                  <div style={{ flex: 1 }} >
+                    <SupplyType supplyTypeList={supplyTypeList} />
+                  </div>
+
+                </Stack>
+
+
               </Row>
             </Row>
-            
+
             {/* 타입 내비게이션 */}
             <Row className="mb-5">
               <TypeNavBar houseTypes={houseTypes} setKey={handleTypeClick} eventKey={key} />
@@ -122,7 +179,7 @@ function DetailHeader({ houseData, houseDetailData }) {
 }
 
 /* 공고 상세(기본) */
-function DefaultDetailData({ houseData, houseDetailData }) {
+function DefaultDetailData({ houseData, houseDetailData, normalSupplyCount, specialSupplyCount }) {
 
   const detail01ScheduleData = [
     { name: 'rcritPblancDe', display: '모집공고일' },
@@ -149,11 +206,11 @@ function DefaultDetailData({ houseData, houseDetailData }) {
   const today = new Date();
 
   const scheduleList = [
-    {id: 1, name: scheduleData[0].display, date: houseData[scheduleData[0].name], completed: new Date(houseData[scheduleData[0].name]) <= today},
-    {id: 2, name: scheduleData[1].display, date: houseDetailData[scheduleData[1].name], completed: new Date(houseDetailData[scheduleData[1].name]) <= today},
-    {id: 3, name: scheduleData[2].display, date: houseDetailData[scheduleData[2].name], completed: new Date(houseDetailData[scheduleData[2].name]) <= today},
-    {id: 4, name: scheduleData[3].display, date: houseData[scheduleData[3].name], completed: new Date(houseData[scheduleData[3].name]) <= today},
-    {id: 5, name: scheduleData[4].display, date: houseData[scheduleData[4].name], completed: new Date(houseData[scheduleData[4].name]) <= today},
+    { id: 1, name: scheduleData[0].display, date: houseData[scheduleData[0].name], completed: new Date(houseData[scheduleData[0].name]) <= today },
+    { id: 2, name: scheduleData[1].display, date: houseDetailData[scheduleData[1].name], completed: new Date(houseDetailData[scheduleData[1].name]) <= today },
+    { id: 3, name: scheduleData[2].display, date: houseDetailData[scheduleData[2].name], completed: new Date(houseDetailData[scheduleData[2].name]) <= today },
+    { id: 4, name: scheduleData[3].display, date: houseData[scheduleData[3].name], completed: new Date(houseData[scheduleData[3].name]) <= today },
+    { id: 5, name: scheduleData[4].display, date: houseData[scheduleData[4].name], completed: new Date(houseData[scheduleData[4].name]) <= today },
   ];
 
   return (
@@ -166,18 +223,51 @@ function DefaultDetailData({ houseData, houseDetailData }) {
 
       <section className='mb-5'>
         <h3>접수 일정</h3>
+
         <ScheduleProgress scheduleList={scheduleList} />
 
       </section>
 
       <section>
         <h2>총 공급 수량</h2>
-        <p>일반 공급: {houseData.general_units || 0}세대</p>
-        <p>특별 공급: {houseData.special_units || 0}세대</p>
+        <p>일반 공급: {normalSupplyCount || 0}세대</p>
+        <p>특별 공급: {specialSupplyCount || 0}세대</p>
         <p>총 공급: {houseData.totSuplyHsldco}세대</p>
       </section>
 
     </div>
+  );
+}
+
+/* 공급방식 */
+function SupplyType({ supplyTypeList }) {
+
+  const [selectedValue, setSelectedValue] = useState('');
+
+  useEffect(() => {
+    setSelectedValue(supplyTypeList[0]);
+    
+  }, []);
+
+  function handleChanged(e) {
+    setSelectedValue(e.target.value);
+  }
+
+  return (
+    <Card body>
+    <Form.Label>신청 자격 조회</Form.Label>
+      <Form.Select value={selectedValue} onChange={handleChanged} >
+        
+        {supplyTypeList.map((type) =>
+          <option key={type} value={type} >
+            {type}
+          </option>
+        )}
+      </Form.Select>
+      <div style={{minHeight: '10vh'}} >
+
+      </div>
+    </Card>
   );
 }
 
