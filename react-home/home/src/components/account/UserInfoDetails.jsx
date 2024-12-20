@@ -42,6 +42,10 @@ const UserInfoDetails = ({ setError, setErrorTitle }) => {
     }
   };
 
+  const handleClickBack = () => {
+    navigate("/mypage");
+  };
+
   const handleClick = () => {
     navigate("/mypage/account/edit");
   };
@@ -77,10 +81,10 @@ const UserInfoDetails = ({ setError, setErrorTitle }) => {
               </li>
               <li>
                 <div className="info_flex_one">
-                  <p className="info_subtitle2">핸드폰 번호</p>
+                  <p className="info_subtitle2">휴대폰 번호</p>
                   <p className="info_data_text2">{userInfo.phoneNumber}</p>
                   {userInfo.userVerify &&
-                  userInfo.userVerify === "휴대폰 인증" ? (
+                  userInfo.userVerify === "핸드폰 인증" ? (
                     <p className="info_data_text3">인증됨</p>
                   ) : null}
                 </div>
@@ -105,9 +109,14 @@ const UserInfoDetails = ({ setError, setErrorTitle }) => {
         </div>
         <Col md="auto" className="d-flex justify-content-end">
           <p className="nav-bar-links">
-            <Button type="button" variant="dark" onClick={handleClick}>
-              정보 수정
-            </Button>
+            <div className="d-flex gap-4">
+              <Button type="button" variant="light" onClick={handleClickBack}>
+                뒤로 가기
+              </Button>
+              <Button type="submit" variant="dark" onClick={handleClick}>
+                정보 수정
+              </Button>
+            </div>
           </p>
         </Col>
       </section>

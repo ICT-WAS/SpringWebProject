@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import "./Modal.css";
 
-const InfoModal = React.forwardRef(({ title, message, onClose }) => {
+const InfoModal = ({ title, message, onClose }) => {
   // Enter 키 입력 시 확인 버튼 클릭 이벤트 실행
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -27,6 +27,6 @@ const InfoModal = React.forwardRef(({ title, message, onClose }) => {
       </div>
     </div>
   );
-});
+};
 
 export default InfoModal;
