@@ -135,10 +135,10 @@ const UserInfoAndConditionDetails = ({ setError, setErrorTitle }) => {
               </li>
               <li>
                 <div className="info_flex_one">
-                  <p className="info_subtitle2">핸드폰 번호</p>
+                  <p className="info_subtitle2">휴대폰 번호</p>
                   <p className="info_data_text2">{userInfo.phoneNumber}</p>
                   {userInfo.userVerify &&
-                  userInfo.userVerify === "휴대폰 인증" ? (
+                  userInfo.userVerify === "핸드폰 인증" ? (
                     <p className="info_data_text3">인증됨</p>
                   ) : null}
                 </div>
