@@ -49,7 +49,7 @@ export default function CollectionPostContent() {
                 
                 <p className='card-body-text' >{totalCount || 0} 건</p>
                 {loading && <Spinners />}
-                {posts.length < 1 && <p className='filter-values'>관심 공고가 없습니다.</p>}
+                {totalCount < 1 && <p className='filter-values'>작성한 글이 없없습니다.</p>}
                 <Posts posts={posts} />
             </Stack>
             </Container>
