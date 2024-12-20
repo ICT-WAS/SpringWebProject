@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import AccountInputUsername from "./AccountInputUsername";
 import AccountInputPhoneNumber from "./AccountInputPhoneNumber";
 
-const UserInfoDetailsEdit = ({ setError, setErrorTitle }) => {
+const UserInfoDetailsEdit = ({ setError, setErrorTitle, ClickDeleteUser }) => {
   //로그인 상태를 관리하는 전역 변수
   const { userId } = useGlobalContext();
   //수정된 값을 담을 변수
@@ -171,7 +171,9 @@ const UserInfoDetailsEdit = ({ setError, setErrorTitle }) => {
             md="auto"
             className="d-flex justify-content-between align-items-center"
           >
-            <p className="info-small-text">회원 탈퇴</p>
+            <p className="info-small-text" onClick={ClickDeleteUser}>
+              회원 탈퇴
+            </p>
             <div className="d-flex gap-4">
               <Button
                 type="button"
