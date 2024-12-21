@@ -3,6 +3,7 @@ import { Container, Row, Col, Stack, Nav, Table, Form, Card, Button } from 'reac
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import InterestButton from './InterestButton';
+import AnnouncementLocationMap from './AnnouncementLocationMap';
 
 export default function ApplyAnnouncementContent() {
 
@@ -147,18 +148,9 @@ export default function ApplyAnnouncementContent() {
 
             </Row>
 
+            {/* 네이버지도 API */}
             <Row>
-              <div className='house-detail'>
-                <section className='mb-5'>
-                  <h2>공급 위치</h2>
-                  <hr />
-                </section></div>
-            </Row>
-
-            <Row>
-              <div style={{ minHeight: '300px' }}>
-
-              </div>
+              <AnnouncementLocationMap address={houseData.hssplyAdres} houseName={houseData.houseNm} />
             </Row>
 
             <Row>
@@ -201,7 +193,7 @@ function DetailHeader({ houseData, houseDetailData }) {
         <p className='card-body-text'>{houseData.hssplyAdres}</p>
       </Stack>
       <p className='housing-subtitle'>
-        [{houseDetailData.houseDtlSecdNm || '무순위'}]{houseData.houseNm}
+        {houseData.houseNm}
       </p>
     </Stack>
   );
@@ -268,8 +260,8 @@ function DefaultDetailData({ houseData, houseDetailData, normalSupplyCount, spec
 
         <section>
           <h3>공급 세대 수</h3>
-          <p className='filter-values'>일반 공급 {normalSupplyCount || 0}세대, 
-            특별 공급 {specialSupplyCount || 0}세대, 
+          <p className='filter-values'>일반 공급 {normalSupplyCount || 0}세대,
+            특별 공급 {specialSupplyCount || 0}세대,
             총 공급 {houseData.totSuplyHsldco}세대
           </p>
         </section>
@@ -463,8 +455,7 @@ function AdditionalInfo({ houseData }) {
 
       <section>
         <p>
-          <Button variant='light'></Button>
-          공고 모집 url : <a href={houseData.pblancUrl}>{houseData.pblancUrl}</a>
+          <Button variant='secondary' onClick={() => window.location.href = `${houseData.pblancUrl}`}>공고 모집 확인</Button>
         </p>
       </section>
     </div>

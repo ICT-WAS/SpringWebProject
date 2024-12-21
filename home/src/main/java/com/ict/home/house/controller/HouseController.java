@@ -9,16 +9,25 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/house")
 @RequiredArgsConstructor
 public class HouseController {
+
+    @Value("${api.key.id}")
+    private String apiKeyId;
+
+    @Value("${api.key.secret}")
+    private String apiKeySecret;
 
     private final HouseService hs;
 
@@ -101,5 +110,38 @@ public class HouseController {
             put("totalCount", houseInfoList.size());
             put("houseInfoList", paginatedList);
         }});
+    }
+
+    @GetMapping("/api/geocode")
+    public ResponseEntity<?> getGeocode(@RequestParam String query) {
+        String url = "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=" + query;
+
+        RestTemplate restTemplate = new RestTemplate();
+        var headers = new org.springframework.http.HttpHeaders();
+        headers.set("x-ncp-apigw-api-key-id", apiKeyId);
+        headers.set("x-ncp-apigw-api-key", apiKeySecret);
+
+        var entity = new org.springframework.http.HttpEntity<>(headers);
+
+        var response = restTemplate.exchange(
+                url, org.springframework.http.HttpMethod.GET, entity, Map.class);
+
+        Map<String, Object> responseBody = response.getBody();
+        if (responseBody != null) {
+            // "addresses" 배열 가져오기
+            List<Map<String, Object>> addresses = (List<Map<String, Object>>) responseBody.get("addresses");
+
+            if (addresses != null && !addresses.isEmpty()) {
+                // 첫 번째 주소에서 "x" 값 가져오기
+                String x = (String) addresses.get(0).get("x");
+                String y = (String) addresses.get(0).get("y");
+
+                return ResponseEntity.ok(new HashMap<String, Object>() {{
+                    put("x", x);
+                    put("y", y);
+                }});
+            }
+        }
+        return null;
     }
 }
