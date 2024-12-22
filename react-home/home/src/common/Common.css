@@ -248,3 +248,14 @@ table tr:hover {
 .house-detail * {
   font-size: 0.75rem;
 }
+
+
+.house-detail h2 {
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  .house-detail h3 {
+    font-weight: 600;
+    font-size: 16px;
+  }

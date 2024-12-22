@@ -15,7 +15,7 @@ export default function Condition02Content() {
     const [validate, setValidate] = useState(true);
 
     /* 제출용 데이터 */
-    const [familyDataList, setFamilyDataList] = useState([{}]);
+    const [familyDataList, setFamilyDataList] = useState([]);
     const [spouseFamilyDataList, setSpouseFamilyDataList] = useState([
         {
             seqIndex: 0, livingTogether: 2, relationship: 2, birthday: null,
@@ -23,7 +23,7 @@ export default function Condition02Content() {
         }]);
 
     const [married, setMarried] = useState(0);
-    const [hasSpouse, setHasSpouse] = useState(false); // 배우자와 동거
+    const [hasSpouse, setHasSpouse] = useState(false); // true: 배우자와 동거
 
     const token = localStorage.getItem("accessToken");
     const userId = getUserIdFromToken(token);
@@ -43,7 +43,6 @@ export default function Condition02Content() {
                     setHasSpouse(nextFamilyList.some(item => item.relationship === 2));
 
                     setFamilyDataList(nextFamilyList);
-                    setFamilyDataList(response.data.familyList);
                     setSpouseFamilyDataList(response.data.spouseFamilyList);
 
                     sessionStorage.removeItem('familyDataList');
@@ -60,7 +59,6 @@ export default function Condition02Content() {
     };
 
     const updateCondition = (FamilyData) => {
-        console.log(FamilyData);
         axios
             .patch(`http://localhost:8989/condition/2/${userId}`, FamilyData)
             .then((response) => {
@@ -74,6 +72,18 @@ export default function Condition02Content() {
     useEffect(() => {
         /* 이전 폼 데이터 읽어오기 */
         fetchCondition();
+
+        // 폼2데이터
+        const sessionFamilyData = sessionStorage.getItem('familyDataList');
+        const sessionSpouseFamilyData = sessionStorage.getItem('spouseFamilyDataList');
+        if (sessionFamilyData && sessionFamilyData.length > 0) {
+            const storedFamilyData = JSON.parse(sessionFamilyData);
+            setFamilyDataList(storedFamilyData);
+            const storedSpouseFamilyData = JSON.parse(sessionSpouseFamilyData) || [];
+            setSpouseFamilyDataList(storedSpouseFamilyData);
+
+            return;
+        }
 
         // 폼1데이터
         const nextHasSeperateSpouse = sessionStorage.getItem('livingWithSpouse') === 'N';
@@ -110,19 +120,6 @@ export default function Condition02Content() {
 
         setMarried(married);
         setFamilyDataList(nextFamilyDataList);
-
-        // 폼2데이터
-        const sessionFamilyData = sessionStorage.getItem('familyDataList');
-        const sessionSpouseFamilyData = sessionStorage.getItem('spouseFamilyDataList');
-        if (sessionFamilyData && sessionFamilyData.length > 0) {
-            const storedFamilyData = JSON.parse(sessionFamilyData);
-            setFamilyDataList(storedFamilyData);
-            const storedSpouseFamilyData = JSON.parse(sessionSpouseFamilyData) || [];
-            setSpouseFamilyDataList(storedSpouseFamilyData);
-
-            return;
-        }
-
 
     }, []);
 
@@ -165,8 +162,10 @@ export default function Condition02Content() {
 
         sessionStorage.setItem('hasSpouse', finalHasSpouse);
         sessionStorage.setItem('familyDataList', JSON.stringify(familyDataList));
-        sessionStorage.setItem('spouseFamilyDataList', JSON.stringify(spouseFamilyDataList));
-
+        if(finalHasSpouse && !hasSpouse) {
+            sessionStorage.setItem('spouseFamilyDataList', JSON.stringify(spouseFamilyDataList));
+        }
+    
         navigate("/condition-3");
     }
 
@@ -323,6 +322,7 @@ function FamilyForm({ married, handleChange, hasSpouse, savedFamilyDataList }) {
 
     return (
         <>
+        
             본인 세대의 세대구성원
             <Table>
                 <thead>

@@ -1,8 +1,9 @@
 import axios from 'axios';
-import { Container, Row, Col, Stack, Nav, Table } from 'react-bootstrap';
-import React, { useState } from 'react';
+import { Container, Row, Col, Stack, Nav, Table, Form, Card, Button } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import InterestButton from './InterestButton';
+import AnnouncementLocationMap from './AnnouncementLocationMap';
 
 export default function ApplyAnnouncementContent() {
 
@@ -17,11 +18,33 @@ export default function ApplyAnnouncementContent() {
 
   const [houseDetailListData, setHouseDetailListData] = useState([]);
 
+  // 선택한 타입의 상세 정보
   const [selectedHouseDetailData, setSelectedHouseDetailData] = useState({});
 
   const [houseTypes, setHouseType] = useState([]);
 
   const [key, setKey] = useState(null);
+
+  // 일반공급세대수
+  const [normalSupplyCount, setNormalSupplyCount] = useState(0);
+  // 특별공급세대수
+  const [specialSupplyCount, setSpecialSupplyCount] = useState(0);
+
+
+  const [supplyTypeList, setSupplyTypeList] = useState([]);
+
+  const supplyTypeNameList = [
+    { name: 'mnychHshldco', kor: '다자녀가구' },
+    { name: 'nwwdsHshldco', kor: '신혼부부' },
+    { name: 'lfeFrstHshldco', kor: '생애최초' },
+    { name: 'oldParntsSuportHshldco', kor: '노부모부양' },
+    { name: 'insttRecomendHshldco', kor: '기관추천' },
+    { name: 'etcHshldco', kor: '기타' },
+    { name: 'transrInsttEnfsnHshldco', kor: '이전기관' },
+    { name: 'ygmnHshldco', kor: '청년' },
+    { name: 'nwbbHshldco', kor: '신생아' },
+  ];
+
 
   const getDetailData = () => {
     axios
@@ -44,6 +67,27 @@ export default function ApplyAnnouncementContent() {
         setSelectedHouseDetailData(nextSelectedHouseData);
 
         setHouseType(nextHouseDetailData.map(house => house.houseType));
+
+        const nextNormalSupplyCount = nextHouseDetailData
+          .map(house => house.normalSupply)
+          .reduce((sum, current) => sum + current, 0);
+        setNormalSupplyCount(nextNormalSupplyCount);
+
+        const nextSpecialSupplyCount = nextHouseDetailData
+          .map(house => house.specialSupply)
+          .reduce((sum, current) => sum + current, 0);
+        setSpecialSupplyCount(nextSpecialSupplyCount);
+
+        let nextSupplyTypeList = response.data.house.houseSecd === "04" ? ["일반"] : ["1순위", "2순위"];
+        nextHouseDetailData.forEach(data => {
+          supplyTypeNameList.forEach((typeName) => {
+            if (data[typeName.name] > 0 && !nextSupplyTypeList.find(type => type === typeName.kor)) {
+              nextSupplyTypeList.push(typeName.kor);
+            }
+          })
+        });
+
+        setSupplyTypeList(nextSupplyTypeList);
       })
       .catch((error) => {
         console.error("데이터 요청 실패:", error);
@@ -68,7 +112,7 @@ export default function ApplyAnnouncementContent() {
         <Row>
           <Container>
 
-            <Row>
+            <Row className="mb-5">
               {/* 기본 헤더 */}
               <Col>
                 <DetailHeader houseData={houseData} houseDetailData={houseDetailData} />
@@ -76,13 +120,47 @@ export default function ApplyAnnouncementContent() {
               <Col md="auto">
                 <InterestButton houseId={houseId} />
               </Col>
-
-              {/* 기본 상세 */}
-              <Row className="mb-5">
-                <DefaultDetailData houseData={houseData} houseDetailData={houseDetailData} />
-              </Row>
             </Row>
-            
+
+            {/* 기본 상세 */}
+            <Row className="mb-5">
+              <div className='house-detail'>
+                <section className='mb-5'>
+                  <h2>공고 상세</h2>
+                  <hr />
+                </section></div>
+
+
+
+              <Stack direction='horizontal' gap={3} style={{ alignItems: 'start' }}>
+
+                <div style={{ flex: 1 }} >
+                  <DefaultDetailData houseData={houseData} houseDetailData={houseDetailData}
+                    normalSupplyCount={normalSupplyCount} specialSupplyCount={specialSupplyCount} />
+
+                </div>
+
+                <div style={{ flex: 1 }} >
+                  <SupplyType supplyTypeList={supplyTypeList} />
+                </div>
+
+              </Stack>
+
+            </Row>
+
+            {/* 네이버지도 API */}
+            <Row>
+              <AnnouncementLocationMap address={houseData.hssplyAdres} houseName={houseData.houseNm} />
+            </Row>
+
+            <Row>
+              <div className='house-detail'>
+                <section className='mb-5'>
+                  <h2>타입 별 상세</h2>
+                  <hr />
+                </section></div>
+            </Row>
+
             {/* 타입 내비게이션 */}
             <Row className="mb-5">
               <TypeNavBar houseTypes={houseTypes} setKey={handleTypeClick} eventKey={key} />
@@ -93,7 +171,7 @@ export default function ApplyAnnouncementContent() {
               <TypeDetailData selectedHouseDetailData={selectedHouseDetailData} />
             </Row>
 
-            {/* 특이사항, 문의 */}
+            {/* 문의 */}
             <Row>
               <AdditionalInfo houseData={houseData} houseDetailData={houseDetailData} />
             </Row>
@@ -110,9 +188,9 @@ function DetailHeader({ houseData, houseDetailData }) {
   return (
     <Stack direction='vertical' gap={3}>
       <Stack direction='horizontal' gap={3} >
-        <p className='card-body-text'>{houseDetailData.houseDtlSecdNm || '무순위'}</p>
-        <p className='card-body-text'>{houseDetailData.hssplyAdres}</p>
         <p className='card-body-text'>{houseData.rcritPblancDe}</p>
+        <p className='card-body-text'>{houseDetailData.houseDtlSecdNm || '무순위'}</p>
+        <p className='card-body-text'>{houseData.hssplyAdres}</p>
       </Stack>
       <p className='housing-subtitle'>
         {houseData.houseNm}
@@ -122,7 +200,7 @@ function DetailHeader({ houseData, houseDetailData }) {
 }
 
 /* 공고 상세(기본) */
-function DefaultDetailData({ houseData, houseDetailData }) {
+function DefaultDetailData({ houseData, houseDetailData, normalSupplyCount, specialSupplyCount }) {
 
   const detail01ScheduleData = [
     { name: 'rcritPblancDe', display: '모집공고일' },
@@ -144,40 +222,108 @@ function DefaultDetailData({ houseData, houseDetailData }) {
     { name: 'mvnPrearngeYm', display: '입주예정월' },
   ];
 
+  const specialNotes = [
+    { name: 'specltRdnEarthAt', display: '투기과열지구' },
+    { name: 'mdatTrgetAreaSecd', display: '조정대상지역' },
+    { name: 'parcprcUlsAt', display: '분양가상한제' },
+    { name: 'imprnmBsnsAt', display: '정비사업' },
+    { name: 'publicHouseEarthAt', display: '공공주택지구' },
+    { name: 'lrsclBldlndAt', display: '대규모 택지개발지구' },
+    { name: 'nplnPrvoprPublicHouseAt', display: '수도권 내 민영 공공주택지구' },
+    { name: 'publicHouseSpclwApplcAt', display: '공공주택 특별법 적용' },
+  ];
+
   const scheduleData = houseData.houseSecd === "01" ? detail01ScheduleData : detail04ScheduleData;
 
   const today = new Date();
 
   const scheduleList = [
-    {id: 1, name: scheduleData[0].display, date: houseData[scheduleData[0].name], completed: new Date(houseData[scheduleData[0].name]) <= today},
-    {id: 2, name: scheduleData[1].display, date: houseDetailData[scheduleData[1].name], completed: new Date(houseDetailData[scheduleData[1].name]) <= today},
-    {id: 3, name: scheduleData[2].display, date: houseDetailData[scheduleData[2].name], completed: new Date(houseDetailData[scheduleData[2].name]) <= today},
-    {id: 4, name: scheduleData[3].display, date: houseData[scheduleData[3].name], completed: new Date(houseData[scheduleData[3].name]) <= today},
-    {id: 5, name: scheduleData[4].display, date: houseData[scheduleData[4].name], completed: new Date(houseData[scheduleData[4].name]) <= today},
+    { id: 1, name: scheduleData[0].display, date: houseData[scheduleData[0].name], completed: new Date(houseData[scheduleData[0].name]) <= today },
+    { id: 2, name: scheduleData[1].display, date: houseDetailData[scheduleData[1].name], completed: new Date(houseDetailData[scheduleData[1].name]) <= today },
+    { id: 3, name: scheduleData[2].display, date: houseDetailData[scheduleData[2].name], completed: new Date(houseDetailData[scheduleData[2].name]) <= today },
+    { id: 4, name: scheduleData[3].display, date: houseData[scheduleData[3].name], completed: new Date(houseData[scheduleData[3].name]) <= today },
+    { id: 5, name: scheduleData[4].display, date: houseData[scheduleData[4].name], completed: new Date(houseData[scheduleData[4].name]) <= today },
   ];
 
   return (
-    <div className='house-detail'>
-      <h1>청약 공고 상세 정보</h1>
+    <>
+      <div className='house-detail'>
 
-      <section>
-        <p>공급 위치 : ({houseData.hssplyZip})&nbsp;{houseData.hssplyAdres}</p>
-      </section>
+        <section>
+          <h3>공급 위치</h3>
 
-      <section className='mb-5'>
-        <h3>접수 일정</h3>
-        <ScheduleProgress scheduleList={scheduleList} />
+          <p className='filter-values'>
+            ({houseData.hssplyZip})&nbsp;{houseData.hssplyAdres}
+          </p>
 
-      </section>
+        </section>
 
-      <section>
-        <h2>총 공급 수량</h2>
-        <p>일반 공급: {houseData.general_units || 0}세대</p>
-        <p>특별 공급: {houseData.special_units || 0}세대</p>
-        <p>총 공급: {houseData.totSuplyHsldco}세대</p>
-      </section>
+        <section>
+          <h3>공급 세대 수</h3>
+          <p className='filter-values'>일반 공급 {normalSupplyCount || 0}세대,
+            특별 공급 {specialSupplyCount || 0}세대,
+            총 공급 {houseData.totSuplyHsldco}세대
+          </p>
+        </section>
 
-    </div>
+        {houseData.houseSecd === "01" &&
+          <section className='mb-5'>
+            <h3>특이사항</h3>
+
+            {
+              specialNotes.map((data, index) => (
+                houseDetailData[data.name] === true
+                  ? <li key={index} className='mb-1'>{data.display}</li>
+                  : null
+              ))
+            }
+          </section>
+        }
+
+        <section className='mb-5'>
+          <h3>접수 일정</h3>
+
+          <ScheduleProgress scheduleList={scheduleList} />
+
+        </section>
+
+      </div>
+    </>
+  );
+}
+
+/* 공급방식 */
+function SupplyType({ supplyTypeList }) {
+
+  const [selectedValue, setSelectedValue] = useState('');
+
+  useEffect(() => {
+    setSelectedValue(supplyTypeList[0]);
+
+  }, [supplyTypeList]);
+
+  function handleChanged(e) {
+    setSelectedValue(e.target.value);
+  }
+
+  return (
+    <Card body>
+      <div className='house-detail mb-3'>
+        <h3>신청 자격 조회</h3>
+
+      </div>
+      <Form.Select value={selectedValue} onChange={handleChanged} >
+
+        {supplyTypeList.map((type) =>
+          <option key={type} value={type} >
+            {type}
+          </option>
+        )}
+      </Form.Select>
+      <div style={{ minHeight: '30vh' }} >
+
+      </div>
+    </Card>
   );
 }
 
@@ -234,7 +380,7 @@ function TypeDetailData({ selectedHouseDetailData }) {
   return (
     <div className='house-detail'>
 
-      <h2>공급 대상</h2>
+      <h3>공급 대상</h3>
 
       <Table striped bordered hover>
         <thead>
@@ -296,40 +442,20 @@ function TypeNavBar({ houseTypes, setKey, eventKey }) {
 }
 
 /* 특이사항, 문의 */
-function AdditionalInfo({ houseData, houseDetailData }) {
-
-  const scheduleData = [
-    { name: 'specltRdnEarthAt', display: '투기과열지구' },
-    { name: 'mdatTrgetAreaSecd', display: '조정대상지역' },
-    { name: 'parcprcUlsAt', display: '분양가상한제' },
-    { name: 'imprnmBsnsAt', display: '정비사업' },
-    { name: 'publicHouseEarthAt', display: '공공주택지구' },
-    { name: 'lrsclBldlndAt', display: '대규모 택지개발지구' },
-    { name: 'nplnPrvoprPublicHouseAt', display: '수도권 내 민영 공공주택지구' },
-    { name: 'publicHouseSpclwApplcAt', display: '공공주택 특별법 적용' },
-  ];
+function AdditionalInfo({ houseData }) {
 
   return (
     <div className='house-detail'>
-      {houseData.houseSecd === "01" &&
-        <section>
-          <ul>
-            특이사항
-            {
-              scheduleData.map((data, index) => (
-                houseDetailData[data] === "Y" ?? <li key={index}>scheduleData[index]['display']</li>
-              ))
-            }
-          </ul>
-        </section>
-      }
 
       <section>
-        <h2>문의 정보</h2>
-        <p><a href={houseData.hmpgAdres}>{houseData.bsnsMbyNm}</a></p>
-        <p>문의처: {houseData.mdhsTelno}</p>
+        <h3>문의 정보</h3>
+        {houseData.hmpgAdres && <p><a href={houseData.hmpgAdres}>{houseData.bsnsMbyNm}</a></p>}
+        <p>문의처: {houseData.mdhsTelno || ''}</p>
+      </section>
+
+      <section>
         <p>
-          공고 모집 url : <a href={houseData.pblancUrl}>{houseData.pblancUrl}</a>
+          <Button variant='secondary' onClick={() => window.location.href = `${houseData.pblancUrl}`}>공고 모집 확인</Button>
         </p>
       </section>
     </div>
