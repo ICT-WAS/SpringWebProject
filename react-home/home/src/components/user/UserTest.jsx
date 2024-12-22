@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { instance } from "../../api/AxiosInterseptor";
+import { instance } from "../../api/AxiosInterceptor";
 
 const UserTest = () => {
   const [apiResponse, setApiResponse] = useState("");

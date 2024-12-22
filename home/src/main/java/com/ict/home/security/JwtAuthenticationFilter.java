@@ -37,8 +37,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             //토큰 검사. JWT -> 인가를 서버에 요청하지 않고도 검증 가능
             if (token != null && !token.equalsIgnoreCase("null")) {
 
-                //유효할 시 true
-//                if (jwtProvider.validateToken(token)) {
                 log.info("JwtAuthenticationFilter is running...");
                 userId = jwtProvider.getUserIdFromToken(request, response);
                 log.info("userId:{}", userId);
@@ -58,7 +56,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
                 securityContext.setAuthentication(authenticationToken);
                 SecurityContextHolder.setContext(securityContext);
-//                }
             }
             //다음 필터 체인 실행
             filterChain.doFilter(request, response);

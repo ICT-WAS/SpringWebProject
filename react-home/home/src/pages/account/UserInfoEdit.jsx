@@ -5,7 +5,7 @@ import UserInfoDetailsEdit from "../../components/account/UserInfoDetailsEdit";
 import { useEffect, useState } from "react";
 import InfoCheckModal from "../../components/modal/InfoCheckModal";
 import { useGlobalContext } from "../../Context";
-import { instance } from "../../api/AxiosInterseptor";
+import { instance } from "../../api/AxiosInterceptor";
 import InfoModal from "../../components/modal/InfoModal";
 import { useNavigate } from "react-router-dom";
 
