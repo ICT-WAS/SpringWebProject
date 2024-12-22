@@ -300,7 +300,7 @@ function SupplyType({ supplyTypeList }) {
   useEffect(() => {
     setSelectedValue(supplyTypeList[0]);
 
-  }, []);
+  }, [supplyTypeList]);
 
   function handleChanged(e) {
     setSelectedValue(e.target.value);
@@ -449,8 +449,8 @@ function AdditionalInfo({ houseData }) {
 
       <section>
         <h3>문의 정보</h3>
-        <p><a href={houseData.hmpgAdres}>{houseData.bsnsMbyNm}</a></p>
-        <p>문의처: {houseData.mdhsTelno}</p>
+        {houseData.hmpgAdres && <p><a href={houseData.hmpgAdres}>{houseData.bsnsMbyNm}</a></p>}
+        <p>문의처: {houseData.mdhsTelno || ''}</p>
       </section>
 
       <section>

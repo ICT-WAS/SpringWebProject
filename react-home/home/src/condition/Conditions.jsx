@@ -58,10 +58,6 @@ function ConditionInfo() {
                 setForm3Data(response.data.form3Data);
 
                 setLoading(false);
-
-                console.log(response.data.form1Data)
-                console.log(response.data.familyList)
-                console.log(response.data.spouseFamilyList)
             })
             .catch((error) => {
                 if (error.response.status === 500) {
