@@ -58,6 +58,10 @@ function ConditionInfo() {
                 setForm3Data(response.data.form3Data);
 
                 setLoading(false);
+
+                console.log(response.data.form1Data)
+                console.log(response.data.familyList)
+                console.log(response.data.spouseFamilyList)
             })
             .catch((error) => {
                 if (error.response.status === 500) {
@@ -87,6 +91,12 @@ function ConditionInfo() {
     };
 
     useEffect(() => {
+        sessionStorage.removeItem('familyDataList');
+        sessionStorage.removeItem('spouseFamilyDataList');
+        sessionStorage.removeItem('livingWithSpouse');
+        sessionStorage.removeItem('formData1');
+        sessionStorage.removeItem('formData3');
+
         fetchCondition();
     }, []);
 
@@ -264,11 +274,11 @@ function DisplayCondition01({ accountData, form1Data, spouseAccountData }) {
             생년월일 : {form1Data.birthday}<br />
             거주 지역 : {`${Sido[form1Data.siDo]} ${form1Data.gunGu}`}<br />
             현재 거주지 입주일 : {form1Data.transferDate}<br />
-            {form1Data.regionMoveInDate.length > 0 &&
+            {form1Data.regionMoveInDate &&
                 <>{Sido[form1Data.siDo]} 입주일 : {form1Data.regionMoveInDate}<br /></>
                 
             }
-            {form1Data.metropolitanAreaDate.length > 0 &&
+            {form1Data.metropolitanAreaDate &&
                 <>수도권 입주일 : {form1Data.metropolitanAreaDate}<br /></>
             }
             세대주 {form1Data.isHouseHolder ? "O" : "X"} <br />
