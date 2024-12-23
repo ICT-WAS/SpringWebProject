@@ -42,9 +42,7 @@ import { NavermapsProvider } from "react-naver-maps";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <NavermapsProvider
-    ncpClientId='pvkq1et62k'
-  >
+  <NavermapsProvider ncpClientId="pvkq1et62k">
     <AppProvider>
       <Router>
         <Routes>
@@ -82,7 +80,11 @@ root.render(
 
           {/* 커뮤니티 */}
           <Route exact path="/community" element={<CommunityPostList />} />
-          <Route exact path="/community/posting" element={<CommunityPosting />} />
+          <Route
+            exact
+            path="/community/posting"
+            element={<CommunityPosting />}
+          />
           <Route exact path="/community/:postId" element={<PostDetail />} />
           <Route
             exact

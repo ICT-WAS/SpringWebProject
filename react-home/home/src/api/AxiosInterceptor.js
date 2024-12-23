@@ -12,7 +12,7 @@ let failedQueue = [];
 let isRefreshing = false;
 
 //요청 실패 시 대기 큐 처리
-const procssQueue = (error, token = null) => {
+const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -70,12 +70,12 @@ instance.interceptors.response.use(
 
         if (newToken) {
           localStorage.setItem("accessToken", newToken);
-          procssQueue(null, newToken); //대기 중인 요청들에 새로운 토큰 전달
+          processQueue(null, newToken); //대기 중인 요청들에 새로운 토큰 전달
 
           return instance(originalRequest); //원래 요청 재시도
         }
       } catch (tokenError) {
-        procssQueue(tokenError, null); //에러 발생 시 대기 큐에 에러 처리
+        processQueue(tokenError, null); //에러 발생 시 대기 큐에 에러 처리
         return Promise.reject(tokenError); //토큰 발급 실패 시 에러 반환
       } finally {
         isRefreshing = false; //갱신 완료

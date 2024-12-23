@@ -30,11 +30,16 @@ public class WebSecurityConfig {
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                //메인페이지, 회원가입,로그인,로그아웃 허용 - > 차후 페이지 별로 인증 여부 확인
+                                //로그인한 사용자만 접근이 가능한 URL 설정
+                                //해당 경로로 요청 시 토큰/쿠키 필수로 보내주어야 함
+                                //import { instance } from "./api/AxiosInterceptor";
+                                // -- axios 대신 사용하면 자동으로 토큰/쿠키를 설정해줌
+                                .requestMatchers("/users/test", "/users/reset/password", "/users/update", "/users/delete").authenticated()
+                                .anyRequest().permitAll()  //그 외 경로는 모두 접근 허용
+//                        authorizeRequests
+//                                //
 //                                .requestMatchers("/", "/users/**").permitAll()
-//                                .requestMatchers("/", "/users", "/users/login", "/users/logout", "/users/check/**", "/users/check/access-token/reset" ).permitAll()
-//                                .anyRequest().authenticated()
-                                .anyRequest().permitAll()
+//                                .anyRequest().authenticated()  //그 외 경로는 모두 인증이 필요함
                 );
 
         //CorsFilter 추가 시 순서 지정

@@ -22,8 +22,7 @@ import static com.ict.home.exception.BaseResponseStatus.*;
 public class JwtProvider {
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 15; //15일
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 15; // 15분
-    //만료 테스트 10초
-//    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 10; // 10초
+//    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 10; // 테스트를 위한 10초 만료
 
     private static final String BEARER_TYPE = "Bearer ";
 
@@ -37,7 +36,6 @@ public class JwtProvider {
         Date now = new Date();
         //현재 시각과 액세스 토큰 유효 시간을 사용해 AccessToken 만료 시간 정의
         Date expiration = new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_TIME);
-
         //JWT 토큰 생성
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)  //TYPE: JWT 표준, JWT_TYPE: 토큰의 유형
@@ -57,7 +55,6 @@ public class JwtProvider {
         Date now = new Date();
         //현재 시각과 리프레시 토큰의 유효 시간을 사용해 리프레시 토큰 만료 시간 정의
         Date expiration = new Date(now.getTime() + REFRESH_TOKEN_EXPIRE_TIME);
-
         //JWT 토큰 생성
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)  //TYPE: JWT 표준, JWT_TYPE: 토큰의 유형
@@ -125,11 +122,6 @@ public class JwtProvider {
         //추출한 풀 토큰에서 맨 앞 Bearer 제거
         String token = bearerRemove(authHeader);
         log.info("jwtProvider token: {}", token);
-
-        //토큰 유효성 검사 - 실패 시 '유효하지 않은 토큰'
-//        if (!validateToken(token)) {
-//            throw new BaseException(INVALID_JWT);
-//        }
 
         //사용자 정보 추출
         long userId = 0;
