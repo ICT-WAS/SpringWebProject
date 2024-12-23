@@ -46,7 +46,7 @@ export const getUserIdFromToken = (token) => {
 const refreshAccessToken = async (token) => {
   try {
     const userId = getUserIdFromToken(token);
-    console.log("tokenUtil-userId", userId);
+    console.log("액세스 토큰 만료, 재발급");
 
     const response = await axios.post(
       `http://localhost:8989/users/check/access-token/reset?userId=${userId}`,

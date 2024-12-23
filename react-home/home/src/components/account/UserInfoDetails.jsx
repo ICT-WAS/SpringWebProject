@@ -1,7 +1,7 @@
 import { Button, Col } from "react-bootstrap";
 import "./account.css";
 import { useGlobalContext } from "../../Context";
-import { instance } from "../../api/AxiosInterseptor";
+import { instance } from "../../api/AxiosInterceptor";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
