@@ -42,7 +42,20 @@ function ConditionInfo() {
     const token = localStorage.getItem("accessToken");
     const userId = getUserIdFromToken(token);
 
+    const [showLoginModal, setLoginShowModal] = useState(false);
+
+    // 로그인 모달 닫기 함수
+    const handleCloseLoginModal = () => setLoginShowModal(false);
+
+    // 로그인 모달 열기 함수
+    const handleShowLoginModal = () => setLoginShowModal(true);
+
     const fetchCondition = () => {
+
+        if (userId === null) {
+            return;
+        }
+
         setLoading(true);
         axios
             .get(`http://localhost:8989/condition/${userId}`)
@@ -73,6 +86,7 @@ function ConditionInfo() {
     };
 
     const clearCondition = () => {
+
         setLoading(true);
         axios
             .delete(`http://localhost:8989/condition/${userId}`)
@@ -99,6 +113,12 @@ function ConditionInfo() {
     const navigate = useNavigate();
 
     function handleClick1(e) {
+
+        if (userId === null) {
+            handleShowLoginModal();
+            return;
+        }
+
         navigate("/condition-1");
     }
 
@@ -142,6 +162,29 @@ function ConditionInfo() {
                     <Button variant="dark" onClick={handleClick1}>조건 등록</Button>
                 </>
             }
+            {/* 로그인 모달 */}
+            <Modal show={showLoginModal} onHide={handleCloseLoginModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>로그인 필요</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    해당 기능은 로그인 후 이용할 수 있습니다. 로그인 하시겠습니까?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button
+                        variant="primary"
+                        onClick={() => {
+                            // 로그인 페이지로 리다이렉트
+                            window.location.href = '/login';
+                        }}
+                    >
+                        로그인 하러 가기
+                    </Button>
+                    <Button variant="secondary" onClick={handleCloseLoginModal}>
+                        닫기
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
             {hasCondition &&
                 <>
@@ -164,8 +207,8 @@ function ConditionInfo() {
                                     {hasCondition && <FamilyData family={family} />}
                                 </span>
                                 <span className='filter-values'>
-                                    {(hasCondition && spouseFamily?.length > 0) && 
-                                    <><hr /><FamilyData family={spouseFamily} /></>}
+                                    {(hasCondition && spouseFamily?.length > 0) &&
+                                        <><hr /><FamilyData family={spouseFamily} /></>}
                                 </span>
                                 <br />
                                 <Button variant="dark" onClick={handleClick2}>세대구성원 정보{hasCondition ? " 수정" : " 등록"}</Button>
@@ -272,7 +315,7 @@ function DisplayCondition01({ accountData, form1Data, spouseAccountData }) {
             현재 거주지 입주일 : {form1Data.transferDate}<br />
             {form1Data.regionMoveInDate &&
                 <>{Sido[form1Data.siDo]} 입주일 : {form1Data.regionMoveInDate}<br /></>
-                
+
             }
             {form1Data.metropolitanAreaDate &&
                 <>수도권 입주일 : {form1Data.metropolitanAreaDate}<br /></>

@@ -1,5 +1,4 @@
 import Header from '../common/Header'
-import ApplyAnnouncementContent from './ApplyAnouncementListContent';
 import Stack from 'react-bootstrap/Stack';
 import Container from 'react-bootstrap/Container';
 import Footer from '../common/Footer';
