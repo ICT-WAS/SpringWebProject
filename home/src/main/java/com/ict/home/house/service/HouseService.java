@@ -5,6 +5,7 @@ import com.ict.home.house.dto.HouseInfo;
 import com.ict.home.house.model.House;
 
 import java.util.List;
+import java.util.Map;
 
 public interface HouseService {
 
@@ -22,4 +23,6 @@ public interface HouseService {
     HouseDetailDTO getHouseDetail(Long houseId);
 
     List<HouseInfo> getHouseInfoByInterest(List<House> houses);
+
+    Map<String, List<String>> getSolution(Long houseId, Long userId, String type);
 }

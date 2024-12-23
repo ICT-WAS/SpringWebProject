@@ -23,8 +23,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -118,6 +117,93 @@ public class HouseServiceImpl implements HouseService {
             houseInfoList.add(houseInfo);
         }
         return houseInfoList;
+    }
+
+    @Override
+    public Map<String, List<String>> getSolution(Long houseId, Long userId, String type) {
+
+        /*
+            기타 조건들(투기과열지구 등등등)과 공급 방식, 유저의 조건을 파악하여 지원 가능한지 여부와 개선점 등 맞춤형 솔루션 제공
+            공급 방식(무순위): 일반
+            공급 방식(일반공고): 1순위, 2순위, 다자녀가구, 신혼부부, 생애최초, 노부모부양, 기관추천, 기타, 이전기관, 청년, 신생아
+         */
+
+        // 공고 정보
+        Optional<Detail01> optionalDetail01 = d01r.findByHouse_HouseId(houseId);
+        Optional<Detail04> optionalDetail04 = d04r.findByHouse_HouseId(houseId);
+        House house = hr.findById(houseId);
+        Detail01 detail01 = optionalDetail01.orElse(null);
+        Detail04 detail04 = optionalDetail04.orElse(null);
+        List<Detail> details = dr.findByHouse_HouseId(houseId);
+
+        // 회원 조건 정보
+        List<Account> accounts = ar.findByUser_Id(userId);
+        Condition01 condition01 = c01r.findByUser_Id(userId);
+        Condition03 condition03 = c03r.findByUser_Id(userId);
+        List<Family> families = fr.findByUser_Id(userId);
+
+        // satisfied: 충족한 점
+        // unsatisfied: 충족하지 못한 점
+        // solution: 개선할 수 있는 점
+        List<String> satisfied = new ArrayList<>();
+        List<String> unsatisfied = new ArrayList<>();
+        List<String> solution = new ArrayList<>();
+
+        if ("일반".equals(type)) {
+            System.out.println("type: 일반");
+        }
+
+        if ("1순위".equals(type)) {
+            System.out.println("type: 1순위");
+        }
+
+        if ("2순위".equals(type)) {
+            System.out.println("type: 2순위");
+        }
+
+        if ("다자녀가구".equals(type)) {
+            System.out.println("type: 다자녀가구");
+        }
+
+        if ("신혼부부".equals(type)) {
+            System.out.println("type: 신혼부부");
+        }
+
+        if ("생애최초".equals(type)) {
+            System.out.println("type: 생애최초");
+        }
+
+        if ("노부모부양".equals(type)) {
+            System.out.println("type: 노부모부양");
+        }
+
+        if ("기관추천".equals(type)) {
+            System.out.println("type: 기관추천");
+        }
+
+        if ("기타".equals(type)) {
+            System.out.println("type: 기타");
+        }
+
+        if ("이전기관".equals(type)) {
+            System.out.println("type: 이전기관");
+        }
+
+        if ("청년".equals(type)) {
+            System.out.println("type: 청년");
+        }
+
+        if ("신생아".equals(type)) {
+            System.out.println("type: 신생아");
+        }
+
+        Map<String, List<String>> map = new HashMap<>(){{
+            put("satisfied", satisfied);
+            put("unsatisfied", unsatisfied);
+            put("solution", solution);
+        }};
+
+        return map;
     }
 
     private HouseDetailDTO makeHouseDetailDTO(House house, Detail01 detail01, Detail04 detail04, List<Detail> details) {

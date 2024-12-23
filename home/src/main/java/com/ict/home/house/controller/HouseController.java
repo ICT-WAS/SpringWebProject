@@ -64,7 +64,7 @@ public class HouseController {
                                           @RequestParam(defaultValue = "10") int size) {
         List<HouseInfo> houseInfoListByFilter = hs.getHouseInfoListByFilter(regions, houseTypes, area, prices, supplies, statuses, userId, orderBy);
 
-        if (houseInfoListByFilter.isEmpty() || houseInfoListByFilter.size() < 10) {
+        if (houseInfoListByFilter.isEmpty() || houseInfoListByFilter.size() < size) {
             HashMap<String, Object> stringObjectHashMap = new HashMap<>();
             stringObjectHashMap.put("totalCount", houseInfoListByFilter.size());
             stringObjectHashMap.put("houseInfoList", houseInfoListByFilter);
@@ -95,7 +95,7 @@ public class HouseController {
                                                    @RequestParam(defaultValue = "10") int size){
         List<HouseInfo> houseInfoList = hs.getHouseInfoListByName(keyword);
 
-        if (houseInfoList.isEmpty() || houseInfoList.size() < 10) {
+        if (houseInfoList.isEmpty() || houseInfoList.size() < size) {
             HashMap<String, Object> stringObjectHashMap = new HashMap<>();
             stringObjectHashMap.put("totalCount", houseInfoList.size());
             stringObjectHashMap.put("houseInfoList", houseInfoList);
@@ -112,7 +112,28 @@ public class HouseController {
         }});
     }
 
+    @GetMapping("/solution/{houseId}/{userId}/{type}")
+    @Operation(summary = "공고별 공급방식별 맞춤형 솔루션", description = "원하는 공고의 원하는 공급방식의 지원가능 여부와 개선점을 알 수 있습니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "솔루션 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
+    })
+    public ResponseEntity<?> getSolution(@PathVariable Long houseId,
+                                         @PathVariable Long userId,
+                                         @PathVariable String type) {
+        System.out.println("houseId = " + houseId);
+        System.out.println("userId = " + userId);
+        System.out.println("type = " + type);
+
+        Map<String, List<String>> solution = hs.getSolution(houseId, userId, type);
+
+        return ResponseEntity.ok("hellos");
+    }
+
     @GetMapping("/api/geocode")
+    @SuppressWarnings("unchecked")
     public ResponseEntity<?> getGeocode(@RequestParam String query) {
         String url = "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=" + query;
 
