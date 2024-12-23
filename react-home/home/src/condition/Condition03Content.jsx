@@ -94,6 +94,13 @@ export default function Condition03Content() {
         };
 
     useEffect(() => {
+
+        // 권한 확인
+        if(userId === null) {
+            navigate("/login");
+            return;
+        }
+
         /* 이전 폼 데이터 읽어오기 */
         // 수정모드
         fetchCondition();
