@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Button, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import React, { useState, useEffect, useRef } from 'react';
 import SubscriptionCardsWithHeader from './SubscriptionCards.jsx'
 import PaginationItem from './PaginationItem';
@@ -179,12 +179,16 @@ export default function MainContent() {
           <Conditions onClickedFilter={onClickedFilter} onChangeCheck={handleChangeCheck} value={checked} />
         </Row>
         <Row >
-          <Button onClick={onFilterClearClick}
+          <Col>
+          </Col>
+          <Col style={{textAlign: 'right'}}>
+            <Button onClick={onFilterClearClick}
             variant='link' className="link-body-emphasis link-underline link-underline-opacity-0">
             <p className="nav-bar-links" style={{ textAlign: 'right' }}>
               <b><i className="bi bi-arrow-clockwise" />초기화</b>
             </p>
           </Button>
+          </Col>
         </Row>
         <Row className="mb-5">
           <Filters selectedFilter={selectedFilter} handleClose={handleClose} handleFilterButtonClick={handleFilterButtonClick} />
