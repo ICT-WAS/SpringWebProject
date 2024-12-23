@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import InterestButton from './InterestButton';
 import AnnouncementLocationMap from './AnnouncementLocationMap';
+import SupplySolution from './SupplySolution';
 
 export default function ApplyAnnouncementContent() {
 
@@ -321,7 +322,7 @@ function SupplyType({ supplyTypeList }) {
         )}
       </Form.Select>
       <div style={{ minHeight: '30vh' }} >
-
+        <SupplySolution type={selectedValue} />
       </div>
     </Card>
   );
