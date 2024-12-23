@@ -129,7 +129,7 @@ public class HouseController {
 
         Map<String, List<String>> solution = hs.getSolution(houseId, userId, type);
 
-        return ResponseEntity.ok("hellos");
+        return ResponseEntity.ok(solution);
     }
 
     @GetMapping("/api/geocode")
