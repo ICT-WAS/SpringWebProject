@@ -275,6 +275,8 @@ public class PostalCodeFind {
             new PostalCodeRange("경상남도", "거창군", 50100, 50153),
             new PostalCodeRange("경상남도", "합천군", 50200, 50253),
             new PostalCodeRange("제주특별자치도", "제주시", 63000, 63365),
-            new PostalCodeRange("제주특별자치도", "서귀포시", 63500, 63644)
+            new PostalCodeRange("제주특별자치도", "서귀포시", 63500, 63644),
+            new PostalCodeRange("세종특별자치시", "세종시", 30000, 30150)
+
     };
 }
