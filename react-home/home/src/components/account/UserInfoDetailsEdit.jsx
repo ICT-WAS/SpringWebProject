@@ -81,7 +81,7 @@ const UserInfoDetailsEdit = ({ setError, setErrorTitle, ClickDeleteUser }) => {
   };
 
   const handleClickToMypage = () => {
-    navigate("/mypage");
+    navigate("/mypage/account");
   };
 
   // username과 phoneNumber 값이 변경되었는지 감지
@@ -132,7 +132,7 @@ const UserInfoDetailsEdit = ({ setError, setErrorTitle, ClickDeleteUser }) => {
                   <p className="info_subtitle2">휴대폰 번호</p>
 
                   {userInfo.userVerify &&
-                  userInfo.userVerify === "휴대폰 인증" ? (
+                  userInfo.userVerify === "핸드폰 인증" ? (
                     <>
                       <p className="info_data_text2">{userInfo.phoneNumber}</p>
                       <p className="info_data_text3">인증됨</p>

@@ -193,7 +193,7 @@ const SendVerification = () => {
     return email;
   };
 
-  //핸드폰 마스킹
+  //휴대폰 마스킹
   const maskPhoneNumber = (phoneNumber) => {
     const parts = phoneNumber.split("-");
     if (parts.length === 3) {

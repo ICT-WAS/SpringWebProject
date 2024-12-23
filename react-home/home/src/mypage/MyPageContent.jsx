@@ -72,7 +72,7 @@ export default function MyPageContent() {
                 name={"개인 정보"}
                 text={"개인 정보 확인 및 변경"}
                 iClassName={"bi-person"}
-                url={"/mypage/account/edit"}
+                url={"/mypage/account"}
               />
             </Col>
             <Col>
@@ -145,4 +145,5 @@ function MyMenuCard({ name, text, iClassName, url }) {
     </>
   );
 }
+
 
