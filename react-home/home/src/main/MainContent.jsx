@@ -101,7 +101,7 @@ function NewSubscriptionCards() {
       .get("http://localhost:8989/house", {
         params: {
           orderBy: '최신순',
-          page: 0,
+          page: 1,
           size: 5,
         },
       })
