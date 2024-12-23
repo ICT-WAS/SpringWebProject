@@ -54,8 +54,8 @@ const FindEmail = () => {
           <div className="body-container">
             <div className="verification-message">
               * 이메일 인증 회원의 경우{" "}
-              <a href="/password-reset" className="highlight-link">
-                '비밀번호 찾기'
+              <a href="/find-password" className="highlight-link">
+                비밀번호 찾기
               </a>
               를 이용해 주세요.
             </div>
