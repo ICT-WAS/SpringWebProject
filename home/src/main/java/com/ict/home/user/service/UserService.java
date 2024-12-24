@@ -159,7 +159,7 @@ public class UserService {
         if (refreshTokenCookie != null) {
             //쿠키에서 리프레시 토큰 삭제
             refreshTokenCookie.setValue(null);
-            refreshTokenCookie.setPath("/");  //도메인에 맞는 경로??????==>>???
+            refreshTokenCookie.setPath("/");
             refreshTokenCookie.setMaxAge(0);  //쿠키 만료 처리
             refreshTokenCookie.setHttpOnly(true);  //클라이언트에서 쿠키 접근 불가
             refreshTokenCookie.setHttpOnly(false);  //로컬 환경이기 때문에 일단 false

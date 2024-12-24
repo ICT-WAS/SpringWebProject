@@ -34,7 +34,7 @@ public class WebSecurityConfig {
                                 //해당 경로로 요청 시 토큰/쿠키 필수로 보내주어야 함
                                 //import { instance } from "./api/AxiosInterceptor";
                                 // -- axios 대신 사용하면 자동으로 토큰/쿠키를 설정해줌
-                                .requestMatchers("/users/test", "/users/reset/password", "/users/update", "/users/delete").authenticated()
+                                .requestMatchers("/users/test", "/users/update", "/users/delete").authenticated()
                                 .anyRequest().permitAll()  //그 외 경로는 모두 접근 허용
 //                        authorizeRequests
 //                                //
