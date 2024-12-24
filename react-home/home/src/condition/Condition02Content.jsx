@@ -88,6 +88,7 @@ export default function Condition02Content() {
             setFamilyDataList(storedFamilyData);
             const storedSpouseFamilyData = JSON.parse(sessionSpouseFamilyData) || [];
             setSpouseFamilyDataList(storedSpouseFamilyData);
+            setHasSpouse(sessionStorage.getItem('hasSpouse'));
 
             return;
         }
@@ -329,13 +330,13 @@ function FamilyForm({ married, handleChange, hasSpouse, savedFamilyDataList }) {
 
     return (
         <>
-        
             본인 세대의 세대구성원
             <Table>
                 <thead>
                     <FamilyFormHead />
                 </thead>
                 <tbody>
+                    
                     <SelfFormRow handleChange={handleFamilyRowChange}
                         rowData={savedFamilyDataList.find(item => item.relationship === 1)} />
                     {hasSpouse && <SpouseFormRow handleChange={handleFamilyRowChange}
