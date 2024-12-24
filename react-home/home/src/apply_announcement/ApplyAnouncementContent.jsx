@@ -313,7 +313,7 @@ function SupplyType({ supplyTypeList }) {
         <h3>신청 자격 조회</h3>
 
       </div>
-      <Form.Select value={selectedValue} onChange={handleChanged} >
+      <Form.Select className='mb-3' value={selectedValue} onChange={handleChanged} >
 
         {supplyTypeList.map((type) =>
           <option key={type} value={type} >
