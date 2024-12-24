@@ -49,6 +49,7 @@ export default function PostDetailContent() {
                 const data = await response.text();
                 const showComment = editedComment.replaceAll(/\n/g, "<br>");
                 // 댓글 수정 성공 시
+                
                 setComments(comments.map((comment) => {
                     // commentId와 일치하는 댓글을 찾았을 때
                     if (comment.commentId === commentId) {
@@ -176,9 +177,7 @@ export default function PostDetailContent() {
                         normalComments.push(comment);
                     }
                 });
-
-                // 댓글과 대댓글을 상태에 설정
-                setComments(normalComments);
+                
 
                 // 대댓글은 일반 댓글의 replies 배열로 설정
                 normalComments.forEach((normalComment) => {
@@ -186,9 +185,12 @@ export default function PostDetailContent() {
                         (reply) => reply.parentComment.commentId === normalComment.commentId
                     );
                 });
+
+                // 댓글과 대댓글을 상태에 설정
+                setComments(normalComments);
             })
             .catch((err) => console.error("댓글 가져오기 실패:", err));
-    }, [postId]);
+    }, [postId, comments]);
 
     // 댓글 작성 함수
     const handleCommentSubmit = () => {

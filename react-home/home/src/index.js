@@ -10,7 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
-import ApplyAnnouncementList from "./apply_announcement/ApplyAnouncementList";
+import ApplyAnnouncementList from "./apply_announcement/ApplyAnnouncementList";
 import ApplyAnnouncement from "./apply_announcement/ApplyAnouncement";
 import Condition01 from "./condition/Condition01";
 import Condition02 from "./condition/Condition02";

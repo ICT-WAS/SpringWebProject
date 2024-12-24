@@ -130,6 +130,7 @@ const SendVerification = () => {
           setIsVerified(true); //인증 성공
           setError(""); //오류 메시지 제거
           setIsTimerActive(false); //타이머 종료
+          localStorage.setItem("userId", response.data.result.userId);
         }
 
         navigate("/find-password/reset");

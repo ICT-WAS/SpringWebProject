@@ -1,15 +1,15 @@
 import axios from 'axios';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Modal, Row } from 'react-bootstrap';
 import React, { useState, useEffect, useRef } from 'react';
 import SubscriptionCardsWithHeader from './SubscriptionCards.jsx'
-import PaginationItem from './PaginationItem';
-import Filters from './Filters';
+import PaginationItem from './PaginationItem.jsx';
+import Filters from './Filters.jsx';
 import Conditions from './Conditions.jsx';
 import { convertFiltersToQuery, convertFiltersToUrl } from '../common/utils.js';
 import { getUserIdFromToken } from '../api/TokenUtils.js';
 
 
-export default function MainContent() {
+export default function ApplyAnnouncementListContent() {
   const [selectedFilter, setSelectedFilter] = useState([]);
   const [loading, setLoading] = useState(true);  // 로딩 상태
   const [subscriptions, setSubscriptions] = useState([]);  // 공고 리스트 상태
@@ -164,16 +164,52 @@ export default function MainContent() {
     paginationRef.current.resetPage(filter);
   }
 
+  const [showModal, setShowModal] = useState(false);
+
+  // 로그인 모달 닫기 함수
+  const handleCloseModal = () => setShowModal(false);
+
+  // 로그인 모달 열기 함수
+  const handleShowModal = () => setShowModal(true);
+
 
   // 내 조건으로 검색
   function handleChangeCheck(checked) {
+
+    if(userId === null) {
+      handleShowModal();
+      return;
+    }
+
     setChecked(checked);
   }
 
-
-
   return (
     <>
+    {/* 로그인 모달 */}
+    <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>로그인 필요</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          해당 기능은 로그인 후 이용할 수 있습니다. 로그인 하시겠습니까?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={() => {
+              // 로그인 페이지로 리다이렉트
+              window.location.href = '/login';
+            }}
+          >
+            로그인 하러 가기
+          </Button>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            닫기
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       <Container>
         <Row className="mb-2">
           <Conditions onClickedFilter={onClickedFilter} onChangeCheck={handleChangeCheck} value={checked} />

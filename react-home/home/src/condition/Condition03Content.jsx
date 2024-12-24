@@ -94,6 +94,13 @@ export default function Condition03Content() {
         };
 
     useEffect(() => {
+
+        // 권한 확인
+        if(userId === null) {
+            navigate("/login");
+            return;
+        }
+
         /* 이전 폼 데이터 읽어오기 */
         // 수정모드
         fetchCondition();
@@ -175,8 +182,10 @@ export default function Condition03Content() {
             return;
         }
 
-        console.log(familyDataList);
-        const submitData = { condition01DTO: formData1, ...accountDTOList, condition03DTO: finalFormData3, familyDTOList: [...familyDataList] };
+        const submitData = { 
+            condition01DTO: formData1, ...accountDTOList, 
+            condition03DTO: finalFormData3, 
+            familyDTOList: [...familyDataList] };
         console.log(submitData);
 
 
