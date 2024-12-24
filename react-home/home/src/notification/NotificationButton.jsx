@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Button, Offcanvas, Toast } from "react-bootstrap";
+import { Badge, Button, Offcanvas, Toast } from "react-bootstrap";
 import { getUserIdFromToken } from "../api/TokenUtils";
 import { useEffect, useState } from "react";
 import Notification from "./Notification";
@@ -8,6 +8,7 @@ function NotificationButton() {
 
     const [showNotification, setShowNotification] = useState(false);
     const [notifications, setNotifications] = useState([]);
+    const [notificationCount, setNotificationCount] = useState(0);
 
     const token = localStorage.getItem("accessToken");
     const userId = getUserIdFromToken(token);
@@ -33,6 +34,7 @@ function NotificationButton() {
             )
             .then((response) => {
                 setNotifications(response.data);
+                setNotificationCount(response.data.filter(notification => notification.isChecked === false).length);
             })
             .catch((error) => {
                 console.error("데이터 요청 실패:", error);
@@ -64,6 +66,10 @@ function NotificationButton() {
                         className="link-body-emphasis link-underline link-underline-opacity-0"
                     >
                         <i className="bi bi-bell" />
+                        
+                        {notificationCount > 0 && 
+                        <Badge pill bg="danger">{notificationCount}</Badge>
+                        }
                     </a>
                 </p>
             </Button>
