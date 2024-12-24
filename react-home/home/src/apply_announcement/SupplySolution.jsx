@@ -15,6 +15,7 @@ function TypeSolution({ type }) {
 
     // 데이터 요청 함수
     function fetchDate(houseId, userId, type) {
+        userId = userId||0;
         axios
             .get(`http://localhost:8989/house/solution/${houseId}/${userId}/${type}`, {
             })
