@@ -86,8 +86,8 @@ const Signup = () => {
       );
 
       //1-1. 회원가입 실패
-      if (!response.data.IsSuccess) {
-        console.log(response.data.IsSuccess);
+      if (!response.data.isSuccess) {
+        console.log(response.data.isSuccess);
         setSignupErrorTitle("회원가입 실패");
         setSignupError("입력하신 정보를 확인하세요.");
         return;
