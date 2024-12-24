@@ -11,6 +11,7 @@ import com.ict.home.login.jwt.Token;
 import com.ict.home.login.jwt.TokenRepository;
 import com.ict.home.login.repository.SocialAccountRepository;
 import com.ict.home.user.dto.*;
+import com.ict.home.user.enums.UserStatus;
 import com.ict.home.user.enums.UserVerify;
 import com.ict.home.user.repository.UserRepository;
 
@@ -105,6 +106,11 @@ public class UserService {
             throw new BaseException(PASSWORD_DECRYPTION_ERROR);
         }
 
+        //탈퇴한 회원일 시
+        if (user.getStatus() == UserStatus.INACTIVE) {
+            throw new BaseException(USER_ALREADY_DEACTIVATED);
+        }
+
         //DB에 저장된 유저의 비밀번호(password)와 입력받은 비밀번호(postLoginReq.getPassword())가 동일할 시
         if (postLoginReq.getPassword().equals(password)) {
 
@@ -153,7 +159,7 @@ public class UserService {
         if (refreshTokenCookie != null) {
             //쿠키에서 리프레시 토큰 삭제
             refreshTokenCookie.setValue(null);
-            refreshTokenCookie.setPath("/");  //도메인에 맞는 경로??????==>>???
+            refreshTokenCookie.setPath("/");
             refreshTokenCookie.setMaxAge(0);  //쿠키 만료 처리
             refreshTokenCookie.setHttpOnly(true);  //클라이언트에서 쿠키 접근 불가
             refreshTokenCookie.setHttpOnly(false);  //로컬 환경이기 때문에 일단 false
@@ -226,6 +232,25 @@ public class UserService {
     /**
      * 회원 탈퇴
      */
+    @Transactional
+    public String setUserStateInactive(Long userId, HttpServletResponse response) {
+        User user;
+        try {
+            user = userUtilService.findByUserIdValidation(userId);
+        } catch (Exception e) {
+            throw new BaseException(USERS_EMPTY_USER_ID);
+        }
+
+        user.setStatus(UserStatus.INACTIVE);
+        try {
+            userRepository.save(user);
+            deleteRefreshTokenCookie(response);
+        } catch (Exception e) {
+            throw new BaseException(FAILED_TO_USER_UPDATE);
+        }
+
+        return "회원 탈퇴 성공";
+    }
 
     /**
      * 회원정보 불러오기
@@ -372,5 +397,15 @@ public class UserService {
             return parts[0] + "-" + parts[1].substring(0, 2) + "**" + "-" + parts[2].substring(0, 2) + "**";
         }
         return phoneNumber;
+    }
+
+    //쿠키 삭제 메서드
+    private void deleteRefreshTokenCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie("refreshToken", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
     }
 }

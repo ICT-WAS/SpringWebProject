@@ -130,9 +130,9 @@ const SendVerification = () => {
           setIsVerified(true); //인증 성공
           setError(""); //오류 메시지 제거
           setIsTimerActive(false); //타이머 종료
+          localStorage.setItem("userId", response.data.result.userId);
         }
 
-        localStorage.setItem("userId", response.data.result.userId);
         navigate("/find-password/reset");
       } catch (error) {
         setErrorTitle("인증 요청 실패");
@@ -194,7 +194,7 @@ const SendVerification = () => {
     return email;
   };
 
-  //핸드폰 마스킹
+  //휴대폰 마스킹
   const maskPhoneNumber = (phoneNumber) => {
     const parts = phoneNumber.split("-");
     if (parts.length === 3) {

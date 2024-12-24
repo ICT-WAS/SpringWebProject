@@ -32,7 +32,9 @@ function ConditionInfo() {
     const [hasCondition, setHasCondition] = useState(false);
 
     const [family, setFamily] = useState([]);
+    const [spouseFamily, setSpouseFamily] = useState([]);
     const [accountData, setAccountData] = useState({});
+    const [spouseAccountData, setSpouseAccountData] = useState({});
 
     const [form1Data, setForm1Data] = useState({});
     const [form3Data, setForm3Data] = useState({});
@@ -40,7 +42,20 @@ function ConditionInfo() {
     const token = localStorage.getItem("accessToken");
     const userId = getUserIdFromToken(token);
 
+    const [showLoginModal, setLoginShowModal] = useState(false);
+
+    // 로그인 모달 닫기 함수
+    const handleCloseLoginModal = () => setLoginShowModal(false);
+
+    // 로그인 모달 열기 함수
+    const handleShowLoginModal = () => setLoginShowModal(true);
+
     const fetchCondition = () => {
+
+        if (userId === null) {
+            return;
+        }
+
         setLoading(true);
         axios
             .get(`http://localhost:8989/condition/${userId}`)
@@ -48,7 +63,9 @@ function ConditionInfo() {
                 setHasCondition(response.data.hasCondition);
 
                 setFamily(response.data.familyList);
+                setSpouseFamily(response.data.spouseFamilyList);
                 setAccountData(response.data.accountData);
+                setSpouseAccountData(response.data.spouseAccountData);
 
                 setForm1Data(response.data.form1Data);
                 setForm3Data(response.data.form3Data);
@@ -60,15 +77,16 @@ function ConditionInfo() {
                     console.error("서버 에러(500):", error.response.data);
                     alert("서버에 문제가 발생했습니다. 나중에 다시 시도해주세요.");
                     navigate("/conditions");
-                  } else {
+                } else {
                     console.error("응답 에러:", error.response.status, error.response.data);
                     console.error("데이터 요청 실패:", error);
-                  }
-                  setLoading(false);
+                }
+                setLoading(false);
             });
     };
 
     const clearCondition = () => {
+
         setLoading(true);
         axios
             .delete(`http://localhost:8989/condition/${userId}`)
@@ -83,12 +101,24 @@ function ConditionInfo() {
     };
 
     useEffect(() => {
+        sessionStorage.removeItem('familyDataList');
+        sessionStorage.removeItem('spouseFamilyDataList');
+        sessionStorage.removeItem('livingWithSpouse');
+        sessionStorage.removeItem('formData1');
+        sessionStorage.removeItem('formData3');
+
         fetchCondition();
     }, []);
 
     const navigate = useNavigate();
 
     function handleClick1(e) {
+
+        if (userId === null) {
+            handleShowLoginModal();
+            return;
+        }
+
         navigate("/condition-1");
     }
 
@@ -132,46 +162,73 @@ function ConditionInfo() {
                     <Button variant="dark" onClick={handleClick1}>조건 등록</Button>
                 </>
             }
+            {/* 로그인 모달 */}
+            <Modal show={showLoginModal} onHide={handleCloseLoginModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>로그인 필요</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    해당 기능은 로그인 후 이용할 수 있습니다. 로그인 하시겠습니까?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button
+                        variant="primary"
+                        onClick={() => {
+                            // 로그인 페이지로 리다이렉트
+                            window.location.href = '/login';
+                        }}
+                    >
+                        로그인 하러 가기
+                    </Button>
+                    <Button variant="secondary" onClick={handleCloseLoginModal}>
+                        닫기
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
-            {hasCondition && 
-            <>
-            <Accordion defaultActiveKey={['0']} alwaysOpen>
-                <Accordion.Item eventKey="0">
-                    <Accordion.Header>신청자 정보</Accordion.Header>
-                    <Accordion.Body>
-                        <span className='filter-values'>{hasCondition &&
-                            <DisplayCondition01 accountData={accountData} family={family}
-                                form1Data={form1Data} />
-                        }</span>
-                        <br />
-                        <Button variant="dark" onClick={handleClick1}>신청자 정보{hasCondition ? " 수정" : " 등록"}</Button>
-                    </Accordion.Body>
-                </Accordion.Item>
-                <Accordion.Item eventKey="1">
-                    <Accordion.Header>세대구성원 정보</Accordion.Header>
-                    <Accordion.Body>
-                        <span className='filter-values'>
-                            {hasCondition && <FamilyData family={family} />}
-                        </span>
-                        <br />
-                        <Button variant="dark" onClick={handleClick2}>세대구성원 정보{hasCondition ? " 수정" : " 등록"}</Button>
-                    </Accordion.Body>
-                </Accordion.Item>
-                <Accordion.Item eventKey="2">
-                    <Accordion.Header>재산 정보</Accordion.Header>
-                    <Accordion.Body>
-                        <span className='filter-values'>
-                            {hasCondition && <DisplayCondition03 form3Data={form3Data} family={family} />}
-                        </span>
-                        <br />
-                        <Button variant="dark" onClick={handleClick3}>재산 정보 {hasCondition ? " 수정" : " 등록"}</Button>
-                    </Accordion.Body>
-                </Accordion.Item>
-            </Accordion>
+            {hasCondition &&
+                <>
+                    <Accordion defaultActiveKey={['0']} alwaysOpen>
+                        <Accordion.Item eventKey="0">
+                            <Accordion.Header>신청자 정보</Accordion.Header>
+                            <Accordion.Body>
+                                <span className='filter-values'>{hasCondition &&
+                                    <DisplayCondition01 accountData={accountData} spouseAccountData={spouseAccountData}
+                                        form1Data={form1Data} />
+                                }</span>
+                                <br />
+                                <Button variant="dark" onClick={handleClick1}>신청자 정보{hasCondition ? " 수정" : " 등록"}</Button>
+                            </Accordion.Body>
+                        </Accordion.Item>
+                        <Accordion.Item eventKey="1">
+                            <Accordion.Header>세대구성원 정보</Accordion.Header>
+                            <Accordion.Body>
+                                <span className='filter-values'>
+                                    {hasCondition && <FamilyData family={family} />}
+                                </span>
+                                <span className='filter-values'>
+                                    {(hasCondition && spouseFamily?.length > 0) &&
+                                        <><hr /><FamilyData family={spouseFamily} /></>}
+                                </span>
+                                <br />
+                                <Button variant="dark" onClick={handleClick2}>세대구성원 정보{hasCondition ? " 수정" : " 등록"}</Button>
+                            </Accordion.Body>
+                        </Accordion.Item>
+                        <Accordion.Item eventKey="2">
+                            <Accordion.Header>재산 정보</Accordion.Header>
+                            <Accordion.Body>
+                                <span className='filter-values'>
+                                    {hasCondition && <DisplayCondition03 form3Data={form3Data} family={family} />}
+                                </span>
+                                <br />
+                                <Button variant="dark" onClick={handleClick3}>재산 정보 {hasCondition ? " 수정" : " 등록"}</Button>
+                            </Accordion.Body>
+                        </Accordion.Item>
+                    </Accordion>
 
-            <Button variant='dark' onClick={handleClearCondition}>조건 삭제</Button>
-            <ConfirmDialog open={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirm} />
-            </>
+                    <Button variant='dark' onClick={handleClearCondition}>조건 삭제</Button>
+                    <ConfirmDialog open={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirm} />
+                </>
             }
         </>
     );
@@ -246,28 +303,41 @@ function FamilyData({ family }) {
 }
 
 
-function DisplayCondition01({ accountData, form1Data }) {
+function DisplayCondition01({ accountData, form1Data, spouseAccountData }) {
 
     const marriedState = ['미혼', '기혼', '예비신혼부부', '한부모'];
 
     return (
         <>
+            <b>[신청자 기본 정보]</b><br />
             생년월일 : {form1Data.birthday}<br />
             거주 지역 : {`${Sido[form1Data.siDo]} ${form1Data.gunGu}`}<br />
             현재 거주지 입주일 : {form1Data.transferDate}<br />
-            {Sido[form1Data.siDo]} 입주일 : {form1Data.regionMoveInDate}<br />
-            수도권 입주일 : {form1Data.metropolitanAreaDate}<br />
-            세대주 {form1Data.isHouseHolder ? "O" : "X"} <br />
+            {form1Data.regionMoveInDate &&
+                <>{Sido[form1Data.siDo]} 입주일 : {form1Data.regionMoveInDate}<br /></>
 
+            }
+            {form1Data.metropolitanAreaDate &&
+                <>수도권 입주일 : {form1Data.metropolitanAreaDate}<br /></>
+            }
+            세대주 {form1Data.isHouseHolder ? "O" : "X"} <br />
 
             {marriedState[form1Data.married]}
             {form1Data.married === 1 && <span>, 결혼기념일 : {form1Data.marriedDate}</span>}
 
             <hr />
-            청약통장 : {AccountType[accountData.type]} <br />
+            <b>[신청자 청약통장]</b><br />
+            통장 종류 : {AccountType[accountData.type]} <br />
             가입 : {accountData.createdAt}  <br />
             총 {accountData.totalAmount} 만원 {accountData.paymentCount}회 납입<br />
             납입 인정 금액 : {accountData.recognizedAmount} 만원<br />
+
+            {spouseAccountData?.type && <>
+                <hr />
+                <b>[배우자 청약통장]</b><br />
+                통장 종류 : {AccountType[spouseAccountData.type]} <br />
+                가입 : {spouseAccountData.createdAt}  <br />
+            </>}
         </>
     );
 }

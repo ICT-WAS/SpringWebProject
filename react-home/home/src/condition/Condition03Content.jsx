@@ -94,6 +94,13 @@ export default function Condition03Content() {
         };
 
     useEffect(() => {
+
+        // 권한 확인
+        if(userId === null) {
+            navigate("/login");
+            return;
+        }
+
         /* 이전 폼 데이터 읽어오기 */
         // 수정모드
         fetchCondition();
@@ -118,18 +125,23 @@ export default function Condition03Content() {
         let storedAccountData = {};
         let storedFamilyData = {};
         let storedSpouseFamilyData = {};
-
+        
         try {
             storedFormData1 = JSON.parse(sessionFormData1);
             storedAccountData = JSON.parse(sessionAccountData);
             storedFamilyData = JSON.parse(sessionFamilyData);
+            
             storedSpouseFamilyData = JSON.parse(sessionSpouseFamilyData);
 
             // 상태 업데이트
             setHasSpouse(sessionHasSpouse);
             setFormData1(storedFormData1);
             setAccountDTOList(storedAccountData);
-            setFamilyDataList([...storedFamilyData, ...storedSpouseFamilyData]);
+            setFamilyDataList([
+                ...(storedFamilyData || []),
+                ...(storedSpouseFamilyData || [])
+              ]);
+
         } catch (error) { }
 
     }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행
@@ -170,7 +182,8 @@ export default function Condition03Content() {
             return;
         }
 
-        const submitData = { condition01DTO: formData1, ...accountDTOList, condition03DTO: finalFormData3, familyDTOList: familyDataList };
+        console.log(familyDataList);
+        const submitData = { condition01DTO: formData1, ...accountDTOList, condition03DTO: finalFormData3, familyDTOList: [...familyDataList] };
         console.log(submitData);
 
 
@@ -184,12 +197,6 @@ export default function Condition03Content() {
             .post(`http://localhost:8989/condition/${userId}`, submitData)
             .then((response) => {
                 setLoading(false);
-
-                sessionStorage.removeItem('formData1');
-                sessionStorage.removeItem('accountDTOList');
-                sessionStorage.removeItem('spouseFormData');
-                sessionStorage.removeItem('familyDataList');
-                sessionStorage.removeItem('spouseFamilyDataList');
 
                 navigate("/conditions");
             })

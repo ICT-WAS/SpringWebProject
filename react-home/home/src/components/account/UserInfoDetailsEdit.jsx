@@ -1,13 +1,13 @@
 import { Button, Col } from "react-bootstrap";
 import "./account.css";
 import { useGlobalContext } from "../../Context";
-import { instance } from "../../api/AxiosInterseptor";
+import { instance } from "../../api/AxiosInterceptor";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AccountInputUsername from "./AccountInputUsername";
 import AccountInputPhoneNumber from "./AccountInputPhoneNumber";
 
-const UserInfoDetailsEdit = ({ setError, setErrorTitle }) => {
+const UserInfoDetailsEdit = ({ setError, setErrorTitle, ClickDeleteUser }) => {
   //로그인 상태를 관리하는 전역 변수
   const { userId } = useGlobalContext();
   //수정된 값을 담을 변수
@@ -81,7 +81,7 @@ const UserInfoDetailsEdit = ({ setError, setErrorTitle }) => {
   };
 
   const handleClickToMypage = () => {
-    navigate("/mypage");
+    navigate("/mypage/account");
   };
 
   // username과 phoneNumber 값이 변경되었는지 감지
@@ -132,7 +132,7 @@ const UserInfoDetailsEdit = ({ setError, setErrorTitle }) => {
                   <p className="info_subtitle2">휴대폰 번호</p>
 
                   {userInfo.userVerify &&
-                  userInfo.userVerify === "휴대폰 인증" ? (
+                  userInfo.userVerify === "핸드폰 인증" ? (
                     <>
                       <p className="info_data_text2">{userInfo.phoneNumber}</p>
                       <p className="info_data_text3">인증됨</p>
@@ -171,7 +171,9 @@ const UserInfoDetailsEdit = ({ setError, setErrorTitle }) => {
             md="auto"
             className="d-flex justify-content-between align-items-center"
           >
-            <p className="info-small-text">회원 탈퇴</p>
+            <p className="info-small-text" onClick={ClickDeleteUser}>
+              회원 탈퇴
+            </p>
             <div className="d-flex gap-4">
               <Button
                 type="button"

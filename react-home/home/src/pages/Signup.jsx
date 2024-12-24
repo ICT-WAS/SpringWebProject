@@ -86,8 +86,8 @@ const Signup = () => {
       );
 
       //1-1. 회원가입 실패
-      if (response.data.IsSuccess === false) {
-        console.log(response.data.IsSuccess);
+      if (!response.data.isSuccess) {
+        console.log(response.data.isSuccess);
         setSignupErrorTitle("회원가입 실패");
         setSignupError("입력하신 정보를 확인하세요.");
         return;
@@ -108,7 +108,7 @@ const Signup = () => {
       );
 
       //3-1. 로그인 실패 - 로그인 페이지로 이동
-      if (loginResponse.data.success === false) {
+      if (loginResponse.data.isSuccess === false) {
         setSignupErrorTitle("자동 로그인 실패");
         setSignupError("다시 로그인 해주세요.");
         handleLoginPage();
@@ -116,8 +116,10 @@ const Signup = () => {
       }
 
       //4. 로그인 성공
-      const { accessToken } = response.data.result;
-      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem(
+        "accessToken",
+        loginResponse.data.result.accessToken
+      );
       setIsLogin(true);
 
       //4-1. 메인 페이지 리다이렉트 / 상태 초기화

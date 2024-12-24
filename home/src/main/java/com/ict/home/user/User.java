@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class User extends BaseTimeEntity { //아이디, 유저이름, 패스워드, 상태,
+public class User extends BaseTimeEntity {
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,20 +24,20 @@ public class User extends BaseTimeEntity { //아이디, 유저이름, 패스워�
     @Column(nullable = false)
     private String username;
 
-    @Column(nullable = true)  //소셜 로그인의 경우 null, 일반 로그인일 경우 null 일 시 예외 호출
+    @Column(nullable = true)  //소셜 로그인의 경우 null
     private String password;
 
     @Column(nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private UserStatus status;
 
-    @Column(nullable = true, unique = true)  //소셜 로그인의 경우 null, 일반 로그인일 경우 null 일 시 예외 호출
+    @Column(nullable = true, unique = true)  //소셜 로그인의 경우 null
     private String phoneNumber;
 
-    @Column(nullable = true, unique = true)  //소셜 로그인의 경우 null, 일반 로그인일 경우 null 일 시 예외 호출
+    @Column(nullable = true, unique = true)  //소셜 로그인의 경우 null
     private String email;
 
-    @Column(nullable = true)  //최초 회원가입 시 null 가능 -> 자동로그인 구현하면 notNull 설정 변경 예정
+    @Column(nullable = true)
     private LocalDateTime lastLogin;
 
     @Column(nullable = false)
@@ -68,11 +68,4 @@ public class User extends BaseTimeEntity { //아이디, 유저이름, 패스워�
         this.userVerify = UserVerify.UNVERIFIED;
         this.IsSocial=isSocial;
     }
-
-//    @PrePersist
-//    public void prePersist() {
-//        if (lastLogin == null) {
-//            lastLogin = LocalDateTime.now();
-//        }
-//    }
 }

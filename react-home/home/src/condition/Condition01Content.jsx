@@ -103,6 +103,13 @@ export default function Condition01Content() {
     };
 
     useEffect(() => {
+
+        // 권한 확인
+        if(userId === null) {
+            navigate("/login");
+            return;
+        }
+
         // 수정모드
         fetchCondition();
 
