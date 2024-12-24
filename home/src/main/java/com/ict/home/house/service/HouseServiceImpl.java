@@ -560,17 +560,22 @@ public class HouseServiceImpl implements HouseService {
                     long yearsPassed = ChronoUnit.YEARS.between(createdAt, currentDate);
                     if (yearsPassed >= 15) {
                         yearsPassed = 15;
+                    }
+
+                    if (yearsPassed == 0) {
+                        long monthsPassed = ChronoUnit.MONTHS.between(createdAt, currentDate);
+
+                        if (monthsPassed < 12) {
+                            if (monthsPassed >= 6) {
+                                score += 2;
+                            } else {
+                                score += 1;
+                            }
+                        }
+                    } else {
                         score += (int) (yearsPassed + 2);
                     }
-                    long monthsPassed = ChronoUnit.MONTHS.between(createdAt, currentDate);
-
-                    if (monthsPassed < 12) {
-                        if (monthsPassed >= 6) {
-                            score += 2;
-                        } else {
-                            score += 1;
-                        }
-                    }
+                    
                     // 청약통장 가입 기간 종료
                     solution.add("회원님의 현제 가점: " + score);
                 }
