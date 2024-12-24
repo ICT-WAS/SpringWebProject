@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import InterestButton from './InterestButton';
 import AnnouncementLocationMap from './AnnouncementLocationMap';
+import SupplySolution from './SupplySolution';
 
 export default function ApplyAnnouncementContent() {
 
@@ -312,7 +313,7 @@ function SupplyType({ supplyTypeList }) {
         <h3>신청 자격 조회</h3>
 
       </div>
-      <Form.Select value={selectedValue} onChange={handleChanged} >
+      <Form.Select className='mb-3' value={selectedValue} onChange={handleChanged} >
 
         {supplyTypeList.map((type) =>
           <option key={type} value={type} >
@@ -321,7 +322,7 @@ function SupplyType({ supplyTypeList }) {
         )}
       </Form.Select>
       <div style={{ minHeight: '30vh' }} >
-
+        <SupplySolution type={selectedValue} />
       </div>
     </Card>
   );

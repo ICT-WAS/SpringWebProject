@@ -182,8 +182,10 @@ export default function Condition03Content() {
             return;
         }
 
-        console.log(familyDataList);
-        const submitData = { condition01DTO: formData1, ...accountDTOList, condition03DTO: finalFormData3, familyDTOList: [...familyDataList] };
+        const submitData = { 
+            condition01DTO: formData1, ...accountDTOList, 
+            condition03DTO: finalFormData3, 
+            familyDTOList: [...familyDataList] };
         console.log(submitData);
 
 
