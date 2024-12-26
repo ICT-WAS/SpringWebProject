@@ -53,7 +53,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework:spring-context'
 	implementation 'org.springframework:spring-context-support'
-	implementation 'com.sun.mail:jakarta.mail'
+	implementation 'com.sun.mail:jakarta.mail:2.0.1'
 
 	//휴대폰 인증
 	implementation 'net.nurigo:sdk:4.3.0'

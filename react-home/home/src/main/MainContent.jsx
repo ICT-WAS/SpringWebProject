@@ -56,7 +56,7 @@ function CommunityCards() {
   return (
     <>
       <p className='heading-text'>
-        <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0'>
+        <a href='/community' className='link-body-emphasis link-underline link-underline-opacity-0'>
           커뮤니티 질문 &gt;
         </a>
       </p>
@@ -119,7 +119,7 @@ function NewSubscriptionCards() {
   return (
     <>
       <p className='heading-text'>
-        <a href='#' className='link-body-emphasis link-underline link-underline-opacity-0' >
+        <a href='/subscriptions' className='link-body-emphasis link-underline link-underline-opacity-0' >
           새로 올라온 공고 &gt;
         </a>
       </p>

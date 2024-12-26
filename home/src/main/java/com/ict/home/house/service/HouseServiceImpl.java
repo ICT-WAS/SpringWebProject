@@ -171,9 +171,8 @@ public class HouseServiceImpl implements HouseService {
             unlogged.add("일명 무순위 줍줍이라고 불리우는 이 공급 방식은, 당첨이 무작위이며, 당첨 시 계약 여부와 관계 없이 다시 지원하기까지 시간이 필요합니다. 신중하게 지원하세요.");
 
             solution.add("일명 \'무순위 줍줍\'이라고 불리우는 이 공급 방식은, 당첨이 무작위이며, 당첨 시 계약 여부와 관계 없이 다시 지원하기까지 시간이 필요합니다. 신중하게 지원하세요.");
-
-            System.out.println("type: 일반");
         }
+
         PostalCodeFind postalCodeFind = new PostalCodeFind();
         String region1 = postalCodeFind.getRegion1(house.getHssplyZip());
         Account myAccount = null;
@@ -582,7 +581,6 @@ public class HouseServiceImpl implements HouseService {
                 solution.add("민영주택의 1순위 공급은 부양가족 수, 통장 가입 지속기간, 무주택 기간에 따른 가점제로 경쟁하여, 당첨자를 선별합니다.");
                 unlogged.add("민영주택의 1순위 공급은 부양가족 수, 통장 가입 지속기간, 무주택 기간에 따른 가점제로 경쟁하여, 당첨자를 선별합니다.");
             }
-            System.out.println("type: 1순위");
         }
 
         if ("2순위".equals(type)) {
@@ -745,7 +743,6 @@ public class HouseServiceImpl implements HouseService {
                     }
                 }
             }
-            System.out.println("type: 다자녀가구");
         }
 
         if ("신혼부부".equals(type)) {
@@ -819,8 +816,6 @@ public class HouseServiceImpl implements HouseService {
                     }
                 }
             }
-
-            System.out.println("type: 신혼부부");
         }
 
         if ("생애최초".equals(type)) {
@@ -878,8 +873,6 @@ public class HouseServiceImpl implements HouseService {
 
                 solution.add("위 조건을 모두 만족하고 1순위에 해당한다면 지원 가능합니다.");
             }
-
-            System.out.println("type: 생애최초");
         }
 
         if ("노부모부양".equals(type)) {
@@ -969,11 +962,9 @@ public class HouseServiceImpl implements HouseService {
                     unsatisfied.add("자산기준 - 자동차 : 37,080천원이하");
                     solution.add("자동차의 자산 기준이 " + (condition03.getCarPrice() - 3708) + "만원 초과했습니다.");
                 }
-
             }
 
             solution.add("위 조건을 모두 만족하고 1순위에 해당한다면 지원 가능합니다.");
-            System.out.println("type: 노부모부양");
         }
 
         if ("기관추천".equals(type)) {
@@ -1085,16 +1076,14 @@ public class HouseServiceImpl implements HouseService {
 
             }
             unlogged.add("기관 추천으로 특별공급을 받을 수 있는 대상자 확인");
-
-            System.out.println("type: 기관추천");
         }
 
 
         if ("이전기관".equals(type)) {
+
             unlogged.add("입주자모집공고일 현재 해당기관 종사자로서 해당기관에서 주택특별공급대상자 확인서를 발급받은 자");
             unsatisfied.add("입주자모집공고일 현재 해당기관 종사자로서 해당기관에서 주택특별공급대상자 확인서를 발급받은 자");
             solution.add("입주자모집공고일 현재 해당기관 종사자로서 해당기관에서 주택특별공급대상자 확인서를 발급받은 자");
-            System.out.println("type: 이전기관");
         }
 
         if ("신생아".equals(type)) {
@@ -1189,20 +1178,14 @@ public class HouseServiceImpl implements HouseService {
                     solution.add("자동차의 자산 기준이 " + (condition03.getCarPrice() - 3708) + "만원 초과했습니다.");
                 }
             }
-
-            System.out.println("type: 신생아");
-        }
-
-        if ("청년".equals(type)) {
-            System.out.println("type: 청년");
         }
 
         if ("기타".equals(type)) {
+
             satisfied.add("기타 특별공급 유형은 모집 공고문에서 확인해야 합니다.");
             unsatisfied.add("기타 특별공급 유형은 모집 공고문에서 확인해야 합니다.");
             solution.add("기타 특별공급 유형은 모집 공고문에서 확인해야 합니다.");
             unlogged.add("기타 특별공급 유형은 모집 공고문에서 확인해야 합니다.");
-            System.out.println("type: 기타");
         }
 
         List<String> checkCondition = new ArrayList<>();

@@ -110,7 +110,7 @@ export default function ApplyAnnouncementListContent() {
   useEffect(() => {
 
     fetchData(null, currentPage);
-  }, []);
+  }, [currentPage]);
 
   // 페이지 변경
   function onPageChanged(page, filter = selectedFilter) {

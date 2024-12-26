@@ -123,9 +123,6 @@ public class HouseController {
     public ResponseEntity<?> getSolution(@PathVariable Long houseId,
                                          @PathVariable Long userId,
                                          @PathVariable String type) {
-        System.out.println("houseId = " + houseId);
-        System.out.println("userId = " + userId);
-        System.out.println("type = " + type);
 
         Map<String, List<String>> solution = hs.getSolution(houseId, userId, type);
 

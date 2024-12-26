@@ -10,8 +10,6 @@ export default function ApplyAnnouncementContent() {
 
   const { houseId } = useParams();
 
-  const [loading, setLoading] = useState(false);
-
   const [houseData, setHouseData] = useState({});
 
   // Detail01 or Detail04
@@ -51,7 +49,6 @@ export default function ApplyAnnouncementContent() {
     axios
       .get(`http://localhost:8989/house/${houseId}`)
       .then((response) => {
-        setLoading(false);
         const detail01 = response.data.detail01;
         const detail04 = response.data.detail04;
         const detailData = detail01 === null ? detail04 : detail01;
@@ -92,7 +89,6 @@ export default function ApplyAnnouncementContent() {
       })
       .catch((error) => {
         console.error("데이터 요청 실패:", error);
-        setLoading(false);
       });
   };
 

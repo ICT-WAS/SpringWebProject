@@ -14,7 +14,7 @@ export default function CollectionPostContent() {
     const [totalCount, setTotalCount] = useState();
     const [loading, setLoading] = useState(false);
 
-    const fetchPosts = () => {
+    const fetchPosts = (userId) => {
         setLoading(true);
         axios
             .get(`http://localhost:8989/community/posts/${userId}`)
@@ -34,8 +34,8 @@ export default function CollectionPostContent() {
 
 
     useEffect(() => {
-        fetchPosts();
-    }, []);
+        fetchPosts(userId);
+    }, [userId]);
 
 
     return (
