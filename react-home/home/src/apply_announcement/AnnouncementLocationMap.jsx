@@ -5,7 +5,6 @@ import { Container as MapDiv, NaverMap, useNavermaps, Marker } from 'react-naver
 export default function AnnouncementLocationMap({ address = null, houseName = null }) {
   const navermaps = useNavermaps()
 
-  const [loading, setLoading] = useState(false);
   const zoomLevel = 18;
 
   const [location, setLocation] = useState(null);
@@ -13,13 +12,11 @@ export default function AnnouncementLocationMap({ address = null, houseName = nu
   const getGeocode = async () => {
     if (address === null) return;
 
-    setLoading(true);
     axios
       .get('http://localhost:8989/house/api/geocode', {
         params: { query: address }
       })
       .then((response) => {
-        setLoading(false);
         if (response.data.x > 0) {
           const location = { x: response.data.x, y: response.data.y };
 

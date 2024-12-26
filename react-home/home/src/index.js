@@ -16,7 +16,6 @@ import Condition01 from "./condition/Condition01";
 import Condition02 from "./condition/Condition02";
 import Condition03 from "./condition/Condition03";
 import Conditions from "./condition/Conditions";
-import UserTest from "./components/user/UserTest";
 import PrivateRoute from "./components/routes/PrivateRoute";
 import LoginRoute from "./components/routes/LoginRoute";
 import KakaoRedirection from "./components/login/KakaoRedirection";
@@ -35,7 +34,6 @@ import SearchAnnouncementByName from "./apply_announcement/SearchAnnouncementByN
 import UserInfo from "./pages/account/UserInfo";
 import UserInfoEdit from "./pages/account/UserInfoEdit";
 import InterestList from "./mypage/InterestList";
-import MyPageContent from "./mypage/MyPageContent";
 import CollectionCommentPost from "./mypage/CollectionCommentPost";
 import CollectionPost from "./mypage/CollectionPost";
 import { NavermapsProvider } from "react-naver-maps";
@@ -55,16 +53,10 @@ root.render(
             }
           />
 
-          {/* 청약 */}
+          {/* 청약 공고 */}
           <Route path="/subscriptions" element={<ApplyAnnouncementList />} />
-          <Route
-            path="/subscriptions/info/:houseId"
-            element={<ApplyAnnouncement />}
-          />
-          <Route
-            path="/subscriptions/search/:keyword"
-            element={<SearchAnnouncementByName />}
-          />
+          <Route path="/subscriptions/info/:houseId" element={<ApplyAnnouncement />} />
+          <Route path="/subscriptions/search/:keyword" element={<SearchAnnouncementByName />} />
 
           {/* 조건등록 */}
           <Route path="/conditions" element={<Conditions />} />
@@ -80,17 +72,9 @@ root.render(
 
           {/* 커뮤니티 */}
           <Route exact path="/community" element={<CommunityPostList />} />
-          <Route
-            exact
-            path="/community/posting"
-            element={<CommunityPosting />}
-          />
+          <Route exact path="/community/posting" element={<CommunityPosting />} />
           <Route exact path="/community/:postId" element={<PostDetail />} />
-          <Route
-            exact
-            path="/community/posting/:postId"
-            element={<UpdatePost />}
-          />
+          <Route exact path="/community/posting/:postId" element={<UpdatePost />} />
 
           {/* 소셜 로그인 리다이렉트 경로 */}
           <Route exact path="/kakao/callback" element={<KakaoRedirection />} />
@@ -183,15 +167,6 @@ root.render(
             element={
               <PrivateRoute>
                 <UserInfoEdit />
-              </PrivateRoute>
-            }
-          />
-          {/* 테스트 페이지입니다. -hw */}
-          <Route
-            path="/test"
-            element={
-              <PrivateRoute>
-                <UserTest />
               </PrivateRoute>
             }
           />

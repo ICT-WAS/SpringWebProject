@@ -61,16 +61,10 @@ function NotificationButton() {
                 className="link-body-emphasis link-underline link-underline-opacity-0"
             >
                 <p>
-                    <a
-                        href="#"
-                        className="link-body-emphasis link-underline link-underline-opacity-0"
-                    >
                         <i className="bi bi-bell" />
-                        
                         {notificationCount > 0 && 
                         <Badge pill bg="danger">{notificationCount}</Badge>
                         }
-                    </a>
                 </p>
             </Button>
             {/* 알림 사이드 바 (Offcanvas) */}

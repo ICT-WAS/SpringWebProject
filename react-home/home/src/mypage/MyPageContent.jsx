@@ -19,7 +19,7 @@ export default function MyPageContent() {
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState([]);
 
-  function fetchInterest() {
+  function fetchInterest(userId) {
     axios
       .get(`http://localhost:8989/interest/${userId}`)
       .then((response) => {
@@ -30,7 +30,7 @@ export default function MyPageContent() {
       });
   }
 
-  function fetchPosts() {
+  function fetchPosts(userId) {
     axios
       .get(`http://localhost:8989/community/posts/${userId}`)
       .then((response) => {
@@ -41,7 +41,7 @@ export default function MyPageContent() {
       });
   }
 
-  function fetchComments() {
+  function fetchComments(userId) {
     axios
       .get(`http://localhost:8989/community/comments/${userId}`)
       .then((response) => {
@@ -53,10 +53,10 @@ export default function MyPageContent() {
   }
 
   useEffect(() => {
-    fetchInterest();
-    fetchPosts();
-    fetchComments();
-  }, []);
+    fetchInterest(userId);
+    fetchPosts(userId);
+    fetchComments(userId);
+  }, [userId]);
 
   return (
     <>

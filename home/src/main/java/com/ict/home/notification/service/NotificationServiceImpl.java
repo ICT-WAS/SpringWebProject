@@ -38,7 +38,7 @@ public class NotificationServiceImpl implements NotificationService{
 
     private final Detail04Repository d04r;
 
-    @Scheduled(cron = "00 00 12 * * ?")
+    @Scheduled(cron = "00 30 9 * * ?")
     public void sendNotificationByInterest() {
         List<Interest> interestList = ir.findAll();
 

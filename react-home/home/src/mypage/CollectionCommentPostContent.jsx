@@ -7,14 +7,14 @@ import CommunityCard from '../community/CommunityCard';
 
 export default function CollectionCommentPostContent() {
 
-     const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     const userId = getUserIdFromToken(token);
 
     const [comments, setComments] = useState([]);
     const [totalCount, setTotalCount] = useState();
     const [loading, setLoading] = useState(false);
 
-    const fetchPosts = () => {
+    const fetchPosts = (userId) => {
         setLoading(true);
         axios
             .get(`http://localhost:8989/community/comments/${userId}`)
@@ -41,8 +41,8 @@ export default function CollectionCommentPostContent() {
 
 
     useEffect(() => {
-        fetchPosts();
-    }, []);
+        fetchPosts(userId);
+    }, [userId]);
 
 
     return (

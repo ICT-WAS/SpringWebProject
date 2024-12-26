@@ -42,7 +42,7 @@ function TypeSolution({ type }) {
         if (type) {
             fetchDate(houseId, userId, type);
         }
-    }, [type]);
+    }, [houseId, userId, type]);
 
     return (
         <>

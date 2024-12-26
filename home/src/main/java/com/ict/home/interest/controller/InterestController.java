@@ -54,14 +54,15 @@ public class InterestController {
             @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
     })
     public ResponseEntity<?> readInterest(@PathVariable Long userId){
-        System.out.println("userId = " + userId);
         List<Interest> interests = is.readInterest(userId);
         List<House> houses = new ArrayList<>();
+
         for (Interest interest : interests) {
             houses.add(interest.getHouse());
         }
+
         List<HouseInfo> houseInfoByInterest = hs.getHouseInfoByInterest(houses);
-        System.out.println("houseInfoByInterest = " + houseInfoByInterest);
+
         return ResponseEntity.ok(houseInfoByInterest);
     }
 
@@ -76,11 +77,8 @@ public class InterestController {
     public ResponseEntity<?> createInterest(@RequestBody InterestRequest interestRequest){
         Long userId = interestRequest.getUserId();
         Long houseId = interestRequest.getHouseId();
-        System.out.println("userId = " + userId);
-        System.out.println("houseId = " + houseId);
 
         Interest interest = is.createInterest(userId, houseId);
-        System.out.println("interest = " + interest);
 
         if (interest == null) {
             return ResponseEntity.ok(null);
@@ -98,7 +96,6 @@ public class InterestController {
             @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
     })
     public ResponseEntity<?> deleteInterest(@PathVariable Long interestId) {
-        System.out.println("interestId = " + interestId);
 
         boolean isDeleted = is.deleteInterest(interestId);
         String data = isDeleted ? "삭제되었습니다." : null;

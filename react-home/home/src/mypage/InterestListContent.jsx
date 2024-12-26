@@ -32,8 +32,8 @@ export default function InterestListContent() {
     }
 
     useEffect(() => {
-        fetchData(userId); // 처음 렌더링 시 모든 게시글 로드
-    }, []);
+        fetchData(userId); // 처음 렌더링 시 모든 관심 공고 로드
+    }, [userId]);
 
     return (
         <>

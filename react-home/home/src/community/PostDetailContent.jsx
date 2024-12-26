@@ -46,7 +46,6 @@ export default function PostDetailContent() {
 
             // 서버가 응답을 OK로 반환하면 성공 처리
             if (response.ok) {
-                const data = await response.text();
                 const showComment = editedComment.replaceAll(/\n/g, "<br>");
                 // 댓글 수정 성공 시
                 
@@ -190,7 +189,7 @@ export default function PostDetailContent() {
                 setComments(normalComments);
             })
             .catch((err) => console.error("댓글 가져오기 실패:", err));
-    }, [postId, comments]);
+    }, [postId, newComment]);
 
     // 댓글 작성 함수
     const handleCommentSubmit = () => {
